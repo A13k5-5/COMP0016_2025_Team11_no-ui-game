@@ -20,10 +20,13 @@ DEFAULT_CAMERA_INDEX = 0
 WINDOW_NAME = "Hand Detection"
 
 
-# everything before yield is run when entering the with statement
-# everything after is run when exiting the with statement
 @contextmanager
 def video_capture_manager(index: int):
+    """
+    Makes sure that the camera is properly turned off after the program is finished.
+    Everything before the yield statement is run when entering the with statement and everything after is run when
+    exiting the with statement.
+    """
     cap = cv2.VideoCapture(index)
     try:
         if not cap.isOpened():
@@ -47,6 +50,7 @@ class GestureRecognizerApp:
         self.model_path = model_path
         self.camera_index = camera_index
         self._last_gesture: str | None = None
+        self._last_handedness: str | None = None
         self._last_timestamp_ms: int = 0
         self._fps = 0.0
         self._prev_time = time.time()
@@ -57,16 +61,15 @@ class GestureRecognizerApp:
         Called by MediaPipe on the listener thread when a result is ready.
         Stores the most confident gesture name for overlaying on the next displayed frame.
         """
-        if not result.gestures or len(result.gestures) < 1:
+        if len(result.gestures) < 1:
+            # then no hand detected
             self._last_gesture = None
             return
-
-        # Each gesture category has a list of classifications; take the top one if present.
-        category = result.gestures[0]
-        if category:
-            self._last_gesture = category[0].category_name if category[0].category_name else None
-            self._last_timestamp_ms = timestamp_ms
-            logging.debug("Detected gesture: %s at %d ms", self._last_gesture, timestamp_ms)
+        # set the last gesture and which hand
+        self._last_gesture = result.gestures[0][0].category_name
+        self._last_handedness = result.handedness[0][0].category_name
+        self._last_timestamp_ms = timestamp_ms
+        logging.debug("Detected gesture: %s, %s at %d ms", self._last_handedness, self._last_gesture, timestamp_ms)
 
     def _create_recognizer(self):
         options = GestureRecognizerOptions(
@@ -102,7 +105,7 @@ class GestureRecognizerApp:
                     # overlay last detected gesture and FPS (if any)
                     display_text = f"FPS: {self._fps:.1f}"
                     if self._last_gesture:
-                        display_text += f" | Gesture: {self._last_gesture}"
+                        display_text += f" | Gesture: {self._last_gesture}, {self._last_handedness}"
                     cv2.putText(frame, display_text, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 0), 2)
 
                     cv2.imshow(WINDOW_NAME, frame)
