@@ -16,7 +16,7 @@ def print_result(result: GestureRecognizerResult, output_image: mp.Image, timest
 # Create a gesture recognizer instance with the live stream mode:
 # only livestream mode has result_callback
 options = GestureRecognizerOptions(
-    base_options=BaseOptions(model_asset_path='../gesture_recognizer.task'),
+    base_options=BaseOptions(model_asset_path='gesture_recognizer.task'),
     running_mode=VisionRunningMode.LIVE_STREAM,
     result_callback=print_result)
 

@@ -15,7 +15,7 @@ GestureRecognizerOptions = mp.tasks.vision.GestureRecognizerOptions
 GestureRecognizerResult = mp.tasks.vision.GestureRecognizerResult
 VisionRunningMode = mp.tasks.vision.RunningMode
 
-DEFAULT_MODEL_PATH = "../gesture_recognizer.task"
+DEFAULT_MODEL_PATH = "/home/alex/UCL/COMP0016_SystemsEngineering/AiAutostart/myGestureRecognizer/gesture_recognizer.task"
 DEFAULT_CAMERA_INDEX = 0
 WINDOW_NAME = "Hand Detection"
 
@@ -56,6 +56,10 @@ class GestureRecognizerApp:
         self._prev_time = time.time()
         logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s: %(message)s")
 
+    def _reset(self):
+        self._last_gesture = None
+        self._last_handedness = None
+
     def _result_callback(self, result: GestureRecognizerResult, output_image: mp.Image, timestamp_ms: int):
         """
         Called by MediaPipe on the listener thread when a result is ready.
@@ -80,6 +84,7 @@ class GestureRecognizerApp:
         return GestureRecognizer.create_from_options(options)
 
     def run(self) -> tuple[str, str]:
+        self._reset()
         logging.info("Starting GestureRecognizerApp (model=%s, camera=%d)", self.model_path, self.camera_index)
         try:
             with self._create_recognizer() as recognizer, video_capture_manager(self.camera_index) as cap:
