@@ -2,7 +2,6 @@ import mediapipe as mp
 import cv2
 import time
 
-
 mp_hands = mp.solutions.hands
 mp_drawing = mp.solutions.drawing_utils
 
@@ -12,9 +11,15 @@ GestureRecognizerOptions = mp.tasks.vision.GestureRecognizerOptions
 GestureRecognizerResult = mp.tasks.vision.GestureRecognizerResult
 VisionRunningMode = mp.tasks.vision.RunningMode
 
+
 # Create a gesture recognizer instance with the live stream mode:
 def print_result(result: GestureRecognizerResult, output_image: mp.Image, timestamp_ms: int):
-    print('gesture recognition result: {}'.format(result))
+    # print('gesture recognition result: {}'.format(result.gestures))
+    for category in result.gestures:
+        print(category[0].category_name)
+        if category[0].category_name == "Victory":
+            exit()
+
 
 options = GestureRecognizerOptions(
     base_options=BaseOptions(model_asset_path='../gesture_recognizer.task'),
