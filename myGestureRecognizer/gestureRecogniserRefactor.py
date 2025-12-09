@@ -1,6 +1,7 @@
 import argparse
 import logging
 import time
+import os
 from contextlib import contextmanager
 
 import cv2
@@ -15,7 +16,7 @@ GestureRecognizerOptions = mp.tasks.vision.GestureRecognizerOptions
 GestureRecognizerResult = mp.tasks.vision.GestureRecognizerResult
 VisionRunningMode = mp.tasks.vision.RunningMode
 
-DEFAULT_MODEL_PATH = "/home/alex/UCL/COMP0016_SystemsEngineering/AiAutostart/myGestureRecognizer/gesture_recognizer.task"
+DEFAULT_MODEL_PATH = os.path.join(os.path.dirname(__file__), "gesture_recognizer.task")
 DEFAULT_CAMERA_INDEX = 0
 WINDOW_NAME = "Hand Detection"
 
