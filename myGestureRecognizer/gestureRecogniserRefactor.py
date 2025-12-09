@@ -79,7 +79,7 @@ class GestureRecognizerApp:
         )
         return GestureRecognizer.create_from_options(options)
 
-    def run(self):
+    def run(self) -> tuple[str, str]:
         logging.info("Starting GestureRecognizerApp (model=%s, camera=%d)", self.model_path, self.camera_index)
         try:
             with self._create_recognizer() as recognizer, video_capture_manager(self.camera_index) as cap:
@@ -106,6 +106,7 @@ class GestureRecognizerApp:
                     display_text = f"FPS: {self._fps:.1f}"
                     if self._last_gesture:
                         display_text += f" | Gesture: {self._last_gesture}, {self._last_handedness}"
+                        return self._last_gesture, self._last_handedness
                     cv2.putText(frame, display_text, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 0), 2)
 
                     cv2.imshow(WINDOW_NAME, frame)
@@ -130,4 +131,5 @@ def parse_args():
 if __name__ == "__main__":
     args = parse_args()
     app = GestureRecognizerApp(model_path=args.model, camera_index=args.camera)
-    app.run()
+    input = app.run()
+    print(input)
