@@ -1,15 +1,13 @@
 class Node:
-    def __init__(self, text: str, adjacencyList=None):
-        if adjacencyList is None:
-            adjacencyList = []
+    def __init__(self, text: str):
         self.text = text
-        self.adjacencyList: list[Node] = adjacencyList
+        self.adjacencyList: dict[tuple[str, str], str] = {}
 
-    def addNode(self, newNode):
-        self.adjacencyList.append(newNode)
+    def addNode(self, gesture: tuple[str, str], newNode):
+        self.adjacencyList[gesture] = newNode
 
-    def getNode(self, decisionNumber: int):
-        return self.adjacencyList[decisionNumber]
+    def getNode(self, gesture: tuple[str, str]):
+        return self.adjacencyList[gesture]
 
     def __str__(self):
         return self.text
