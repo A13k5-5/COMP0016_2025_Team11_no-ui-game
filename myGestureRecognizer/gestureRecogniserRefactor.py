@@ -84,7 +84,7 @@ class GestureRecognizerApp:
         )
         return GestureRecognizer.create_from_options(options)
 
-    def run(self) -> tuple[str, str]:
+    def run(self, gestures: list[tuple[str, str]]) -> tuple[str, str]:
         self._reset()
         logging.info("Starting GestureRecognizerApp (model=%s, camera=%d)", self.model_path, self.camera_index)
         try:
@@ -110,7 +110,7 @@ class GestureRecognizerApp:
 
                     # overlay last detected gesture and FPS (if any)
                     display_text = f"FPS: {self._fps:.1f}"
-                    if self._last_gesture:
+                    if (self._last_gesture, self._last_handedness) in gestures:
                         display_text += f" | Gesture: {self._last_gesture}, {self._last_handedness}"
                         return self._last_gesture, self._last_handedness
                     cv2.putText(frame, display_text, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 0), 2)

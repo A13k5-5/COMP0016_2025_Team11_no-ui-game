@@ -1,5 +1,3 @@
-import time
-
 from graph import Node
 from myGestureRecognizer.gestureRecogniserRefactor import GestureRecognizerApp
 
@@ -18,6 +16,6 @@ if __name__ == "__main__":
     while True:
         print(curNode.text)
         print(f"Pick a decision: {[node.text for node in curNode.adjacencyList.values()]}: ")
-        decision = recogniser.run()
+        print(["None", "Closed_Fist", "Open_Palm", "Pointing_Up", "Thumb_Down", "Thumb_Up", "Victory", "ILoveYou"])
+        decision = recogniser.run(list(curNode.adjacencyList.keys()))
         curNode = curNode.getNode(decision)
-        time.sleep(5)
