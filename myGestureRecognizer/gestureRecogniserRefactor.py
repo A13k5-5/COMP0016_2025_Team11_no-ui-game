@@ -35,7 +35,8 @@ def video_capture_manager(index: int):
         yield cap
     finally:
         cap.release()
-        cv2.destroyAllWindows()
+        # cv2.destroyAllWindows()
+        pass
 
 
 class GestureRecognizerApp:
