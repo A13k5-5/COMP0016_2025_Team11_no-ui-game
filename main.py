@@ -49,14 +49,14 @@ if __name__ == "__main__":
 
     while True:
         # Display current scene and available choices (explicit about handedness)
-        print("\n" + curNode.text + "\n")
+        print("\n" + curNode.getText() + "\n")
         # Build readable option list for console preview
         options = list(curNode.adjacencyList.items())
         print("Choices (perform `ILoveYou` gesture with the shown hand):")
         for idx, (key, node) in enumerate(options, start=1):
             gesture, handedness = key
             # show a short preview of the destination and the required handedness
-            print(f" {idx}. Hand: {handedness} -> {node.text.split('.')[0]}")
+            print(f" {idx}. Hand: {handedness} -> {node._text.split('.')[0]}")
 
         # Ask recogniser for a decision (expects a tuple like ("ILoveYou", "Left"))
         decision = recogniser.run(list(curNode.adjacencyList.keys()))
