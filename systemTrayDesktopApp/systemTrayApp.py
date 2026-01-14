@@ -1,33 +1,36 @@
 import pystray
-from PIL import Image
 
-image = Image.open("McDonalds-Logo-1993.png")
-
-
-def after_click(icon, query):
-    if str(query) == "GeeksforGeeks Website":
-        print("The Best Place to learn anything Tech \
-      Related -> https://www.geeksforgeeks.org/")
-        # icon.stop()
-    elif str(query) == "GeeksforGeeks Youtube":
-        print("Youtube Channel of GeeksforGeeks \
-      is -> https://www.youtube.com/@GeeksforGeeksVideos")
-        # icon.stop()
-    elif str(query) == "GeeksforGeeks LinkedIn":
-        print("LinkedIn of GeeksforGeeks \
-      is -> https://www.linkedin.com/company/geeksforgeeks/")
-    elif str(query) == "Exit":
-        icon.stop()
+from PIL import Image, ImageDraw
 
 
-icon = pystray.Icon("GFG", image, "GeeksforGeeks", 
-                    menu=pystray.Menu(
-    pystray.MenuItem("GeeksforGeeks Website", 
-                     after_click),
-    pystray.MenuItem("GeeksforGeeks Youtube", 
-                     after_click),
-    pystray.MenuItem("GeeksforGeeks LinkedIn", 
-                     after_click),
-    pystray.MenuItem("Exit", after_click)))
+def create_image(width, height, color1, color2):
+    # Generate an image and draw a pattern
+    image = Image.new('RGB', (width, height), color1)
+    dc = ImageDraw.Draw(image)
+    dc.rectangle(
+        (width // 2, 0, width, height // 2),
+        fill=color2)
+    dc.rectangle(
+        (0, height // 2, width // 2, height),
+        fill=color2)
 
+    return image
+
+
+def simple_callback():
+    print("hello world")
+
+item1 = pystray.MenuItem("Item1", simple_callback)
+
+menu = pystray.Menu(item1)
+
+# In order for the icon to be displayed, you must provide an icon
+icon = pystray.Icon(
+    'test name',
+    icon=create_image(64, 64, 'black', 'white'),
+    menu=menu
+)
+
+
+# To finally show you icon, call run
 icon.run()
