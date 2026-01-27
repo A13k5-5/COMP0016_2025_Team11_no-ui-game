@@ -96,6 +96,8 @@ class GestureRecognizerApp:
                         logging.warning("Failed to read frame from camera")
                         break
 
+                    time.sleep(5/30)
+
                     # compute and update FPS
                     now = time.time()
                     dt = now - self._prev_time if now != self._prev_time else 1e-6
