@@ -48,7 +48,7 @@ class GestureRecognizerApp:
     - Displays frames with optional overlayed gesture names and FPS
     """
 
-    def __init__(self, model_path: str = DEFAULT_MODEL_PATH, camera_index: int = DEFAULT_CAMERA_INDEX):
+    def __init__(self, model_path: str = DEFAULT_MODEL_PATH, camera_index: int = DEFAULT_CAMERA_INDEX, frame_rate: float = 30.0):
         self.model_path = model_path
         self.camera_index = camera_index
         self._last_gesture: str | None = None
@@ -56,6 +56,8 @@ class GestureRecognizerApp:
         self._last_timestamp_ms: int = 0
         self._fps = 0.0
         self._prev_time = time.time()
+        self._frame_rate = frame_rate
+        self._prev = 0
         logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s: %(message)s")
 
     def _reset(self):
@@ -95,32 +97,34 @@ class GestureRecognizerApp:
                     if not ret:
                         logging.warning("Failed to read frame from camera")
                         break
+                    time_elapsed = time.time() - self._prev
+                    if time_elapsed > 1.0 / self._frame_rate:
+                        self._prev = time.time()
+                        # compute and update FPS
+                        now = time.time()
+                        dt = now - self._prev_time if now != self._prev_time else 1e-6
+                        self._fps = 1.0 / dt
+                        self._prev_time = now
 
-                    # compute and update FPS
-                    now = time.time()
-                    dt = now - self._prev_time if now != self._prev_time else 1e-6
-                    self._fps = 1.0 / dt
-                    self._prev_time = now
+                        timestamp_ms = int(1000 * now)
 
-                    timestamp_ms = int(1000 * now)
+                        # convert and send to recognizer asynchronously
+                        rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                        mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb_frame)
+                        recognizer.recognize_async(mp_image, timestamp_ms)
 
-                    # convert and send to recognizer asynchronously
-                    rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                    mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb_frame)
-                    recognizer.recognize_async(mp_image, timestamp_ms)
+                        # overlay last detected gesture and FPS (if any)
+                        display_text = f"FPS: {self._fps:.1f}"
+                        if (self._last_gesture, self._last_handedness) in gestures:
+                            display_text += f" | Gesture: {self._last_gesture}, {self._last_handedness}"
+                            return self._last_gesture, self._last_handedness
+                        cv2.putText(frame, display_text, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 0), 2)
 
-                    # overlay last detected gesture and FPS (if any)
-                    display_text = f"FPS: {self._fps:.1f}"
-                    if (self._last_gesture, self._last_handedness) in gestures:
-                        display_text += f" | Gesture: {self._last_gesture}, {self._last_handedness}"
-                        return self._last_gesture, self._last_handedness
-                    cv2.putText(frame, display_text, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 0), 2)
-
-                    cv2.imshow(WINDOW_NAME, frame)
-                    key = cv2.waitKey(1) & 0xFF
-                    if key == ord("q"):
-                        logging.info("Quit key pressed")
-                        break
+                        cv2.imshow(WINDOW_NAME, frame)
+                        key = cv2.waitKey(1) & 0xFF
+                        if key == ord("q"):
+                            logging.info("Quit key pressed")
+                            break
 
         except Exception as exc:
             logging.exception("Unhandled error in GestureRecognizerApp: %s", exc)

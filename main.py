@@ -61,7 +61,12 @@ if __name__ == "__main__":
     loop_back.addNode(("ILoveYou", "Right"), start)
 
     curNode: Node = start
-    recogniser: GestureRecognizerApp = GestureRecognizerApp()
+
+    LOW_FPS_MODE = True
+    if LOW_FPS_MODE:
+        recogniser: GestureRecognizerApp = GestureRecognizerApp(frame_rate=5.0)
+    else:
+        recogniser: GestureRecognizerApp = GestureRecognizerApp()
 
     while True:
         # Display current scene and available choices (explicit about handedness)
