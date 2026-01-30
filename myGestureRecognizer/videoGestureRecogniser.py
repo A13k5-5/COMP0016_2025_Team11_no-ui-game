@@ -78,6 +78,10 @@ class VideoGestureRecogniser:
             while self._running:
                 ret, frame = cap.read()
 
+                if not ret:
+                    print("Failed to grab frame from camera.")
+                    continue
+
                 self._send_to_recognizer(frame, recognizer)
 
                 cv2.imshow(WINDOW_NAME, frame)
