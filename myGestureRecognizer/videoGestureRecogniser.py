@@ -46,8 +46,7 @@ class VideoGestureRecogniser:
         )
         return GestureRecognizer.create_from_options(options)
 
-    @staticmethod
-    def _send_to_recognizer(frame: mp.Image, recognizer: GestureRecognizer):
+    def _send_to_recognizer(self, frame: mp.Image, recognizer: GestureRecognizer):
         """
         Convert and send to recognizer asynchronously.
         """
