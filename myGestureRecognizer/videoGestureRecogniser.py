@@ -68,14 +68,25 @@ class VideoGestureRecogniser:
         if self._get_last_gesture() in self._gestures_to_spot:
             self._stop()
 
+    def timeout_stop(self, start_time: float, timeout_duration: float):
+        """
+        Stop the recognition due to timeout.
+        """
+        if time.time() - start_time > timeout_duration:
+            raise TimeoutError(f"Gesture recognition timed out after {timeout_duration} seconds.")
+
     def _start_recognition(self):
         """
         Start the video capture and gesture recognition loop. This loop stops when a gesture to spot is detected. The
         code for this can be found in the _result_callback method.
+        Raises TimeoutError if no gesture is detected within 30 seconds.
         """
+        start = time.time()
         with self._create_recognizer() as recognizer, video_capture_manager(self.camera_index) as cap:
             while self._running:
+
                 ret, frame = cap.read()
+                self.timeout_stop(start, 30.0)  # 30 seconds timeout
 
                 if not ret:
                     print("Failed to grab frame from camera.")
