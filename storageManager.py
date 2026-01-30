@@ -4,28 +4,27 @@ from graph import Node
 class StorageManager:
     def save_graph(self, root: Node, filename: str):
         with open(filename, 'w') as file:
-            json.dump(self.serialize_graph(root), file, indent=4)
+            json.dump(self._serialize_graph(root), file, indent=4)
 
-    def serialize_node(self, node: Node) -> dict:
-        serialized = {
-            "id": node.id,
-            "text": node.getText(),
-            "adjacencyList": {gesture.__str__(): adjacent_node.id for gesture, adjacent_node in node.adjacencyList.items()}
-        }
-        return serialized
-
-    def serialize_graph(self, root: Node) -> dict:
+    def _serialize_graph(self, root: Node) -> dict:
         visited = {}
 
         def dfs(node: Node):
             if node.id in visited:
                 return
-            visited[node.id] = self.serialize_node(node)
+            visited[node.id] = self._serialize_node(node)
             for adjacent_node in node.adjacencyList.values():
                 dfs(adjacent_node)
 
         dfs(root)
         return visited
+
+    def _serialize_node(self, node: Node) -> dict:
+        return {
+            "id": node.id,
+            "text": node.getText(),
+            "adjacencyList": {gesture.__str__(): adjacent_node.id for gesture, adjacent_node in node.adjacencyList.items()}
+        }
 
     def load_graph(self, filename: str) -> Node:
         with open(filename, 'r') as file:
