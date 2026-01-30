@@ -1,15 +1,19 @@
+from myTypes import Gesture
+
+
 class Node:
     def __init__(self, text: str):
+        self.id = id(self)
         self._text = text
-        self.adjacencyList: dict[tuple[str, str], Node] = {}
+        self.adjacencyList: dict[Gesture, Node] = {}
 
     def getText(self):
         return self._text
 
-    def addNode(self, gesture: tuple[str, str], newNode):
+    def addNode(self, gesture: Gesture, newNode):
         self.adjacencyList[gesture] = newNode
 
-    def getNode(self, gesture: tuple[str, str]):
+    def getNode(self, gesture: Gesture):
         return self.adjacencyList.get(gesture)
 
     def __str__(self):
