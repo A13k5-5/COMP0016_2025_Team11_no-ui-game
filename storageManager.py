@@ -31,26 +31,36 @@ class StorageManager:
         with open(filename, 'r') as file:
             data = json.load(file)
 
-        root = None
-        nodes = {}
+        root, nodes = self._load_nodes(data)
+        self._establish_connections(data, nodes)
 
-        # first load all the nodes individually (without connections)
+        return root
+
+    def _load_nodes(self, data: dict):
+        """
+        Load nodes without connections. Gives back the root node and a dictionary of all nodes.
+        """
+        root: Node | None = None
+        nodes = {}
         for node_id, node_data in data.items():
             node = Node(node_data["text"])
             node.id = int(node_id)
             nodes[node.id] = node
             if root is None:
                 root = node
+        return root, nodes
 
-        # then establish connections
+    def _establish_connections(self, data: dict, nodes: dict[int, Node]):
+        """
+        Establish connections between nodes based on adjacency lists.
+        """
         for node_id, node_data in data.items():
             node = nodes[int(node_id)]
             for gesture_str, adjacent_node_id in node_data["adjacencyList"].items():
-                gesture = eval(gesture_str)  # reconstruct the gesture tuple
+                # reconstruct the gesture tuple
+                gesture = eval(gesture_str)
                 adjacent_node = nodes[int(adjacent_node_id)]
                 node.addNode(gesture, adjacent_node)
-
-        return root
 
 if __name__ == "__main__":
     storage_manager = StorageManager()
