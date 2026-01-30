@@ -27,12 +27,42 @@ class StorageManager:
         dfs(root)
         return visited
 
+    def load_graph(self, filename: str) -> Node:
+        with open(filename, 'r') as file:
+            data = json.load(file)
+
+        root = None
+        nodes = {}
+
+        # first load all the nodes individually (without connections)
+        for node_id, node_data in data.items():
+            node = Node(node_data["text"])
+            node.id = int(node_id)
+            nodes[node.id] = node
+            if root is None:
+                root = node
+
+        # then establish connections
+        for node_id, node_data in data.items():
+            node = nodes[int(node_id)]
+            for gesture_str, adjacent_node_id in node_data["adjacencyList"].items():
+                gesture = eval(gesture_str)  # reconstruct the gesture tuple
+                adjacent_node = nodes[int(adjacent_node_id)]
+                node.addNode(gesture, adjacent_node)
+
+        return root
+
 if __name__ == "__main__":
     storage_manager = StorageManager()
-    root = Node("Root Node")
-    child1 = Node("Child Node 1")
-    child2 = Node("Child Node 2")
-    root.addNode(("Gesture1", "Left"), child1)
-    root.addNode(("Gesture2", "Right"), child2)
-    child1.addNode(("Gesture3", "Left"), root)
-    storage_manager.save_graph(root, "graph.json")
+    # root = Node("Root Node")
+    # child1 = Node("Child Node 1")
+    # child2 = Node("Child Node 2")
+    # root.addNode(("Gesture1", "Left"), child1)
+    # root.addNode(("Gesture2", "Right"), child2)
+    # child1.addNode(("Gesture3", "Left"), root)
+    # storage_manager.save_graph(root, "graph.json")
+    loaded_root = storage_manager.load_graph("graph.json")
+    print(loaded_root)
+    print(loaded_root.adjacencyList)
+    print(loaded_root.adjacencyList[("Gesture1", "Left")])
+    print(loaded_root.adjacencyList[("Gesture2", "Right")])

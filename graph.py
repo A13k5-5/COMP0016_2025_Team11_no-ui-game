@@ -17,4 +17,4 @@ class Node:
         return self.adjacencyList.get(gesture)
 
     def __str__(self):
-        return self._text
+        return f"{self._text}, adjacent to {[f"\n{node._text}" for node in self.adjacencyList.values()]}"
