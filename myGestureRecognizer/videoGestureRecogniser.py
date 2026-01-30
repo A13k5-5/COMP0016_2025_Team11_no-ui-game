@@ -85,6 +85,10 @@ class VideoGestureRecogniser:
                     break
 
     def get_gesture(self, gestures_to_spot: list[Gesture]) -> Gesture:
+        """
+        Get a gesture from the user. This method blocks until one of the specified gestures is detected.
+        The return type is Gesture, which is a tuple of (gesture_category: str, handedness: str).
+        """
         self._reset(gestures_to_spot)
         self._start_recognition()
         return self._get_last_gesture()
