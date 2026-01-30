@@ -12,23 +12,13 @@ from .videoCaptureManager import video_capture_manager
 WINDOW_NAME = "Hand Detection"
 
 
-class GestureRecognizerApp:
-    """
-    Encapsulates gesture recognition lifecycle:
-    - Creates a MediaPipe GestureRecognizer in LIVE_STREAM mode
-    - Captures frames from a camera
-    - Sends frames asynchronously to the recognizer
-    - Displays frames with optional overlayed gesture names and FPS
-    """
+class VideoGestureRecogniser:
 
     def __init__(self):
         self.model_path = os.path.join(os.path.dirname(__file__), "gesture_recognizer.task")
         self.camera_index = 0
         self._last_gesture: str | None = None
         self._last_handedness: str | None = None
-        self._last_timestamp_ms: int = 0
-        self._fps = 0.0
-        self._prev_time = time.time()
 
     def _reset(self):
         self._last_gesture = None
@@ -46,7 +36,6 @@ class GestureRecognizerApp:
         # set the last gesture and which hand
         self._last_gesture = result.gestures[0][0].category_name
         self._last_handedness = result.handedness[0][0].category_name
-        self._last_timestamp_ms = timestamp_ms
 
     def _create_recognizer(self):
         options = GestureRecognizerOptions(
@@ -69,24 +58,8 @@ class GestureRecognizerApp:
         with self._create_recognizer() as recognizer, video_capture_manager(self.camera_index) as cap:
             while True:
                 ret, frame = cap.read()
-                if not ret:
-                    logging.warning("Failed to read frame from camera")
-                    break
-
-                # compute and update FPS
-                now = time.time()
-                dt = now - self._prev_time if now != self._prev_time else 1e-6
-                self._fps = 1.0 / dt
-                self._prev_time = now
 
                 self._send_to_recogniser(frame, recognizer)
-
-                # overlay last detected gesture and FPS (if any)
-                display_text = f"FPS: {self._fps:.1f}"
-                if (self._last_gesture, self._last_handedness) in gestures:
-                    display_text += f" | Gesture: {self._last_gesture}, {self._last_handedness}"
-                    return self._last_gesture, self._last_handedness
-                cv2.putText(frame, display_text, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 0), 2)
 
                 cv2.imshow(WINDOW_NAME, frame)
                 key = cv2.waitKey(1) & 0xFF

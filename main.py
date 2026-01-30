@@ -1,5 +1,5 @@
 from graph import Node
-from myGestureRecognizer.gestureRecogniserRefactor import GestureRecognizerApp
+from myGestureRecognizer.gestureRecogniser import GestureRecognizerApp
 import time
 
 if __name__ == "__main__":
