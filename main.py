@@ -1,5 +1,5 @@
 from graph import Node
-from myGestureRecognizer.gestureRecogniserRefactor import GestureRecognizerApp
+from myGestureRecognizer import VideoGestureRecogniser
 import time
 
 if __name__ == "__main__":
@@ -61,7 +61,7 @@ if __name__ == "__main__":
     loop_back.addNode(("ILoveYou", "Right"), start)
 
     curNode: Node = start
-    recogniser: GestureRecognizerApp = GestureRecognizerApp()
+    recogniser: VideoGestureRecogniser = VideoGestureRecogniser()
 
     while True:
         # Display current scene and available choices (explicit about handedness)
@@ -74,8 +74,9 @@ if __name__ == "__main__":
             # show a short preview of the destination and the required handedness
             print(f" {idx}. Hand: {handedness} -> {node._text.split('.')[0]}")
 
-        # Ask recogniser for a decision (expects a tuple like ("ILoveYou", "Left"))
-        decision = recogniser.run(list(curNode.adjacencyList.keys()))
+        # Ask recognizer for a decision (expects a tuple like ("ILoveYou", "Left"))
+        decision = recogniser.get_gesture(list(curNode.adjacencyList.keys()))
+        print(f"_______________Recognised gesture: {decision}")
 
         if not decision:
             print("Unrecognised input from recogniser. Please try again.")
