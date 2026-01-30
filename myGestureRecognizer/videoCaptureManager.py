@@ -19,4 +19,3 @@ def video_capture_manager(index: int):
         cap.release()
         # cv2.destroyAllWindows()
         pass
-
