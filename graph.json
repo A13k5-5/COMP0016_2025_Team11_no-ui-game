@@ -1,22 +1,50 @@
 {
-    "125216763387952": {
-        "id": 125216763387952,
-        "text": "Root Node",
+    "4305213616": {
+        "id": 4305213616,
+        "text": "You find yourself at the ruined gate of an old manor. Two paths lie ahead:Options: - Left: Go through the garden (leads to the shed). - Right: Go down the cellar stairs (leads to the cellar).",
         "adjacencyList": {
-            "('Gesture1', 'Left')": 125216764002912,
-            "('Gesture2', 'Right')": 125216764002960
+            "('ILoveYou', 'Left')": 4305865376,
+            "('ILoveYou', 'Right')": 4305865424
         }
     },
-    "125216764002912": {
-        "id": 125216764002912,
-        "text": "Child Node 1",
+    "4305865376": {
+        "id": 4305865376,
+        "text": "You slip through the garden, tangled roses parting around you. Moonlight reveals a hidden tool shed.Options: - Left: Enter the shed and search (leads to finding a lantern and rope). - Right: Follow a winding path that leads back toward the gate.",
         "adjacencyList": {
-            "('Gesture3', 'Left')": 125216763387952
+            "('ILoveYou', 'Left')": 4305865616,
+            "('ILoveYou', 'Right')": 4305865904
         }
     },
-    "125216764002960": {
-        "id": 125216764002960,
-        "text": "Child Node 2",
-        "adjacencyList": {}
+    "4305865616": {
+        "id": 4305865616,
+        "text": "Inside the shed you find a lantern and rope. This may help later.Options: - Left: Leave the shed and return toward the gate. - Right: Take a different path that leads toward the cellar encounter.",
+        "adjacencyList": {
+            "('ILoveYou', 'Left')": 4305865904,
+            "('ILoveYou', 'Right')": 4305865520
+        }
+    },
+    "4305865904": {
+        "id": 4305865904,
+        "text": "The path leads back to the gate. You may choose again.Options: - Left: Reattempt the gate choices (Left -> garden). - Right: Reattempt the gate choices (Right -> cellar).",
+        "adjacencyList": {
+            "('ILoveYou', 'Left')": 4305213616,
+            "('ILoveYou', 'Right')": 4305213616
+        }
+    },
+    "4305865520": {
+        "id": 4305865520,
+        "text": "A shadow rustles \u2014 a friendly stray dog wags its tail, offering companionship.Options: - Left: Escort the dog back toward the gate. - Right: Continue on a path that also leads back toward the gate.",
+        "adjacencyList": {
+            "('ILoveYou', 'Left')": 4305865904,
+            "('ILoveYou', 'Right')": 4305865904
+        }
+    },
+    "4305865424": {
+        "id": 4305865424,
+        "text": "You descend the stone stair into a cold cellar. The air smells of dust and old paper; something moves in the corner.Options: - Left: Retreat and head back toward the gate. - Right: Approach the corner (may reveal an encounter).",
+        "adjacencyList": {
+            "('ILoveYou', 'Left')": 4305865904,
+            "('ILoveYou', 'Right')": 4305865520
+        }
     }
 }
