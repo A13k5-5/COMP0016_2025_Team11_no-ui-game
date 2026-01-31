@@ -1,0 +1,22 @@
+{
+    "125216763387952": {
+        "id": 125216763387952,
+        "text": "Root Node",
+        "adjacencyList": {
+            "('Gesture1', 'Left')": 125216764002912,
+            "('Gesture2', 'Right')": 125216764002960
+        }
+    },
+    "125216764002912": {
+        "id": 125216764002912,
+        "text": "Child Node 1",
+        "adjacencyList": {
+            "('Gesture3', 'Left')": 125216763387952
+        }
+    },
+    "125216764002960": {
+        "id": 125216764002960,
+        "text": "Child Node 2",
+        "adjacencyList": {}
+    }
+}
