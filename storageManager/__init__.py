@@ -1,1 +1,1 @@
-from storageManager.storageManager import StorageManager
+from .storageManager import StorageManager
