@@ -11,6 +11,7 @@ from myTypes import Gesture
 from .videoCaptureManager import video_capture_manager
 
 WINDOW_NAME = "Hand Detection"
+TIMEOUT_TIME = 30.0 # seconds
 
 
 class VideoGestureRecogniser:
@@ -86,7 +87,7 @@ class VideoGestureRecogniser:
             while self._running:
 
                 ret, frame = cap.read()
-                self.timeout_stop(start, 30.0)  # 30 seconds timeout
+                self.timeout_stop(start, TIMEOUT_TIME)
 
                 if not ret:
                     print("Failed to grab frame from camera.")
@@ -102,6 +103,7 @@ class VideoGestureRecogniser:
         """
         Get a gesture from the user. This method blocks until one of the specified gestures is detected.
         The return type is Gesture, which is a tuple of (gesture_category: str, handedness: str).
+        Raises TimeoutError if no gesture is detected within 30 seconds.
         """
         self._reset(gestures_to_spot)
         self._start_recognition()

@@ -25,6 +25,9 @@ class GamePlayer:
         self._startGameLoop(root_node)
 
     def _startGameLoop(self, startNode: Node):
+        """
+        Throws TimeoutError if no gesture is detected within TIMEOUT_TIME seconds.
+        """
         curNode = startNode
         while True:
             # Display current scene and available choices (explicit about handedness)
