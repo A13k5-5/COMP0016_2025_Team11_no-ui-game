@@ -1,8 +1,16 @@
+from graph import Node
 import myGestureRecognizer
 import storageManager
 import time
 
+from myTypes import Gesture
+
+
 class GamePlayer:
+    """
+    Class to play the interactive story game.
+    """
+
     def __init__(self):
         self.storage_manager = storageManager.StorageManager()
         self.recogniser = myGestureRecognizer.VideoGestureRecogniser()
@@ -14,27 +22,23 @@ class GamePlayer:
             print(f"Failed to load graph from file: {e}")
             return
 
-        curNode = root_node
+        self._startGameLoop(root_node)
 
+    def _startGameLoop(self, startNode: Node):
+        curNode = startNode
         while True:
             # Display current scene and available choices (explicit about handedness)
             print("\n" + curNode.getText() + "\n")
 
-            self.listOptions(curNode)
+            self._listOptions(curNode)
 
             # Ask recognizer for a decision (expects a tuple like ("ILoveYou", "Left"))
-            decision = self.recogniser.get_gesture(list(curNode.adjacencyList.keys()))
-            print(f"_______________Recognised gesture: {decision}")
-
-            if not decision:
-                print("Unrecognised input from recogniser. Please try again.")
-                continue
-
+            decision: Gesture = self.recogniser.get_gesture(list(curNode.adjacencyList.keys()))
             curNode = curNode.getNode(decision)
 
             time.sleep(3)
 
-    def listOptions(self, curNode):
+    def _listOptions(self, curNode):
         options = list(curNode.adjacencyList.items())
         print("Choices (perform a gesture with the shown hand):")
         for idx, ((gesture, handedness), node) in enumerate(options, start=1):

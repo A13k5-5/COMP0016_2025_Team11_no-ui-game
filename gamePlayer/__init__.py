@@ -1,1 +1,1 @@
-from .GamePlayer import GamePlayer
+from .gamePlayer import GamePlayer
