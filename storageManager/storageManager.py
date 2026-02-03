@@ -53,7 +53,7 @@ class StorageManager:
         for node_id, node_data in data.items():
             node = Node(node_data["text"])
             node.id = int(node_id)
-            node.audioPath = node_data.get("audio_path")
+            node.audioPath = node_data.get("audioPath")
             nodes[node.id] = node
             if root is None:
                 root = node
