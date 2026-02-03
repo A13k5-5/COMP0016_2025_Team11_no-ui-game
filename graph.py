@@ -5,6 +5,7 @@ class Node:
     def __init__(self, text: str):
         self.id = id(self)
         self._text = text
+        self.audioPath = None
         self.adjacencyList: dict[Gesture, Node] = {}
 
     def getText(self):
