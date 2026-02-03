@@ -4,11 +4,20 @@ from graph import Node
 from text2speech.text2speech import Talker
 
 class StorageManager:
-    def save_graph(self, root: Node, filename: str, audio_dir: str = "audio"):
+    def save_graph(self, root: Node, filename: str, audio_dir: str = "audio", game_folder: str = "game"):
         # Create audio directory - if it doesnt exist already
+        audio_dir = os.path.join(game_folder, audio_dir)
+
+        # Remove old audio files to avoid duplicates
+        if os.path.exists(audio_dir):
+            for f in os.listdir(audio_dir):
+                print(f)
+                os.remove(os.path.join(audio_dir, f))
+        
         os.makedirs(audio_dir, exist_ok=True)
 
-        with open(filename, 'w') as file:
+        graph_path = os.path.join(game_folder, filename)
+        with open(graph_path, 'w') as file:
             json.dump(self._serialize_graph(root), file, indent=4)
         
         self._generate_audio(self._serialize_graph(root), audio_dir)
@@ -31,12 +40,13 @@ class StorageManager:
         return {
             "id": node.id,
             "text": node.getText(),
-            "audioPath": f"audio/{audio_filename}",
+            "audioPath": f"game/audio/{audio_filename}",
             "adjacencyList": {gesture.__str__(): adjacent_node.id for gesture, adjacent_node in node.adjacencyList.items()}
         }
 
-    def load_graph(self, filename: str) -> Node:
-        with open(filename, 'r') as file:
+    def load_graph(self, filename: str, game_folder: str = "game") -> Node:
+        graph_path = os.path.join(game_folder, filename)
+        with open(graph_path, 'r') as file:
             data = json.load(file)
 
         root, nodes = self._load_nodes(data)
