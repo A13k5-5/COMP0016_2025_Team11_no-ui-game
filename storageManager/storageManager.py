@@ -8,18 +8,21 @@ class StorageManager:
         # Create audio directory - if it doesnt exist already
         audio_dir = os.path.join(game_folder, audio_dir)
 
-        # Remove old audio files to avoid duplicates
-        if os.path.exists(audio_dir):
-            for f in os.listdir(audio_dir):
-                os.remove(os.path.join(audio_dir, f))
-        
-        os.makedirs(audio_dir, exist_ok=True)
+        self._prep_audio_dir(audio_dir)
 
         graph_path = os.path.join(game_folder, filename)
         with open(graph_path, 'w') as file:
             json.dump(self._serialize_graph(root), file, indent=4)
         
         self._generate_audio(self._serialize_graph(root), audio_dir)
+
+    def _prep_audio_dir(self, audio_dir: str):
+        # Remove old audio files to avoid duplicates
+        if os.path.exists(audio_dir):
+            for f in os.listdir(audio_dir):
+                os.remove(os.path.join(audio_dir, f))
+        os.makedirs(audio_dir, exist_ok=True)
+
 
     def _serialize_graph(self, root: Node) -> dict:
         visited = {}

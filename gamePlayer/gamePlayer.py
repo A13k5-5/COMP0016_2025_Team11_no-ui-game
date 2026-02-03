@@ -40,12 +40,13 @@ class GamePlayer:
         """
         curNode = startNode
         while True:
-            # Play current scene audio
-            self._playAudio(curNode.audioPath)
             # Display current scene and available choices (explicit about handedness)
             print("\n" + curNode.getText() + "\n")
 
             self._listOptions(curNode)
+            
+            # Play current scene audio
+            self._playAudio(curNode.audioPath)
 
             # Ask recognizer for a decision (expects a tuple like ("ILoveYou", "Left"))
             decision: Gesture = self.recogniser.get_gesture(list(curNode.adjacencyList.keys()))
