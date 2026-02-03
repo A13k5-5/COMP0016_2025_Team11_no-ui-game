@@ -11,7 +11,6 @@ class StorageManager:
         # Remove old audio files to avoid duplicates
         if os.path.exists(audio_dir):
             for f in os.listdir(audio_dir):
-                print(f)
                 os.remove(os.path.join(audio_dir, f))
         
         os.makedirs(audio_dir, exist_ok=True)
@@ -163,7 +162,6 @@ class StorageManager:
         root.addNode(("ILoveYou", "Right"), nodeB)
         
         return root
-
 
 if __name__ == "__main__":
     storage_manager = StorageManager()
