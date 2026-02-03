@@ -27,9 +27,11 @@ class StorageManager:
         return visited
 
     def _serialize_node(self, node: Node) -> dict:
+        audio_filename = f"node_{node.id}.wav"
         return {
             "id": node.id,
             "text": node.getText(),
+            "audioPath": f"audio/{audio_filename}",
             "adjacencyList": {gesture.__str__(): adjacent_node.id for gesture, adjacent_node in node.adjacencyList.items()}
         }
 
@@ -51,6 +53,7 @@ class StorageManager:
         for node_id, node_data in data.items():
             node = Node(node_data["text"])
             node.id = int(node_id)
+            node.audioPath = node_data.get("audio_path")
             nodes[node.id] = node
             if root is None:
                 root = node
