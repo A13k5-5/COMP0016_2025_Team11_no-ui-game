@@ -1,9 +1,9 @@
-from graph import Node
-import myGestureRecognizer
-import storageManager
 import time
 from playsound3 import playsound
 
+from graph import Node
+import myGestureRecognizer
+import storageManager
 from myTypes import Gesture
 
 
@@ -15,7 +15,7 @@ class GamePlayer:
     def __init__(self):
         self.storage_manager = storageManager.StorageManager()
         self.recogniser = myGestureRecognizer.VideoGestureRecogniser()
-    
+
     def _playAudio(self, audioPath: str):
         """
         Play the audio file.
@@ -44,7 +44,7 @@ class GamePlayer:
             print("\n" + curNode.getText() + "\n")
 
             self._listOptions(curNode)
-            
+
             # Play current scene audio
             self._playAudio(curNode.audioPath)
 
