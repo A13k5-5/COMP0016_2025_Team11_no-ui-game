@@ -31,8 +31,12 @@ class NodeWidget(QtWidgets.QFrame):
     """
     UI widget for a story node with text and two options.
     """
-    def __init__(self):
+    def __init__(self, page):
         super().__init__()
+
+        # the page the node belongs to
+        self.page = page
+
         self.setFrameShape(QtWidgets.QFrame.Box)
         self.setLineWidth(2)
 
@@ -66,10 +70,21 @@ class NodeWidget(QtWidgets.QFrame):
         layout.addWidget(self.text)
         layout.addLayout(options_row)
 
-        # placeholder hooks for arrow creation
-        self.left_plus.clicked.connect(lambda: print("Left + clicked"))
-        self.right_plus.clicked.connect(lambda: print("Right + clicked"))
+        # buttons clicked
+        self.left_plus.clicked.connect(self._create_left_option)
+        self.right_plus.clicked.connect(self._create_right_option)
 
+    def _create_left_option(self):
+        """
+        Tell the GameCreationPage to create a new node on the left.
+        """
+        self.page._create_child_node(self, "left")
+
+    def _create_right_option(self):
+        """
+        Tell the GameCreationPage to create a new node on the right.
+        """
+        self.page._create_child_node(self, "right")
 
 class GameCreationPage(QtWidgets.QWidget):
     """
@@ -79,6 +94,9 @@ class GameCreationPage(QtWidgets.QWidget):
         super().__init__()
 
         self.game_title = ""
+        # node -> (x,y)
+        self.node_coords_dict = {}
+
         self._setup_window_layout("No-UI-Game Creator")
         self._title_entry()
 
@@ -112,12 +130,36 @@ class GameCreationPage(QtWidgets.QWidget):
         self.view.setMinimumHeight(400)
         self.layout.addWidget(self.view)
 
-    def _add_root_node(self):
-        root_widget = NodeWidget()
+    def _create_node_at(self, x, y):
+        """
+        Create a NodeWidget, wrap it in a proxy, and add it to the scene.
+        """
+        node = NodeWidget(self)
+
         proxy = QtWidgets.QGraphicsProxyWidget()
-        proxy.setWidget(root_widget)
-        proxy.setPos(50, 50)
+        proxy.setWidget(node)
+        proxy.setPos(x,y)
         self.scene.addItem(proxy)
+
+        self.node_coords_dict[node] = (x,y)
+
+    def _add_root_node(self):
+        self._create_node_at(50,50)
+    
+    def _create_child_node(self, parent, side):
+        parent_coords = self.node_coords_dict.get(parent)
+        if not parent:
+            return
+        
+        y_offset = 420
+        if side == "left": 
+            x_offset = -260
+        else:
+            x_offset = 260
+        
+        new_x = parent_coords[0] + x_offset
+        new_y = parent_coords[1] + y_offset
+        self._create_node_at(new_x, new_y)
 
     def save_title(self):
         self.game_title = self.title_entry.text().strip()
