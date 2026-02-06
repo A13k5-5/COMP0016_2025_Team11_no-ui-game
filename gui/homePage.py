@@ -40,6 +40,8 @@ class HomePage(QtWidgets.QWidget):
         self._creation_window = GameCreationPage()
         self._creation_window.show()
 
+
+
 def run():
     app = QtWidgets.QApplication([])
 
@@ -48,7 +50,6 @@ def run():
     widget.show()
 
     sys.exit(app.exec())
-
 
 if __name__ == "__main__":
     run()
