@@ -1,5 +1,5 @@
 import sys
-from PySide6 import QtWidgets, QtCore, QtGui
+from PySide6 import QtWidgets, QtCore, QtGui 
 
 class ZoomableGraphicsView(QtWidgets.QGraphicsView):
     """
@@ -39,7 +39,7 @@ class NodeWidget(QtWidgets.QFrame):
         self._setup_frame()
         self._create_widgets()
         self._build_layout()
-        self._connect_signals()
+        self._assign_button_functions()
 
     def _setup_frame(self):
         self.setFrameShape(QtWidgets.QFrame.Box)
