@@ -36,10 +36,16 @@ class NodeWidget(QtWidgets.QFrame):
 
         # the page the node belongs to
         self.page = page
+        self._setup_frame()
+        self._create_widgets()
+        self._build_layout()
+        self._connect_signals()
 
+    def _setup_frame(self):
         self.setFrameShape(QtWidgets.QFrame.Box)
         self.setLineWidth(2)
-
+    
+    def _create_widgets(self):
         self.text = QtWidgets.QPlainTextEdit()
         self.text.setPlaceholderText("Write the node text here...")
 
@@ -52,7 +58,8 @@ class NodeWidget(QtWidgets.QFrame):
         self.right_option.setPlaceholderText("Right option text")
         self.right_plus = QtWidgets.QPushButton("+")
         self.right_plus.setFixedWidth(22)
-
+    
+    def _build_layout(self):
         options_row = QtWidgets.QHBoxLayout()
         left_col = QtWidgets.QVBoxLayout()
         right_col = QtWidgets.QVBoxLayout()
@@ -70,7 +77,7 @@ class NodeWidget(QtWidgets.QFrame):
         layout.addWidget(self.text)
         layout.addLayout(options_row)
 
-        # buttons clicked
+    def _assign_button_functions(self):
         self.left_plus.clicked.connect(self._create_left_option)
         self.right_plus.clicked.connect(self._create_right_option)
 
@@ -85,6 +92,7 @@ class NodeWidget(QtWidgets.QFrame):
         Tell the GameCreationPage to create a new node on the right.
         """
         self.page._create_child_node(self, "right")
+
 
 class GameCreationPage(QtWidgets.QWidget):
     """
