@@ -24,6 +24,7 @@ class HomePage(QtWidgets.QWidget):
         self._creation_window = None
 
         self.edit_game_button = QtWidgets.QPushButton("Edit Game")
+        self.edit_game_button.clicked.connect(self.open_file_dialog)
         self.text = QtWidgets.QLabel("No-UI Game", alignment=QtCore.Qt.AlignCenter)
 
     def _add_widgets(self):
@@ -40,6 +41,18 @@ class HomePage(QtWidgets.QWidget):
         self._creation_window = GameCreationPage()
         self._creation_window.show()
 
+    def open_file_dialog(self):
+        """
+        Open Finder file picker. No file handling yet.
+        """
+        file_path, _ = QtWidgets.QFileDialog.getOpenFileName(
+            self,
+            "Open Game File",
+            "",
+            "All Files (*.*)"
+        )
+        if file_path:
+            print(f"Selected file: {file_path}")
 
 
 def run():
