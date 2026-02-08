@@ -1,5 +1,11 @@
 import sys
 from PySide6 import QtWidgets, QtCore, QtGui 
+from graph import Node
+from myTypes import Gesture
+from storageManager import StorageManager
+
+LEFT_GESTURE: Gesture = ("ILoveYou", "Left")
+RIGHT_GESTURE: Gesture = ("ILoveYou", "Right")
 
 class ZoomableGraphicsView(QtWidgets.QGraphicsView):
     """
@@ -102,8 +108,13 @@ class GameCreationPage(QtWidgets.QWidget):
         super().__init__()
 
         self.game_title = ""
+        # list of all nodes in the game
+        self.nodes = []
+        self.root_node = None
         # node -> (x,y)
         self.node_coords_dict = {}
+        # parent_node -> {"left": child_node, "right": child_node}
+        self.node_children = {}
 
         self._setup_window_layout("No-UI-Game Creator")
         self._title_entry()
@@ -142,7 +153,7 @@ class GameCreationPage(QtWidgets.QWidget):
         self.save_game_button.clicked.connect(self.save_game)
         self.layout.addWidget(self.save_game_button)
 
-    def _create_node_at(self, x, y):
+    def _create_node_at(self, x, y) -> Node:
         """
         Create a NodeWidget, wrap it in a proxy, and add it to the scene.
         """
@@ -154,6 +165,12 @@ class GameCreationPage(QtWidgets.QWidget):
         self.scene.addItem(proxy)
 
         self.node_coords_dict[node] = (x,y)
+        self.nodes.append(node)
+
+        if self.root_node is None:
+            self.root_node = node
+        
+        return node
 
     def _add_root_node(self):
         self._create_node_at(50,50)
@@ -171,14 +188,58 @@ class GameCreationPage(QtWidgets.QWidget):
         
         new_x = parent_coords[0] + x_offset
         new_y = parent_coords[1] + y_offset
-        self._create_node_at(new_x, new_y)
+        child = self._create_node_at(new_x, new_y)
 
+        # record connection for saving graph
+        if parent not in self.node_children:
+            self.node_children[parent] = {}
+        self.node_children[parent][side] = child
+
+    def _save_game_graph(self) -> Node | None:
+        """
+        Build a backend graph tree from the UI nodes.
+        """
+        if not self.root_node:
+            return None
+        
+        widget_node = {}
+        # 1. create backend nodes
+        for node_widget in self.nodes:
+            text = node_widget.text.toPlainText().strip()
+            game_graph_node = Node(text)
+            widget_node[node_widget] = game_graph_node
+
+
+        # 2. loop through the node widgets 
+        # for each node create connections to their children as Node objects
+        for parent_widget, children in self.node_children.items():
+            parent_node = widget_node[parent_widget]
+
+            left_child = children.get("left")
+            right_child = children.get("right")
+
+            if left_child:
+                parent_node.addNode(LEFT_GESTURE, widget_node[left_child])
+            if right_child:
+                parent_node.addNode(RIGHT_GESTURE, widget_node[right_child])
+        return widget_node[self.root_node]
+    
     def save_title(self):
         self.game_title = self.title_entry.text().strip()
-        print(f"Saved title: {self.game_title}")
+        print(f"Title: {self.game_title}")
 
     def save_game(self):
-        pass
+        root = self._save_game_graph()
+        if not root:
+            return
+
+        # TODO - right now we save all games into graph.json for test purposes
+        # later update so that the game is saved into the "title".json
+        title = self.title_entry.text().strip() or "untitled"
+        filename = "graph.json" #f"{title}.json"
+
+        StorageManager().save_graph(root, filename=filename)
+        print(f"Saved game to {filename}")
 
 
 def run():

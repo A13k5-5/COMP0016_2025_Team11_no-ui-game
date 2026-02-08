@@ -1,23 +1,23 @@
 {
-    "4368055664": {
-        "id": 4368055664,
-        "text": "Start",
-        "audioPath": "game/audio/node_4368055664.wav",
+    "11073617504": {
+        "id": 11073617504,
+        "text": "Node Start",
+        "audioPath": "game/audio/node_11073617504.wav",
         "adjacencyList": {
-            "('ILoveYou', 'Left')": 4368056192,
-            "('ILoveYou', 'Right')": 4368056240
+            "('ILoveYou', 'Left')": 11073617408,
+            "('ILoveYou', 'Right')": 11073617456
         }
     },
-    "4368056192": {
-        "id": 4368056192,
-        "text": "Node A",
-        "audioPath": "game/audio/node_4368056192.wav",
+    "11073617408": {
+        "id": 11073617408,
+        "text": "you are dead",
+        "audioPath": "game/audio/node_11073617408.wav",
         "adjacencyList": {}
     },
-    "4368056240": {
-        "id": 4368056240,
-        "text": "Node B",
-        "audioPath": "game/audio/node_4368056240.wav",
+    "11073617456": {
+        "id": 11073617456,
+        "text": "you have won",
+        "audioPath": "game/audio/node_11073617456.wav",
         "adjacencyList": {}
     }
 }

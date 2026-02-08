@@ -1,5 +1,5 @@
 import sys
-from gameCreationPage import GameCreationPage
+from .gameCreationPage import GameCreationPage
 from PySide6 import QtWidgets, QtCore, QtGui
 
 class HomePage(QtWidgets.QWidget):
