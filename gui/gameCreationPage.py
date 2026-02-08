@@ -138,6 +138,10 @@ class GameCreationPage(QtWidgets.QWidget):
         self.view.setMinimumHeight(400)
         self.layout.addWidget(self.view)
 
+        self.save_game_button = QtWidgets.QPushButton("Save Game")
+        self.save_game_button.clicked.connect(self.save_game)
+        self.layout.addWidget(self.save_game_button)
+
     def _create_node_at(self, x, y):
         """
         Create a NodeWidget, wrap it in a proxy, and add it to the scene.
@@ -173,7 +177,8 @@ class GameCreationPage(QtWidgets.QWidget):
         self.game_title = self.title_entry.text().strip()
         print(f"Saved title: {self.game_title}")
 
-
+    def save_game(self):
+        pass
 
 
 def run():
