@@ -2,7 +2,6 @@ import json
 import os
 from graph import Node
 from storageManager import testGraphs
-from text2speech.text2speech import Talker
 
 class StorageManager:
     def save_graph(self, root: Node, filename: str, audio_dir: str = "audio", game_folder: str = "game"):
@@ -88,6 +87,7 @@ class StorageManager:
         """
         Generate audio files for all nodes in the graph using Talker class.
         """
+        from text2speech.text2speech import Talker
         talker = Talker()
         description = "A calm and soothing narration voice"
 
