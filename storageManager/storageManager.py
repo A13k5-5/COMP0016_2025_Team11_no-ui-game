@@ -1,7 +1,7 @@
 import json
 import os
 from graph import Node
-import testGraphs
+from storageManager import testGraphs
 from text2speech.text2speech import Talker
 
 class StorageManager:
