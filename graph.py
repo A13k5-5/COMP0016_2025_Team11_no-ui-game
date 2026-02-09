@@ -11,6 +11,9 @@ class Node:
     def getText(self):
         return self._text
 
+    def get_id(self):
+        return self.id
+
     def addNode(self, gesture: Gesture, newNode):
         self.adjacencyList[gesture] = newNode
 
