@@ -52,14 +52,14 @@ class GraphSave:
         dfs(root)
         return visited
 
-    def _get_node_audio_path(self, node: Node, audio_dir: str) -> str:
+    def _get_node_audio_path(self, node_id: int, audio_dir: str) -> str:
         """
         Generates the file path for the audio file corresponding to a given node.
-        :param node: the node for which to generate the audio path
+        :param node_id: the ID of the node for which to generate the audio file path
         :param audio_dir: the directory where audio files are stored
         :return: the file path for the node's audio file
         """
-        return os.path.join(audio_dir, f"node_{node.get_id()}.wav")
+        return os.path.join(audio_dir, f"node_{node_id}.wav")
 
 
     def _serialize_node(self, node: Node, audio_dir: str) -> dict:
@@ -72,6 +72,6 @@ class GraphSave:
         return {
             "id": node.get_id(),
             "text": node.getText(),
-            "audioPath": self._get_node_audio_path(node, audio_dir),
+            "audioPath": self._get_node_audio_path(node.get_id(), audio_dir),
             "adjacencyList": {gesture.__str__(): adjacent_node.get_id() for gesture, adjacent_node in node.adjacencyList.items()}
         }

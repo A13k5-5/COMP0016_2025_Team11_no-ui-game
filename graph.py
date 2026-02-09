@@ -3,7 +3,7 @@ from myTypes import Gesture
 
 class Node:
     def __init__(self, text: str):
-        self.id = id(self)
+        self.id: int = id(self)
         self._text = text
         self.audioPath = None
         self.adjacencyList: dict[Gesture, Node] = {}
@@ -11,7 +11,7 @@ class Node:
     def getText(self):
         return self._text
 
-    def get_id(self):
+    def get_id(self) -> int:
         return self.id
 
     def addNode(self, gesture: Gesture, newNode):
