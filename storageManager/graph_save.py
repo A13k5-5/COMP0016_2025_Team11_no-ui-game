@@ -4,19 +4,37 @@ import os
 from graph import Node
 
 class GraphSave:
-    def __init__(self, graph):
-        self.graph = graph
+    """
+    Class responsible for saving the game into a game 'folder' (containing the graph and corresponding audio files).
+    """
 
-    def save_game(self, path_to_save: str, root: Node):
+    def save_game(self, path_to_save: str, game_name: str, root: Node):
         """
         Saves the game to the given path.
         :param path_to_save:
         :param root:
         :return:
         """
-        audio_dir: str = os.path.join(path_to_save, "audio")
+        game_path: str = os.path.join(path_to_save, game_name)
+        self._prepare_game_folder(game_path)
+        audio_dir: str = os.path.join(game_path, "audio")
         serialized_graph: dict = self._serialize_graph(root, audio_dir)
-        self.save_graph(path_to_save, serialized_graph)
+        print(serialized_graph)
+        self.save_graph(game_path, serialized_graph)
+        # self._generate_audio(serialized_graph, audio_dir)
+
+
+    def _prepare_game_folder(self, game_path: str):
+        """
+        Prepares the game folder by creating the necessary directory structure. If a folder with the same name already exists,
+        an exception is raised to prevent overwriting existing data.
+        :param game_path:
+        :return:
+        """
+        audio_dir: str = os.path.join(game_path, "audio")
+        if os.path.exists(audio_dir):
+            raise Exception("Game folder already exists. Please choose a different name or delete the existing folder.")
+        os.makedirs(audio_dir)
 
 
     def save_graph(self, path_to_save: str, serialized_graph: dict):
@@ -51,6 +69,7 @@ class GraphSave:
 
         dfs(root)
         return visited
+
 
     def _get_node_audio_path(self, node_id: int, audio_dir: str) -> str:
         """

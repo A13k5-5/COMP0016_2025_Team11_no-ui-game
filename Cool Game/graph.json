@@ -1,0 +1,23 @@
+{
+    "1558946852272": {
+        "id": 1558946852272,
+        "text": "Start",
+        "audioPath": "C:\\Users\\pison\\Downloads\\no-ui-game\\Cool Game\\audio\\node_1558946852272.wav",
+        "adjacencyList": {
+            "('ILoveYou', 'Left')": 1558983251904,
+            "('ILoveYou', 'Right')": 1559059864256
+        }
+    },
+    "1558983251904": {
+        "id": 1558983251904,
+        "text": "Node A",
+        "audioPath": "C:\\Users\\pison\\Downloads\\no-ui-game\\Cool Game\\audio\\node_1558983251904.wav",
+        "adjacencyList": {}
+    },
+    "1559059864256": {
+        "id": 1559059864256,
+        "text": "Node B",
+        "audioPath": "C:\\Users\\pison\\Downloads\\no-ui-game\\Cool Game\\audio\\node_1559059864256.wav",
+        "adjacencyList": {}
+    }
+}

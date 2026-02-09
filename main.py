@@ -1,5 +1,14 @@
-from gamePlayer import GamePlayer
+# from gamePlayer import GamePlayer
+#
+# if __name__ == "__main__":
+#     player = GamePlayer()
+#     player.playGame("graph.json")
+
+from graph import Node
+from storageManager import test_graphs
+from storageManager import GraphSave
 
 if __name__ == "__main__":
-    player = GamePlayer()
-    player.playGame("graph.json")
+    graph: Node = test_graphs.test_game()
+    saver = GraphSave()
+    saver.save_game("C:\\Users\\pison\\Downloads\\no-ui-game\\", "Cool Game", graph)
