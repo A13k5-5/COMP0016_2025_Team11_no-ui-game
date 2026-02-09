@@ -12,8 +12,9 @@ class GameSaver:
     def save_game(self, path_to_save: str, game_name: str, root: Node):
         """
         Saves the game to the given path.
-        :param path_to_save:
-        :param root:
+        :param path_to_save: the directory where the game folder should be created
+        :param game_name: the name of the game, which will be used as the name of the game folder
+        :param root: the root node of the graph representing the game
         :return:
         """
         game_path: str = os.path.join(path_to_save, game_name)
