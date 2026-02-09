@@ -2,6 +2,7 @@ import json
 import os
 
 from graph import Node
+from text2speech import Talker
 
 class GraphSave:
     """
@@ -21,7 +22,7 @@ class GraphSave:
         serialized_graph: dict = self._serialize_graph(root, audio_dir)
         print(serialized_graph)
         self.save_graph(game_path, serialized_graph)
-        # self._generate_audio(serialized_graph, audio_dir)
+        self._generate_audio(serialized_graph, audio_dir)
 
 
     def _prepare_game_folder(self, game_path: str):
@@ -94,3 +95,21 @@ class GraphSave:
             "audioPath": self._get_node_audio_path(node.get_id(), audio_dir),
             "adjacencyList": {gesture.__str__(): adjacent_node.get_id() for gesture, adjacent_node in node.adjacencyList.items()}
         }
+
+
+    def _generate_audio(self, data: dict, audio_dir: str):
+        """
+        Generates audio files for each node in the graph using the Talker class. The audio files are saved in the specified
+        audio directory with filenames corresponding to their node IDs.
+        :param data:
+        :param audio_dir:
+        :return:
+        """
+        talker = Talker()
+        description = "A calm and soothing narration voice"
+
+        for node_id, node_data in data.items():
+            text = node_data["text"]
+            output_file = self._get_node_audio_path(node_id, audio_dir)
+
+            talker.generate_speech(text, description, output_file)

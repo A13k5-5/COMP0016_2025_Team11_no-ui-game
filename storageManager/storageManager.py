@@ -84,22 +84,6 @@ class StorageManager:
                 node.addNode(gesture, adjacent_node)
 
 
-    def _generate_audio(self, data: dict, audio_dir: str):
-        """
-        Generates audio files for each node in the graph using the Talker class. The audio files are saved in the specified
-        audio directory with filenames corresponding to their node IDs.
-        :param data:
-        :param audio_dir:
-        :return:
-        """
-        talker = Talker()
-        description = "A calm and soothing narration voice"
-
-        for node_id, node_data in data.items():
-            text = node_data["text"]
-            output_file = self._get_node_audio_path(node_id, audio_dir)
-
-            talker.generate_speech(text, description, output_file)
 
     # def _generate_audio(self, data: dict, audio_dir: str):
     #     """
