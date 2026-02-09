@@ -4,7 +4,7 @@ import os
 from graph import Node
 from text2speech import Talker
 
-class GraphSave:
+class GameSaver:
     """
     Class responsible for saving the game into a game 'folder' (containing the graph and corresponding audio files).
     """
