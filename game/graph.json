@@ -1,23 +1,23 @@
 {
-    "11073617504": {
-        "id": 11073617504,
-        "text": "Node Start",
-        "audioPath": "game/audio/node_11073617504.wav",
+    "11003470448": {
+        "id": 11003470448,
+        "text": "you are on a walk You have two options. Do walk left by raising your left hand. Do walk right by raising your right hand.",
+        "audioPath": "game/audio/node_11003470448.wav",
         "adjacencyList": {
-            "('ILoveYou', 'Left')": 11073617408,
-            "('ILoveYou', 'Right')": 11073617456
+            "('ILoveYou', 'Left')": 11003470496,
+            "('ILoveYou', 'Right')": 11003471648
         }
     },
-    "11073617408": {
-        "id": 11073617408,
-        "text": "you are dead",
-        "audioPath": "game/audio/node_11073617408.wav",
+    "11003470496": {
+        "id": 11003470496,
+        "text": "this is a dead end. you lost.",
+        "audioPath": "game/audio/node_11003470496.wav",
         "adjacencyList": {}
     },
-    "11073617456": {
-        "id": 11073617456,
-        "text": "you have won",
-        "audioPath": "game/audio/node_11073617456.wav",
+    "11003471648": {
+        "id": 11003471648,
+        "text": "this path has gorgeous flowers.",
+        "audioPath": "game/audio/node_11003471648.wav",
         "adjacencyList": {}
     }
 }
