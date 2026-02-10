@@ -1,5 +1,4 @@
-from gamePlayer import GamePlayer
+import gui
 
 if __name__ == "__main__":
-    player = GamePlayer()
-    player.playGame("graph.json")
+    gui.homePage.run()
