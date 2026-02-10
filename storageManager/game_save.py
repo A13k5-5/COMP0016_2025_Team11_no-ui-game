@@ -1,5 +1,6 @@
 import json
 import os
+import shutil
 
 from graph import Node
 from text2speech import Talker
@@ -18,10 +19,14 @@ class GameSaver:
         :return:
         """
         game_path: str = os.path.join(path_to_save, game_name)
+        if os.path.exists(game_path):
+            if not self._is_game_folder(game_path):
+                raise Exception(f"A folder named '{game_name}' already exists at the specified path, but it is not a valid game folder. Please choose a different name or delete the existing folder.")
+            # if a game folder, we can proceed to overwrite it
+            shutil.rmtree(game_path)
         self._prepare_game_folder(game_path)
         audio_dir: str = os.path.join(game_path, "audio")
         serialized_graph: dict = self._serialize_graph(root, audio_dir)
-        print(serialized_graph)
         self.save_graph(game_path, serialized_graph)
         self._generate_audio(serialized_graph, audio_dir)
 
@@ -34,9 +39,17 @@ class GameSaver:
         :return:
         """
         audio_dir: str = os.path.join(game_path, "audio")
-        if os.path.exists(audio_dir):
-            raise Exception("Game folder already exists. Please choose a different name or delete the existing folder.")
         os.makedirs(audio_dir)
+
+    def _is_game_folder(self, path: str) -> bool:
+        """
+        Checks if the given path is a valid game folder by verifying the presence of the graph.json file and the audio directory.
+        :param path:
+        :return: True if the path is a valid game folder, False otherwise
+        """
+        graph_path: str = os.path.join(path, "graph.json")
+        audio_dir: str = os.path.join(path, "audio")
+        return os.path.isfile(graph_path) and os.path.isdir(audio_dir)
 
 
     def save_graph(self, path_to_save: str, serialized_graph: dict):

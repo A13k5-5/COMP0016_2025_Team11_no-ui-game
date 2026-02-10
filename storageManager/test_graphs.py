@@ -62,9 +62,9 @@ def build_default_story_graph() -> Node:
 
 
 def test_game() -> Node:
-    root = Node("Start")
-    nodeA = Node("Node A")
-    nodeB = Node("Node B")
+    root = Node("Hi Bilbo. May I come in?")
+    nodeA = Node("Sure come on in.")
+    nodeB = Node("No, I'm busy right now. Come tomorrow.")
     root.addNode(("ILoveYou", "Left"), nodeA)
     root.addNode(("ILoveYou", "Right"), nodeB)
 
