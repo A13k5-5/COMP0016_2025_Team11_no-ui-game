@@ -6,6 +6,9 @@ from PySide6 import QtWidgets, QtCore, QtGui
 from graph import Node
 from myTypes import Gesture
 from storageManager import StorageManager
+from .config import WINDOW_HEIGHT, WINDOW_WIDTH
+
+CANVAS_HEIGHT: int = 400
 
 LEFT_GESTURE: Gesture = ("ILoveYou", "Left")
 RIGHT_GESTURE: Gesture = ("ILoveYou", "Right")
@@ -135,7 +138,7 @@ class GameCreationPage(QtWidgets.QWidget):
         Set the window title, size and layout.
         """
         self.setWindowTitle(window_title)
-        self.resize(800, 600)
+        self.resize(WINDOW_HEIGHT, WINDOW_WIDTH)
         self.layout = QtWidgets.QVBoxLayout(self)
         self.layout.setAlignment(QtCore.Qt.AlignTop)
         
@@ -154,7 +157,7 @@ class GameCreationPage(QtWidgets.QWidget):
     def _setup_canvas(self) -> None:
         self.scene = QtWidgets.QGraphicsScene(self)
         self.view = ZoomableGraphicsView(self.scene)
-        self.view.setMinimumHeight(400)
+        self.view.setMinimumHeight(CANVAS_HEIGHT)
         self.layout.addWidget(self.view)
 
         self.save_game_button = QtWidgets.QPushButton("Save Game")
