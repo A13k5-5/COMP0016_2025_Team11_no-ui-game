@@ -12,7 +12,6 @@ class GamePlayer:
     """
     Class to play the interactive story game.
     """
-
     def __init__(self):
         self.game_loader: storageManager.GameLoader = storageManager.GameLoader()
         self.recogniser: myGestureRecognizer.VideoGestureRecogniser = myGestureRecognizer.VideoGestureRecogniser()
@@ -28,7 +27,7 @@ class GamePlayer:
 
     def playGame(self, gameFilePath: str):
         try:
-            root_node: Node = self.storage_manager.load_graph(gameFilePath)
+            root_node: Node = self.game_loader.load_graph(gameFilePath)
         except Exception as e:
             print(f"Failed to load graph from file: {e}")
             return

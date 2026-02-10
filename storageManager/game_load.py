@@ -23,7 +23,7 @@ class GameLoader:
         return root
 
 
-    def _load_nodes(self, data: dict) -> (Node, dict[int, Node]):
+    def _load_nodes(self, data: dict) -> tuple[Node, dict[int, Node]]:
         """
         Load nodes without connections. Gives back the root node and a dictionary of all nodes.
         :param data:
