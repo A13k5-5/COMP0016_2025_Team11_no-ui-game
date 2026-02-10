@@ -1,8 +1,9 @@
-from graph import Node
 import myGestureRecognizer
-import storageManager
-import time
 from playsound3 import playsound
+import time
+
+from graph import Node
+import storageManager
 
 from myTypes import Gesture
 
@@ -13,9 +14,9 @@ class GamePlayer:
     """
 
     def __init__(self):
-        self.storage_manager = storageManager.StorageManager()
-        self.recogniser = myGestureRecognizer.VideoGestureRecogniser()
-    
+        self.game_loader: storageManager.GameLoader = storageManager.GameLoader()
+        self.recogniser: myGestureRecognizer.VideoGestureRecogniser = myGestureRecognizer.VideoGestureRecogniser()
+
     def _playAudio(self, audioPath: str):
         """
         Play the audio file.
@@ -27,7 +28,7 @@ class GamePlayer:
 
     def playGame(self, gameFilePath: str):
         try:
-            root_node = self.storage_manager.load_graph(gameFilePath)
+            root_node: Node = self.storage_manager.load_graph(gameFilePath)
         except Exception as e:
             print(f"Failed to load graph from file: {e}")
             return
