@@ -1,5 +1,4 @@
 import sys
-from enum import Enum
 from typing import Dict, List, Optional, Tuple
 
 from PySide6 import QtWidgets, QtCore, QtGui 
@@ -7,109 +6,13 @@ from graph import Node
 from myTypes import Gesture
 from storageManager import StorageManager
 from .config import WINDOW_HEIGHT, WINDOW_WIDTH
+from .zoomableGraphicsView import ZoomableGraphicsView
+from .nodeWidget import NodeWidget
+from .optionSide import OptionSide
 
 CANVAS_HEIGHT: int = 400
-
 LEFT_GESTURE: Gesture = ("ILoveYou", "Left")
 RIGHT_GESTURE: Gesture = ("ILoveYou", "Right")
-
-class OptionSide(str, Enum):
-    LEFT = "left"
-    RIGHT = "right"
-
-class ZoomableGraphicsView(QtWidgets.QGraphicsView):
-    """
-    Allows zoom in/out and drag functionality by using a 
-    mouse wheel or trackpad - Ctrl+scroll.
-    """
-    def __init__(self, scene: QtWidgets.QWidget, parent: Optional[QtWidgets.QWidget] = None) -> None:
-        print(parent)
-        super().__init__(scene, parent)
-        self.setDragMode(QtWidgets.QGraphicsView.ScrollHandDrag)
-        # current zoom level
-        self._zoom: float = 1.0 
-    
-    def wheelEvent(self, event: QtGui.QWheelEvent) -> None:
-        if event.modifiers() & QtCore.Qt.ControlModifier:
-            if event.angleDelta().y() > 0:
-                self._zoom *= 1.15
-            else:
-                self._zoom /= 1.15
-
-            # limit zooming too far out/in
-            self._zoom = max(0.2, min(self._zoom, 3.0)) 
-            self.setTransform(QtGui.QTransform().scale(self._zoom, self._zoom))
-            event.accept()
-        else:
-            super().wheelEvent(event)
-
-
-class NodeWidget(QtWidgets.QFrame):
-    """
-    UI widget for a story node with text and two options.
-    """
-    def __init__(self, page: "GameCreationPage") -> None:
-        super().__init__()
-
-        # the page the node belongs to
-        self.page = page
-        self._setup_frame()
-        self._create_widgets()
-        self._build_layout()
-        self._assign_button_functions()
-
-    def _setup_frame(self) -> None:
-        self.setFrameShape(QtWidgets.QFrame.Box)
-        self.setLineWidth(2)
-    
-    def _create_widgets(self) -> None:
-        self.text = QtWidgets.QPlainTextEdit()
-        self.text.setPlaceholderText("Write the node text here...")
-
-        self.left_option = QtWidgets.QLineEdit()
-        self.left_option.setPlaceholderText("Left option text")
-        self.left_plus = QtWidgets.QPushButton("+")
-        self.left_plus.setFixedWidth(22)
-
-        self.right_option = QtWidgets.QLineEdit()
-        self.right_option.setPlaceholderText("Right option text")
-        self.right_plus = QtWidgets.QPushButton("+")
-        self.right_plus.setFixedWidth(22)
-    
-    def _build_layout(self) -> None:
-        options_row = QtWidgets.QHBoxLayout()
-        left_col = QtWidgets.QVBoxLayout()
-        right_col = QtWidgets.QVBoxLayout()
-
-        left_col.addWidget(self.left_option)
-        left_col.addWidget(self.left_plus, alignment=QtCore.Qt.AlignCenter)
-
-        right_col.addWidget(self.right_option)
-        right_col.addWidget(self.right_plus, alignment=QtCore.Qt.AlignCenter)
-
-        options_row.addLayout(left_col)
-        options_row.addLayout(right_col)
-
-        layout = QtWidgets.QVBoxLayout(self)
-        layout.addWidget(self.text)
-        layout.addLayout(options_row)
-
-    def _assign_button_functions(self) -> None:
-        self.left_plus.clicked.connect(self._create_left_option)
-        self.right_plus.clicked.connect(self._create_right_option)
-
-    def _create_left_option(self) -> None:
-        """
-        Tell the GameCreationPage to create a new node on the left.
-        """
-        self.page._create_child_node(self, OptionSide.LEFT)
-
-    def _create_right_option(self) -> None:
-        """
-        Tell the GameCreationPage to create a new node on the right.
-        """
-        self.page._create_child_node(self, OptionSide.LEFT)
-
 
 class GameCreationPage(QtWidgets.QWidget):
     """
