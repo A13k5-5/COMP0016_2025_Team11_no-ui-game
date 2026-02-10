@@ -10,7 +10,7 @@ class HomePage(QtWidgets.QWidget):
         self._create_widgets()
         self._add_widgets()
            
-    def _setup_window_layout(self, window_title : str):
+    def _setup_window_layout(self, window_title: str) -> None:
         """
         Set the window title, size and layout.
         """
@@ -18,7 +18,7 @@ class HomePage(QtWidgets.QWidget):
         self.resize(800, 600)
         self.layout = QtWidgets.QVBoxLayout(self)
 
-    def _create_widgets(self):
+    def _create_widgets(self) -> None:
         self.new_game_button = QtWidgets.QPushButton("Create a New Game")
         self.new_game_button.clicked.connect(self.open_game_creator)
         self._creation_window = None
@@ -27,7 +27,7 @@ class HomePage(QtWidgets.QWidget):
         self.edit_game_button.clicked.connect(self.open_file_dialog)
         self.text = QtWidgets.QLabel("No-UI Game", alignment=QtCore.Qt.AlignCenter)
 
-    def _add_widgets(self):
+    def _add_widgets(self) -> None:
         self.layout.addWidget(self.text)
 
         # horizontal box layout for the 2 buttons
@@ -37,11 +37,11 @@ class HomePage(QtWidgets.QWidget):
 
         self.layout.addLayout(self.button_row)
 
-    def open_game_creator(self):
+    def open_game_creator(self) -> None:
         self._creation_window = GameCreationPage()
         self._creation_window.show()
 
-    def open_file_dialog(self):
+    def open_file_dialog(self) -> None:
         """
         Open Finder file picker. No file handling yet.
         """
