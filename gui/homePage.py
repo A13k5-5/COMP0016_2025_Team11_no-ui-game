@@ -1,7 +1,7 @@
 import sys
 from .gameCreationPage import GameCreationPage
 from PySide6 import QtWidgets, QtCore, QtGui
-from .config import WINDOW_HEIGHT, WINDOW_WIDTH
+from . import config
 
 class HomePage(QtWidgets.QWidget):
     def __init__(self):
@@ -16,7 +16,7 @@ class HomePage(QtWidgets.QWidget):
         Set the window title, size and layout.
         """
         self.setWindowTitle(window_title)
-        self.resize(WINDOW_HEIGHT, WINDOW_WIDTH)
+        self.resize(config.WINDOW_HEIGHT, config.WINDOW_WIDTH)
         self.layout = QtWidgets.QVBoxLayout(self)
 
     def _create_widgets(self) -> None:
