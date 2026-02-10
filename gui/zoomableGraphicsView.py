@@ -14,6 +14,11 @@ class ZoomableGraphicsView(QtWidgets.QGraphicsView):
         self._zoom: float = 1.0 
     
     def wheelEvent(self, event: QtGui.QWheelEvent) -> None:
+        """
+        Each scroll on the trackpad multiplies/divides the zoom of the canvas by a factor
+        of 1.15, for zooming in and out, respectively.
+        Zoom is bounded by a range of 0.2 to 3.0 to avoid the view getting too small/large.
+        """
         if event.modifiers() & QtCore.Qt.ControlModifier:
             if event.angleDelta().y() > 0:
                 self._zoom *= 1.15

@@ -70,6 +70,8 @@ class GameCreationPage(QtWidgets.QWidget):
     def _create_node_at(self, x: float, y: float) -> NodeWidget:
         """
         Create a NodeWidget, wrap it in a proxy, and add it to the scene.
+        A proxy (QGraphicsProxyWidget) is a wrapper that allows a widget to be placed 
+        inside a scene (QGraphicsScene)
         """
         node = NodeWidget(self)
 
