@@ -1,5 +1,5 @@
 import sys
-from typing import Dict, List, Optional, Tuple
+from typing import Optional
 
 from PySide6 import QtWidgets, QtCore, QtGui 
 from graph import Node
@@ -23,12 +23,12 @@ class GameCreationPage(QtWidgets.QWidget):
 
         self.game_title: str= ""
         # list of all nodes in the game
-        self.nodes: List[NodeWidget] = []
+        self.nodes: list[NodeWidget] = []
         self.root_node: Optional[NodeWidget] = None
         # node -> (x,y)
-        self.node_coords_dict: Dict[NodeWidget, Tuple[float, float]] = {}
+        self.node_coords_dict: dict[NodeWidget, tuple[float, float]] = {}
         # parent_node -> {"left": child_node, "right": child_node}
-        self.node_children: Dict[NodeWidget, Dict[str, NodeWidget]] = {}
+        self.node_children: dict[NodeWidget, dict[str, NodeWidget]] = {}
 
         self._setup_window_layout("No-UI-Game Creator")
         self._title_entry()
@@ -135,7 +135,7 @@ class GameCreationPage(QtWidgets.QWidget):
         if not self.root_node:
             return None
         
-        widget_node: Dict[NodeWidget, Node] = {}
+        widget_node: dict[NodeWidget, Node] = {}
         # 1. create backend nodes
         for node_widget in self.nodes:
             text = self._write_node_text(node_widget)
