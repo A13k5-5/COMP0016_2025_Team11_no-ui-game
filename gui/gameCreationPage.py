@@ -1,4 +1,5 @@
 import sys
+from enum import Enum
 from typing import Dict, List, Optional, Tuple
 
 from PySide6 import QtWidgets, QtCore, QtGui 
@@ -8,6 +9,10 @@ from storageManager import StorageManager
 
 LEFT_GESTURE: Gesture = ("ILoveYou", "Left")
 RIGHT_GESTURE: Gesture = ("ILoveYou", "Right")
+
+class OptionSide(str, Enum):
+    LEFT = "left"
+    RIGHT = "right"
 
 class ZoomableGraphicsView(QtWidgets.QGraphicsView):
     """
@@ -94,13 +99,13 @@ class NodeWidget(QtWidgets.QFrame):
         """
         Tell the GameCreationPage to create a new node on the left.
         """
-        self.page._create_child_node(self, "left")
+        self.page._create_child_node(self, OptionSide.LEFT)
 
     def _create_right_option(self) -> None:
         """
         Tell the GameCreationPage to create a new node on the right.
         """
-        self.page._create_child_node(self, "right")
+        self.page._create_child_node(self, OptionSide.LEFT)
 
 
 class GameCreationPage(QtWidgets.QWidget):
@@ -178,15 +183,15 @@ class GameCreationPage(QtWidgets.QWidget):
     def _add_root_node(self) -> None:
         self._create_node_at(50,50)
     
-    def _create_child_node(self, parent: NodeWidget, side: str) -> None:
+    def _create_child_node(self, parent: NodeWidget, side: OptionSide) -> None:
         parent_coords = self.node_coords_dict.get(parent)
         if not parent:
             return
         
         y_offset = 420
-        if side == "left": 
+        if side == OptionSide.LEFT: 
             x_offset = -260
-        else: #side == "right"
+        else: #side == OptionSide.RIGHT
             x_offset = 260
         
         new_x = parent_coords[0] + x_offset
