@@ -1,4 +1,9 @@
+from gesture import Gesture
 from graph import Node
+
+LEFT: Gesture = Gesture(gesture="ILoveYou", handedness="Left")
+RIGHT: Gesture = Gesture(gesture="ILoveYou", handedness="Right")
+
 
 def build_default_story_graph() -> Node:
     # Story nodes with clear choice descriptions that reference handedness
@@ -40,33 +45,32 @@ def build_default_story_graph() -> Node:
     )
 
     # All connections use the same gesture key `ILoveYou`; handedness decides the branch
-    start.addNode(("ILoveYou", "Left"), garden)
-    start.addNode(("ILoveYou", "Right"), cellar)
+    start.addNode(LEFT, garden)
+    start.addNode(RIGHT, cellar)
 
-    garden.addNode(("ILoveYou", "Left"), shed_find)
-    garden.addNode(("ILoveYou", "Right"), loop_back)
+    garden.addNode(LEFT, shed_find)
+    garden.addNode(RIGHT, loop_back)
 
-    cellar.addNode(("ILoveYou", "Left"), loop_back)
-    cellar.addNode(("ILoveYou", "Right"), cellar_encounter)
+    cellar.addNode(LEFT, loop_back)
+    cellar.addNode(RIGHT, cellar_encounter)
 
-    shed_find.addNode(("ILoveYou", "Left"), loop_back)
-    shed_find.addNode(("ILoveYou", "Right"), cellar_encounter)
+    shed_find.addNode(LEFT, loop_back)
+    shed_find.addNode(RIGHT, cellar_encounter)
 
-    cellar_encounter.addNode(("ILoveYou", "Left"), loop_back)
-    cellar_encounter.addNode(("ILoveYou", "Right"), loop_back)
+    cellar_encounter.addNode(LEFT, loop_back)
+    cellar_encounter.addNode(RIGHT, loop_back)
 
-    loop_back.addNode(("ILoveYou", "Left"), start)
-    loop_back.addNode(("ILoveYou", "Right"), start)
+    loop_back.addNode(LEFT, start)
+    loop_back.addNode(RIGHT, start)
 
     return start
 
 
 def test_game() -> Node:
-    root = Node("Hi Bilbo. May I come in?")
-    nodeA = Node("Sure come on in.")
-    nodeB = Node("No, I'm busy right now. Come tomorrow.")
-    root.addNode(("ILoveYou", "Left"), nodeA)
-    root.addNode(("ILoveYou", "Right"), nodeB)
+    root: Node = Node("Hi Bilbo. May I come in?")
+    nodeA: Node = Node("Sure come on in.")
+    nodeB: Node = Node("No, I'm busy right now. Come tomorrow.")
+    root.addNode(LEFT, nodeA)
+    root.addNode(RIGHT, nodeB)
 
     return root
-

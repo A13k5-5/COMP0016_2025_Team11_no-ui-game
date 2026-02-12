@@ -1,23 +1,25 @@
 {
-    "2433004776880": {
-        "id": 2433004776880,
-        "text": "Hi Bilbo. May I come in?",
-        "audioPath": "C:\\Users\\pison\\Downloads\\no-ui-game\\Cool Game\\audio\\node_2433004776880.wav",
-        "adjacencyList": {
-            "('ILoveYou', 'Left')": 2431348713872,
-            "('ILoveYou', 'Right')": 2431347902656
+    "nodes": {
+        "2450861236032": {
+            "id": 2450861236032,
+            "text": "Hi Bilbo. May I come in?",
+            "audio_path": "C:\\Users\\pison\\Downloads\\no-ui-game\\Cool Game\\audio\\node_2450861236032.wav",
+            "adjacency_list": {
+                "gesture='ILoveYou' handedness='Left'": 2450861115536,
+                "gesture='ILoveYou' handedness='Right'": 2450861118032
+            }
+        },
+        "2450861115536": {
+            "id": 2450861115536,
+            "text": "Sure come on in.",
+            "audio_path": "C:\\Users\\pison\\Downloads\\no-ui-game\\Cool Game\\audio\\node_2450861115536.wav",
+            "adjacency_list": {}
+        },
+        "2450861118032": {
+            "id": 2450861118032,
+            "text": "No, I'm busy right now. Come tomorrow.",
+            "audio_path": "C:\\Users\\pison\\Downloads\\no-ui-game\\Cool Game\\audio\\node_2450861118032.wav",
+            "adjacency_list": {}
         }
-    },
-    "2431348713872": {
-        "id": 2431348713872,
-        "text": "Sure come on in.",
-        "audioPath": "C:\\Users\\pison\\Downloads\\no-ui-game\\Cool Game\\audio\\node_2431348713872.wav",
-        "adjacencyList": {}
-    },
-    "2431347902656": {
-        "id": 2431347902656,
-        "text": "No, I'm busy right now. Come tomorrow.",
-        "audioPath": "C:\\Users\\pison\\Downloads\\no-ui-game\\Cool Game\\audio\\node_2431347902656.wav",
-        "adjacencyList": {}
     }
 }
