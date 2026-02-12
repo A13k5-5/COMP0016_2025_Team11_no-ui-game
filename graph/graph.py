@@ -1,4 +1,4 @@
-from myTypes import Gesture
+from gesture import Gesture
 
 
 class Node:

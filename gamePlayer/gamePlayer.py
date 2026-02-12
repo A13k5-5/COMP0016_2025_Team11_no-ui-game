@@ -1,11 +1,11 @@
-import myGestureRecognizer
 from playsound3 import playsound
 import time
 
 from graph import Node
+import myGestureRecognizer
 import storageManager
 
-from myTypes import Gesture
+from gesture import Gesture
 
 
 class GamePlayer:
@@ -38,7 +38,7 @@ class GamePlayer:
         """
         Throws TimeoutError if no gesture is detected within TIMEOUT_TIME seconds.
         """
-        curNode = startNode
+        curNode: Node = startNode
         while True:
             # Display current scene and available choices (explicit about handedness)
             print("\n" + curNode.getText() + "\n")
@@ -54,9 +54,9 @@ class GamePlayer:
 
             time.sleep(3)
 
-    def _listOptions(self, curNode):
+    def _listOptions(self, curNode: Node):
         options = list(curNode.adjacencyList.items())
         print("Choices (perform a gesture with the shown hand):")
-        for idx, ((gesture, handedness), node) in enumerate(options, start=1):
+        for idx, (gesture, node) in enumerate(options, start=1):
             # show a short preview of the destination and the required handedness
-            print(f" {idx}. Gesture: {gesture} Hand: {handedness} -> {node._text.split('.')[0]}")
+            print(f" {idx}. Gesture: {gesture.gesture} Hand: {gesture.handedness} -> {node.getText().split('.')[0]}")
