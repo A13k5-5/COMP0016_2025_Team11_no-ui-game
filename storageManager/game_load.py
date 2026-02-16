@@ -18,8 +18,6 @@ class GameLoader:
         with open(graph_path, 'r') as file:
             serial_graph: SerialGraph = SerialGraph.model_validate_json(file.read().strip())
 
-        print(serial_graph)
-
         root, nodes = self._load_nodes(serial_graph)
         self._establish_connections(serial_graph, nodes)
 

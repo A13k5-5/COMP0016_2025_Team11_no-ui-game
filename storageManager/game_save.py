@@ -21,14 +21,13 @@ class GameSaver:
         :return:
         """
         game_path: str = os.path.join(path_to_save, game_name)
-        audio_dir: str = os.path.join(game_path, "audio")
 
         self._prepare_game_folder(game_path)
 
-        serialized_graph: SerialGraph = self._serialize_graph(root, audio_dir)
+        serialized_graph: SerialGraph = self._serialize_graph(root)
         self.save_graph(game_path, serialized_graph)
 
-        # self._generate_audio(serialized_graph, audio_dir)
+        self._generate_audio(serialized_graph, game_path)
 
 
     def _prepare_game_folder(self, game_path: str):
@@ -69,13 +68,12 @@ class GameSaver:
             file.write(serialized_graph.model_dump_json(indent=4))
 
 
-    def _serialize_graph(self, root: Node, audio_dir: str) -> SerialGraph:
+    def _serialize_graph(self, root: Node) -> SerialGraph:
         """
         Serializes the graph starting from the root node using DFS. Each node is stored in a dictionary with its ID as
         the key and its details (text, audio path, adjacency list) as the value. The adjacency list is represented as a
         dictionary mapping gesture strings to adjacent node IDs.
         :param root:
-        :param audio_dir: directory where audio files will be stored
         :return: dictionary of serialized nodes
         """
         serial_graph: SerialGraph = SerialGraph(nodes={})
@@ -83,7 +81,7 @@ class GameSaver:
         def dfs(node: Node):
             if node.get_id() in serial_graph.nodes:
                 return
-            serial_graph.nodes[node.get_id()] = self._serialize_node(node, audio_dir)
+            serial_graph.nodes[node.get_id()] = self._serialize_node(node)
             for adjacent_node in node.adjacencyList.values():
                 dfs(adjacent_node)
 
@@ -91,43 +89,34 @@ class GameSaver:
         return serial_graph
 
 
-    def _get_node_audio_path(self, node_id: int, audio_dir: str) -> str:
+    def _get_node_audio_path(self, node_id: int) -> str:
         """
         Generates the file path for the audio file corresponding to a given node.
         :param node_id: the ID of the node for which to generate the audio file path
-        :param audio_dir: the directory where audio files are stored
         :return: the file path for the node's audio file
         """
-        return os.path.join(audio_dir, f"node_{node_id}.wav")
+        return os.path.join("audio", f"node_{node_id}.wav")
 
 
-    def _serialize_node(self, node: Node, audio_dir: str) -> SerialNode:
+    def _serialize_node(self, node: Node) -> SerialNode:
         """
         Serializes a single node into a dictionary format, including its text, audio path, and adjacency list.
-        :param node: node to be serialized
-        :param audio_dir: directory where audio files will be stored
-        :return: serialized node as a dictionary
+        :param node: node to be serialised
+        :return: serialised node as a dictionary
         """
         return SerialNode(
             id=node.get_id(),
             text=node.getText(),
-            audio_path=self._get_node_audio_path(node.get_id(), audio_dir),
+            audio_path=self._get_node_audio_path(node.get_id()),
             adjacency_list={gesture: adjacent_node.get_id() for gesture, adjacent_node in node.adjacencyList.items()}
         )
-        return {
-            "id": node.get_id(),
-            "text": node.getText(),
-            "audioPath": self._get_node_audio_path(node.get_id(), audio_dir),
-            "adjacencyList": {gesture.__str__(): adjacent_node.get_id() for gesture, adjacent_node in node.adjacencyList.items()}
-        }
 
 
-    def _generate_audio(self, serial_graph: SerialGraph, audio_dir: str):
+    def _generate_audio(self, serial_graph: SerialGraph, game_path: str):
         """
         Generates audio files for each node in the graph using the Talker class. The audio files are saved in the specified
         audio directory with filenames corresponding to their node IDs.
         :param serial_graph: the serialized graph containing all nodes for which audio needs to be generated
-        :param audio_dir:
         :return:
         """
         talker: Talker = Talker()
@@ -135,6 +124,6 @@ class GameSaver:
 
         for node_id, serial_node in serial_graph.nodes.items():
             text: str = serial_node.text
-            output_file: str = self._get_node_audio_path(node_id, audio_dir)
+            output_file: str = os.path.join(game_path, self._get_node_audio_path(node_id))
 
             talker.generate_speech(text, description, output_file)

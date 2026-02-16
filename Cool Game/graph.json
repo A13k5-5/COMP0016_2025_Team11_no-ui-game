@@ -1,24 +1,24 @@
 {
     "nodes": {
-        "2008078047216": {
-            "id": 2008078047216,
+        "2653698038464": {
+            "id": 2653698038464,
             "text": "Hi Bilbo. May I come in?",
-            "audio_path": "C:\\Users\\pison\\Downloads\\no-ui-game\\Cool Game\\audio\\node_2008078047216.wav",
+            "audio_path": "audio\\node_2653698038464.wav",
             "adjacency_list": {
-                "1": 2008078866176,
-                "0": 2008075644672
+                "1": 2654288017168,
+                "0": 2653715793008
             }
         },
-        "2008078866176": {
-            "id": 2008078866176,
+        "2654288017168": {
+            "id": 2654288017168,
             "text": "Sure come on in.",
-            "audio_path": "C:\\Users\\pison\\Downloads\\no-ui-game\\Cool Game\\audio\\node_2008078866176.wav",
+            "audio_path": "audio\\node_2654288017168.wav",
             "adjacency_list": {}
         },
-        "2008075644672": {
-            "id": 2008075644672,
+        "2653715793008": {
+            "id": 2653715793008,
             "text": "No, I'm busy right now. Come tomorrow.",
-            "audio_path": "C:\\Users\\pison\\Downloads\\no-ui-game\\Cool Game\\audio\\node_2008075644672.wav",
+            "audio_path": "audio\\node_2653715793008.wav",
             "adjacency_list": {}
         }
     }
