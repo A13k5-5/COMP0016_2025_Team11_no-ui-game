@@ -5,7 +5,7 @@ from graph import Node
 import myGestureRecognizer
 import storageManager
 
-from gesture import Gesture
+from gesture import EnumGesture
 
 
 class GamePlayer:
@@ -49,7 +49,7 @@ class GamePlayer:
             self._playAudio(curNode.audioPath)
 
             # Ask recognizer for a decision (expects a tuple like ("ILoveYou", "Left"))
-            decision: Gesture = self.recogniser.get_gesture(list(curNode.adjacencyList.keys()))
+            decision: EnumGesture = self.recogniser.get_gesture(list(curNode.adjacencyList.keys()))
             curNode = curNode.getNode(decision)
 
             time.sleep(3)
@@ -59,4 +59,4 @@ class GamePlayer:
         print("Choices (perform a gesture with the shown hand):")
         for idx, (gesture, node) in enumerate(options, start=1):
             # show a short preview of the destination and the required handedness
-            print(f" {idx}. Gesture: {gesture.gesture} Hand: {gesture.handedness} -> {node.getText().split('.')[0]}")
+            print(f" {idx}. Gesture: {gesture.__str__()} -> {node.getText().split('.')[0]}")

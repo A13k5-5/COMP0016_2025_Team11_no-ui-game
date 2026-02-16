@@ -1,4 +1,4 @@
-from gesture import Gesture
+from gesture import EnumGesture
 
 
 class Node:
@@ -6,7 +6,7 @@ class Node:
         self.id: int = id(self)
         self._text = text
         self.audioPath = None
-        self.adjacencyList: dict[Gesture, Node] = {}
+        self.adjacencyList: dict[EnumGesture, Node] = {}
 
     def getText(self):
         return self._text
@@ -14,10 +14,10 @@ class Node:
     def get_id(self) -> int:
         return self.id
 
-    def addNode(self, gesture: Gesture, newNode):
+    def addNode(self, gesture: EnumGesture, newNode: 'Node'):
         self.adjacencyList[gesture] = newNode
 
-    def getNode(self, gesture: Gesture):
+    def getNode(self, gesture: EnumGesture):
         return self.adjacencyList.get(gesture)
 
     def __str__(self):

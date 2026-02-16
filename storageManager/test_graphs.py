@@ -1,8 +1,5 @@
-from gesture import Gesture
+from gesture import EnumGesture
 from graph import Node
-
-LEFT: Gesture = Gesture(gesture="ILoveYou", handedness="Left")
-RIGHT: Gesture = Gesture(gesture="ILoveYou", handedness="Right")
 
 
 def build_default_story_graph() -> Node:
@@ -45,23 +42,23 @@ def build_default_story_graph() -> Node:
     )
 
     # All connections use the same gesture key `ILoveYou`; handedness decides the branch
-    start.addNode(LEFT, garden)
-    start.addNode(RIGHT, cellar)
+    start.addNode(EnumGesture.ILoveYou_Left, garden)
+    start.addNode(EnumGesture.ILoveYou_Right, cellar)
 
-    garden.addNode(LEFT, shed_find)
-    garden.addNode(RIGHT, loop_back)
+    garden.addNode(EnumGesture.ILoveYou_Left, shed_find)
+    garden.addNode(EnumGesture.ILoveYou_Right, loop_back)
 
-    cellar.addNode(LEFT, loop_back)
-    cellar.addNode(RIGHT, cellar_encounter)
+    cellar.addNode(EnumGesture.ILoveYou_Left, loop_back)
+    cellar.addNode(EnumGesture.ILoveYou_Right, cellar_encounter)
 
-    shed_find.addNode(LEFT, loop_back)
-    shed_find.addNode(RIGHT, cellar_encounter)
+    shed_find.addNode(EnumGesture.ILoveYou_Left, loop_back)
+    shed_find.addNode(EnumGesture.ILoveYou_Right, cellar_encounter)
 
-    cellar_encounter.addNode(LEFT, loop_back)
-    cellar_encounter.addNode(RIGHT, loop_back)
+    cellar_encounter.addNode(EnumGesture.ILoveYou_Left, loop_back)
+    cellar_encounter.addNode(EnumGesture.ILoveYou_Right, loop_back)
 
-    loop_back.addNode(LEFT, start)
-    loop_back.addNode(RIGHT, start)
+    loop_back.addNode(EnumGesture.ILoveYou_Left, start)
+    loop_back.addNode(EnumGesture.ILoveYou_Right, start)
 
     return start
 
@@ -70,7 +67,7 @@ def test_game() -> Node:
     root: Node = Node("Hi Bilbo. May I come in?")
     nodeA: Node = Node("Sure come on in.")
     nodeB: Node = Node("No, I'm busy right now. Come tomorrow.")
-    root.addNode(LEFT, nodeA)
-    root.addNode(RIGHT, nodeB)
+    root.addNode(EnumGesture.ILoveYou_Left, nodeA)
+    root.addNode(EnumGesture.ILoveYou_Right, nodeB)
 
     return root
