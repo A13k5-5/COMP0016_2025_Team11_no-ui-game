@@ -107,7 +107,7 @@ class GameSaver:
         return SerialNode(
             id=node.get_id(),
             text=node.getText(),
-            audio_path=self._get_node_audio_filename(node.get_id()),
+            audio_filename=self._get_node_audio_filename(node.get_id()),
             adjacency_list={gesture: adjacent_node.get_id() for gesture, adjacent_node in node.adjacencyList.items()}
         )
 

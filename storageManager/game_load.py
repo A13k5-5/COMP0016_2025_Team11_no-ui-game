@@ -35,7 +35,7 @@ class GameLoader:
         for node_id, serial_node in serial_graph.nodes.items():
             node: Node = Node(serial_node.text)
             node.id = int(node_id)
-            node.audio_filename = serial_node.audio_path
+            node.audio_filename = serial_node.audio_filename
             nodes[node.id] = node
             if root is None:
                 root = node
