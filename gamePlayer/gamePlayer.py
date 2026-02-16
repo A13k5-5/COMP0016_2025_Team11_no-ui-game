@@ -17,11 +17,11 @@ class GamePlayer:
         self.game_loader: storageManager.GameLoader = storageManager.GameLoader()
         self.recogniser: myGestureRecognizer.VideoGestureRecogniser = myGestureRecognizer.VideoGestureRecogniser()
 
-    def _playAudio(self, game_path: str, audio_path: str):
+    def _playAudio(self, game_path: str, audio_filename: str):
         """
         Play the audio file.
         """
-        audio_full_path = os.path.join(game_path, audio_path)
+        audio_full_path = os.path.join(game_path, "audio", audio_filename)
         try:
             playsound(audio_full_path)
         except Exception as e:
@@ -48,7 +48,7 @@ class GamePlayer:
             self._listOptions(curNode)
             
             # Play current scene audio
-            self._playAudio(game_path, curNode.audioPath)
+            self._playAudio(game_path, curNode.audio_filename)
 
             # Ask recognizer for a decision (expects a tuple like ("ILoveYou", "Left"))
             decision: EnumGesture = self.recogniser.get_gesture(list(curNode.adjacencyList.keys()))

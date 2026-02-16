@@ -5,7 +5,7 @@ class Node:
     def __init__(self, text: str):
         self.id: int = id(self)
         self._text = text
-        self.audioPath = None
+        self.audio_filename = None
         self.adjacencyList: dict[EnumGesture, Node] = {}
 
     def getText(self):

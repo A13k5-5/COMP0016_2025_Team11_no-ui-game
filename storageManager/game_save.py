@@ -89,13 +89,13 @@ class GameSaver:
         return serial_graph
 
 
-    def _get_node_audio_path(self, node_id: int) -> str:
+    def _get_node_audio_filename(self, node_id: int) -> str:
         """
         Generates the file path for the audio file corresponding to a given node.
         :param node_id: the ID of the node for which to generate the audio file path
         :return: the file path for the node's audio file
         """
-        return os.path.join("audio", f"node_{node_id}.wav")
+        return f"node_{node_id}.wav"
 
 
     def _serialize_node(self, node: Node) -> SerialNode:
@@ -107,7 +107,7 @@ class GameSaver:
         return SerialNode(
             id=node.get_id(),
             text=node.getText(),
-            audio_path=self._get_node_audio_path(node.get_id()),
+            audio_path=self._get_node_audio_filename(node.get_id()),
             adjacency_list={gesture: adjacent_node.get_id() for gesture, adjacent_node in node.adjacencyList.items()}
         )
 
@@ -124,6 +124,6 @@ class GameSaver:
 
         for node_id, serial_node in serial_graph.nodes.items():
             text: str = serial_node.text
-            output_file: str = os.path.join(game_path, self._get_node_audio_path(node_id))
+            output_file: str = os.path.join(game_path, "audio", self._get_node_audio_filename(node_id))
 
             talker.generate_speech(text, description, output_file)

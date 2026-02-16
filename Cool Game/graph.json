@@ -3,7 +3,7 @@
         "2653698038464": {
             "id": 2653698038464,
             "text": "Hi Bilbo. May I come in?",
-            "audio_path": "audio\\node_2653698038464.wav",
+            "audio_path": "node_2653698038464.wav",
             "adjacency_list": {
                 "1": 2654288017168,
                 "0": 2653715793008
@@ -12,13 +12,13 @@
         "2654288017168": {
             "id": 2654288017168,
             "text": "Sure come on in.",
-            "audio_path": "audio\\node_2654288017168.wav",
+            "audio_path": "node_2654288017168.wav",
             "adjacency_list": {}
         },
         "2653715793008": {
             "id": 2653715793008,
             "text": "No, I'm busy right now. Come tomorrow.",
-            "audio_path": "audio\\node_2653715793008.wav",
+            "audio_path": "node_2653715793008.wav",
             "adjacency_list": {}
         }
     }
