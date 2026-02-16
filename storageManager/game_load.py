@@ -2,6 +2,8 @@ import json
 import os
 
 from graph import Node
+from graph.serial_graph import SerialGraph
+
 
 class GameLoader:
     """
@@ -15,43 +17,44 @@ class GameLoader:
         """
         graph_path = os.path.join(game_folder, "graph.json")
         with open(graph_path, 'r') as file:
-            data = json.load(file)
+            serial_graph: SerialGraph = SerialGraph.model_validate_json(file.read().strip())
 
-        root, nodes = self._load_nodes(data)
-        self._establish_connections(data, nodes)
+        print(serial_graph)
+
+        root, nodes = self._load_nodes(serial_graph)
+        self._establish_connections(serial_graph, nodes)
 
         return root
 
 
-    def _load_nodes(self, data: dict) -> tuple[Node, dict[int, Node]]:
+    def _load_nodes(self, serial_graph: SerialGraph) -> tuple[Node, dict[int, Node]]:
         """
         Load nodes without connections. Gives back the root node and a dictionary of all nodes.
-        :param data:
+        :param serial_graph:
         :return:
         """
         root: Node | None = None
         nodes: dict[int, Node] = {}
-        for node_id, node_data in data.items():
-            node = Node(node_data["text"])
+        for node_id, serial_node in serial_graph.nodes.items():
+            node: Node = Node(serial_node.text)
             node.id = int(node_id)
-            node.audioPath = node_data.get("audioPath")
+            node.audioPath = serial_node.audio_path
             nodes[node.id] = node
             if root is None:
                 root = node
         return root, nodes
 
 
-    def _establish_connections(self, data: dict, nodes: dict[int, Node]) -> None:
+    def _establish_connections(self, serial_graph: SerialGraph, nodes: dict[int, Node]) -> None:
         """
         Establish connections between nodes based on adjacency lists. Makes sure that all the nodes have their adjacency
         lists properly filled in, so that the game can be played.
-        :param data:
+        :param serial_graph:
         :param nodes:
         """
-        for node_id, node_data in data.items():
+        for node_id, serial_node in serial_graph.nodes.items():
             node = nodes[int(node_id)]
-            for gesture_str, adjacent_node_id in node_data["adjacencyList"].items():
-                # reconstruct the gesture tuple
-                gesture = eval(gesture_str)
+            for gesture, adjacent_node_id in serial_node.adjacency_list.items():
                 adjacent_node = nodes[int(adjacent_node_id)]
                 node.addNode(gesture, adjacent_node)
+
