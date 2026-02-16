@@ -1,0 +1,10 @@
+{
+    "nodes": {
+        "2009316786496": {
+            "id": 2009316786496,
+            "text": "Bi bilbo.",
+            "audio_filename": "node_2009316786496.wav",
+            "adjacency_list": {}
+        }
+    }
+}
