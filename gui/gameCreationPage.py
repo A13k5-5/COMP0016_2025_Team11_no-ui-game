@@ -170,7 +170,7 @@ class GameCreationPage(QtWidgets.QWidget):
             return
 
         title = self.title_entry.text().strip() or "untitled"
-        game_path = os.path.join(__file__, os.pardir, os.pardir, "saved_games")
+        game_path = os.path.join(os.path.dirname(__file__), os.pardir, "saved_games")
 
         self.game_saver.save_game(game_path, title, root)
         print(f"Saved game to {game_path}")
