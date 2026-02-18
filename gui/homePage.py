@@ -46,14 +46,14 @@ class HomePage(QtWidgets.QWidget):
         """
         Open Finder file picker. No file handling yet.
         """
-        file_path, _ = QtWidgets.QFileDialog.getOpenFileName(
+        game_dir = QtWidgets.QFileDialog.getExistingDirectory(
             self,
-            "Open Game File",
-            "",
+            "Select Game Folder",
             "All Files (*.*)"
         )
-        if file_path:
-            print(f"Selected file: {file_path}")
+        if game_dir:
+            self._creation_window = GameCreationPage(game_folder=game_dir)
+            self._creation_window.show()
 
 
 def run():

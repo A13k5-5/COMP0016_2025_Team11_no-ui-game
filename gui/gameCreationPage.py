@@ -17,7 +17,7 @@ class GameCreationPage(QtWidgets.QWidget):
     """
     Main page for creating a no-ui game.
     """
-    def __init__(self) -> None:
+    def __init__(self, game_folder: Optional[str] = None) -> None:
         super().__init__()
 
         self.game_title: str= ""
@@ -37,7 +37,11 @@ class GameCreationPage(QtWidgets.QWidget):
         self._title_entry()
 
         self._setup_canvas()
-        self._add_root_node()
+
+        if game_folder:
+            self._load_game(game_folder)
+        else:
+            self._add_root_node()
     
     def _setup_window_layout(self, window_title: str) -> None:
         """
@@ -188,6 +192,19 @@ class GameCreationPage(QtWidgets.QWidget):
 
         return progress
 
+    def _load_game(self, game_folder: str) -> None:
+        """
+        Load an existing game onto the creation page and populate the graph nodes.
+        """
+        print(f"load game from {game_folder}")
+        try:
+            #serialized_graph = self.game_loader.load_graph(game_folder)
+
+            game_name = os.path.basename(game_folder)
+            self.game_title = game_name
+            self.title_entry.setText(game_name)
+        except Exception as e:
+            QtWidgets.QMessageBox.critical(self, "Error", f"Failed to load game: {e}")
 
 def run():
     app = QtWidgets.QApplication([])
