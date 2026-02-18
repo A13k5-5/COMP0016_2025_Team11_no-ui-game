@@ -172,8 +172,21 @@ class GameCreationPage(QtWidgets.QWidget):
         title = self.title_entry.text().strip() or "untitled"
         game_path = os.path.join(os.path.dirname(__file__), os.pardir, "saved_games")
 
+        progress = self._show_saving_popup()
+
         self.game_saver.save_game(game_path, title, root)
-        print(f"Saved game to {game_path}")
+        progress.close()
+        QtWidgets.QMessageBox.information(self, "Success", f"Game saved to {game_path}/{title}")
+    
+    def _show_saving_popup(self):
+        progress = QtWidgets.QProgressDialog("Saving game...", None, 0, 0, self)
+        progress.setWindowTitle("Saving")
+        progress.setWindowModality(QtCore.Qt.WindowModal)
+        progress.setCancelButton(None)
+        progress.show()
+        QtWidgets.QApplication.processEvents()
+
+        return progress
 
 
 def run():
