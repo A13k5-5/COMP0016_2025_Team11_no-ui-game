@@ -1,9 +1,12 @@
+import os.path
 import sys
 from typing import Optional
 
-from PySide6 import QtWidgets, QtCore, QtGui 
+from PySide6 import QtWidgets, QtCore, QtGui
+
+from gesture import EnumGesture
 from graph import Node
-from storageManager import StorageManager
+from storageManager import GameLoader, GameSaver
 from . import config
 from .zoomableGraphicsView import ZoomableGraphicsView
 from .nodeWidget import NodeWidget
@@ -18,6 +21,10 @@ class GameCreationPage(QtWidgets.QWidget):
         super().__init__()
 
         self.game_title: str= ""
+
+        self.game_loader: GameLoader = GameLoader()
+        self.game_saver: GameSaver = GameSaver()
+
         # list of all nodes in the game
         self.nodes: list[NodeWidget] = []
         self.root_node: Optional[NodeWidget] = None
@@ -148,9 +155,9 @@ class GameCreationPage(QtWidgets.QWidget):
             right_child = children.get("right")
 
             if left_child:
-                parent_node.addNode(config.LEFT_GESTURE, widget_node[left_child])
+                parent_node.addNode(EnumGesture.ILoveYou_Left, widget_node[left_child])
             if right_child:
-                parent_node.addNode(config.RIGHT_GESTURE, widget_node[right_child])
+                parent_node.addNode(EnumGesture.ILoveYou_Right, widget_node[right_child])
         return widget_node[self.root_node]
     
     def save_title(self) -> None:
@@ -162,13 +169,11 @@ class GameCreationPage(QtWidgets.QWidget):
         if not root:
             return
 
-        # TODO - right now we save all games into graph.json for test purposes
-        # later update so that the game is saved into the "title".json
         title = self.title_entry.text().strip() or "untitled"
-        filename = "graph.json" #f"{title}.json"
+        game_path = os.path.join(os.path.dirname(__file__), os.pardir, "saved_games")
 
-        StorageManager().save_graph(root, filename=filename)
-        print(f"Saved game to {filename}")
+        self.game_saver.save_game(game_path, title, root)
+        print(f"Saved game to {game_path}")
 
 
 def run():

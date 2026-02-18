@@ -7,7 +7,7 @@ from mediapipe.tasks.python import BaseOptions
 from mediapipe.tasks.python.vision import GestureRecognizer, RunningMode, GestureRecognizerOptions, \
     GestureRecognizerResult
 
-from myTypes import Gesture
+from gesture import EnumGesture
 from .videoCaptureManager import video_capture_manager
 
 WINDOW_NAME = "Hand Detection"
@@ -25,12 +25,12 @@ class VideoGestureRecogniser:
         self._running: bool = True
         self._last_gesture_category: str | None = None
         self._last_handedness: str | None = None
-        self._gestures_to_spot: list[Gesture] = []
+        self._gestures_to_spot: list[EnumGesture] = []
 
-    def _get_last_gesture(self) -> Gesture:
-        return self._last_gesture_category, self._last_handedness
+    def _get_last_gesture(self) -> EnumGesture:
+        return EnumGesture.from_gesture(self._last_gesture_category, self._last_handedness)
 
-    def _reset(self, gestures_to_spot: list[Gesture]):
+    def _reset(self, gestures_to_spot: list[EnumGesture]):
         self._running = True
         self._last_gesture_category = None
         self._last_handedness = None
@@ -99,11 +99,11 @@ class VideoGestureRecogniser:
                 if cv2.waitKey(1) & 0xFF == ord("q"):
                     break
 
-    def get_gesture(self, gestures_to_spot: list[Gesture]) -> Gesture:
+    def get_gesture(self, gestures_to_spot: list[EnumGesture]) -> EnumGesture:
         """
-        Get a gesture from the user. This method blocks until one of the specified gestures is detected.
-        The return type is Gesture, which is a tuple of (gesture_category: str, handedness: str).
-        Raises TimeoutError if no gesture is detected within 30 seconds.
+        Start the gesture recognition process and return the first gesture detected that is in the gestures_to_spot list.
+        :param gestures_to_spot:
+        :return:
         """
         self._reset(gestures_to_spot)
         self._start_recognition()

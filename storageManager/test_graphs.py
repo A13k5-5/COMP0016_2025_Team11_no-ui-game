@@ -1,0 +1,73 @@
+from gesture import EnumGesture
+from graph import Node
+
+
+def build_default_story_graph() -> Node:
+    # Story nodes with clear choice descriptions that reference handedness
+    start = Node(
+        "You find yourself at the ruined gate of an old manor. Two paths lie ahead:"
+        "Options:"
+        " - Left: Go through the garden (leads to the shed)."
+        " - Right: Go down the cellar stairs (leads to the cellar)."
+    )
+    garden = Node(
+        "You slip through the garden, tangled roses parting around you. Moonlight reveals a hidden tool shed."
+        "Options:"
+        " - Left: Enter the shed and search (leads to finding a lantern and rope)."
+        " - Right: Follow a winding path that leads back toward the gate."
+    )
+    cellar = Node(
+        "You descend the stone stair into a cold cellar. The air smells of dust and old paper; something moves in the corner."
+        "Options:"
+        " - Left: Retreat and head back toward the gate."
+        " - Right: Approach the corner (may reveal an encounter)."
+    )
+    shed_find = Node(
+        "Inside the shed you find a lantern and rope. This may help later."
+        "Options:"
+        " - Left: Leave the shed and return toward the gate."
+        " - Right: Take a different path that leads toward the cellar encounter."
+    )
+    cellar_encounter = Node(
+        "A shadow rustles — a friendly stray dog wags its tail, offering companionship."
+        "Options:"
+        " - Left: Escort the dog back toward the gate."
+        " - Right: Continue on a path that also leads back toward the gate."
+    )
+    loop_back = Node(
+        "The path leads back to the gate. You may choose again."
+        "Options:"
+        " - Left: Reattempt the gate choices (Left -> garden)."
+        " - Right: Reattempt the gate choices (Right -> cellar)."
+    )
+
+    # All connections use the same gesture key `ILoveYou`; handedness decides the branch
+    start.addNode(EnumGesture.ILoveYou_Left, garden)
+    start.addNode(EnumGesture.ILoveYou_Right, cellar)
+
+    garden.addNode(EnumGesture.ILoveYou_Left, shed_find)
+    garden.addNode(EnumGesture.ILoveYou_Right, loop_back)
+
+    cellar.addNode(EnumGesture.ILoveYou_Left, loop_back)
+    cellar.addNode(EnumGesture.ILoveYou_Right, cellar_encounter)
+
+    shed_find.addNode(EnumGesture.ILoveYou_Left, loop_back)
+    shed_find.addNode(EnumGesture.ILoveYou_Right, cellar_encounter)
+
+    cellar_encounter.addNode(EnumGesture.ILoveYou_Left, loop_back)
+    cellar_encounter.addNode(EnumGesture.ILoveYou_Right, loop_back)
+
+    loop_back.addNode(EnumGesture.ILoveYou_Left, start)
+    loop_back.addNode(EnumGesture.ILoveYou_Right, start)
+
+    return start
+
+
+def test_game() -> Node:
+    root: Node = Node("Hi Bilbo. May I come in?")
+    nodeA: Node = Node("Sure come on in.")
+    nodeB: Node = Node("No, I'm busy right now. Come tomorrow.")
+    root.addNode(EnumGesture.ILoveYou_Left, nodeA)
+    root.addNode(EnumGesture.ILoveYou_Right, nodeB)
+
+    return root
