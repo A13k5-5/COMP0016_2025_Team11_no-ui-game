@@ -198,13 +198,50 @@ class GameCreationPage(QtWidgets.QWidget):
         """
         print(f"load game from {game_folder}")
         try:
-            #serialized_graph = self.game_loader.load_graph(game_folder)
-
+            root_node = self.game_loader.load_graph(game_folder)
+            
             game_name = os.path.basename(game_folder)
             self.game_title = game_name
             self.title_entry.setText(game_name)
+
+            self._populate_graph(root_node)
         except Exception as e:
             QtWidgets.QMessageBox.critical(self, "Error", f"Failed to load game: {e}")
+
+    def _populate_graph(self, root_node: Node):
+        """
+        Recursively build UI widgets from loaded Node graph.
+        """
+        queue = [(root_node, 50, 50)]
+        self.root_node = None
+
+        while queue:
+            node, x, y = queue.pop(0)
+
+            node_widget: NodeWidget = self._create_node_at(x, y)            
+            #node_widget.text.setPlainText(node.getText())
+            self._populate_widget_from_node(node_widget, node)
+
+            if not self.root_node:                
+                self.root_node = node_widget 
+
+            for gesture, child_node in node.adjacencyList.items():             
+                if gesture == EnumGesture.ILoveYou_Left:                    
+                    # Add left child                    
+                    self._create_child_node(node_widget, OptionSide.LEFT)                    
+                    queue.append((child_node, x - 260, y + 420))             
+                elif gesture == EnumGesture.ILoveYou_Right:                    
+                    # Add right child                    
+                    self._create_child_node(node_widget, OptionSide.RIGHT)                    
+                    queue.append((child_node, x + 260, y + 420))
+        pass
+
+    def _populate_widget_from_node(self, node_widget: NodeWidget, node: Node) -> None:
+        """
+        Fill in the main text and the options of a node widget from the node object
+        """
+        node_widget.text.setPlainText(node.getText())
+        
 
 def run():
     app = QtWidgets.QApplication([])
