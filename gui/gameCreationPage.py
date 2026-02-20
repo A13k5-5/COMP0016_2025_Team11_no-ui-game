@@ -103,11 +103,11 @@ class GameCreationPage(QtWidgets.QWidget):
         if not parent:
             return
         
-        y_offset = 420
+        y_offset = config.CHILD_NODE_Y_OFFSET
         if side == OptionSide.LEFT: 
-            x_offset = -260
+            x_offset = config.CHILD_NODE_LEFT_X_OFFSET
         else: #side == OptionSide.RIGHT
-            x_offset = 260
+            x_offset = config.CHILD_NODE_RIGHT_X_OFFSET
         
         new_x = parent_coords[0] + x_offset
         new_y = parent_coords[1] + y_offset
@@ -215,11 +215,11 @@ class GameCreationPage(QtWidgets.QWidget):
                 if gesture == EnumGesture.ILoveYou_Left:                    
                     # Add left child                    
                     self._create_child_node(node_widget, OptionSide.LEFT)                    
-                    queue.append((child_node, x - 260, y + 420))             
+                    queue.append((child_node, x + config.CHILD_NODE_LEFT_X_OFFSET, y + config.CHILD_NODE_Y_OFFSET))             
                 elif gesture == EnumGesture.ILoveYou_Right:                    
                     # Add right child                    
                     self._create_child_node(node_widget, OptionSide.RIGHT)                    
-                    queue.append((child_node, x + 260, y + 420))
+                    queue.append((child_node, x + config.CHILD_NODE_RIGHT_X_OFFSET, y + config.CHILD_NODE_Y_OFFSET))
         pass
 
     def _populate_widget_from_node(self, node_widget: NodeWidget, node: Node) -> None:

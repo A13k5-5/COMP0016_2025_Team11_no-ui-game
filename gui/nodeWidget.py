@@ -1,5 +1,6 @@
 from PySide6 import QtWidgets, QtCore
 from .optionSide import OptionSide
+from . import config
 
 
 class NodeWidget(QtWidgets.QFrame):
@@ -27,12 +28,12 @@ class NodeWidget(QtWidgets.QFrame):
         self.left_option = QtWidgets.QLineEdit()
         self.left_option.setPlaceholderText("Left option text")
         self.left_plus = QtWidgets.QPushButton("+")
-        self.left_plus.setFixedWidth(22)
+        self.left_plus.setFixedWidth(config.PLUS_BUTTON_WIDTH)
 
         self.right_option = QtWidgets.QLineEdit()
         self.right_option.setPlaceholderText("Right option text")
         self.right_plus = QtWidgets.QPushButton("+")
-        self.right_plus.setFixedWidth(22)
+        self.right_plus.setFixedWidth(config.PLUS_BUTTON_WIDTH)
     
     def _build_layout(self) -> None:
         options_row = QtWidgets.QHBoxLayout()
