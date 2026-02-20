@@ -118,23 +118,6 @@ class GameCreationPage(QtWidgets.QWidget):
             self.node_children[parent] = {}
         self.node_children[parent][side] = child
 
-    def _write_node_text(self, node_widget: NodeWidget) -> str:
-        """
-        Build spoken text including the two options, if present.
-        """
-        main_text = node_widget.text.toPlainText().strip()
-        left_text = node_widget.left_option.text().strip()
-        right_text = node_widget.right_option.text().strip()
-
-        parts = [main_text]
-        if left_text or right_text:
-            parts.append("...You have two options.")
-        if left_text:
-            parts.append(f"Do {left_text} by raising your left hand.")
-        if right_text:
-            parts.append(f"Do {right_text} by raising your right hand.")
-        return " ".join(parts).strip()
-
     def _build_game_graph(self) -> Optional[Node]:
         """
         Build a backend graph tree from the UI nodes.
@@ -145,8 +128,11 @@ class GameCreationPage(QtWidgets.QWidget):
         widget_node: dict[NodeWidget, Node] = {}
         # 1. create backend nodes
         for node_widget in self.nodes:
-            text = self._write_node_text(node_widget)
-            game_graph_node = Node(text)
+            main_text = node_widget.text.toPlainText().strip()
+            left_text = node_widget.left_option.text().strip()
+            right_text = node_widget.right_option.text().strip()
+            
+            game_graph_node = Node(main_text, left_text, right_text)
             widget_node[node_widget] = game_graph_node
 
 
@@ -241,6 +227,8 @@ class GameCreationPage(QtWidgets.QWidget):
         Fill in the main text and the options of a node widget from the node object
         """
         node_widget.text.setPlainText(node.getText())
+        node_widget.left_option.setText(node.left_option)
+        node_widget.right_option.setText(node.right_option)
         
 
 def run():

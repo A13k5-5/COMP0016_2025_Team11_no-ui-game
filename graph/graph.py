@@ -2,9 +2,11 @@ from gesture import EnumGesture
 
 
 class Node:
-    def __init__(self, text: str):
+    def __init__(self, text: str, left_option: str = "", right_option: str = ""):
         self.id: int = id(self)
         self._text = text
+        self.left_option = left_option
+        self.right_option = right_option
         self.audio_filename = None
         self.adjacencyList: dict[EnumGesture, Node] = {}
 
