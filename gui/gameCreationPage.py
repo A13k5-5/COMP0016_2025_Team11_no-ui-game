@@ -87,6 +87,9 @@ class GameCreationPage(QtWidgets.QWidget):
         proxy.setPos(x,y)
         self.scene.addItem(proxy)
 
+        # store proxy for deletion later
+        node._proxy = proxy  
+
         self.node_coords_dict[node] = (x,y)
         self.nodes.append(node)
 
@@ -117,6 +120,43 @@ class GameCreationPage(QtWidgets.QWidget):
         if parent not in self.node_children:
             self.node_children[parent] = {}
         self.node_children[parent][side] = child
+
+        self._update_delete_buttons()
+    
+    def _update_delete_buttons(self) -> None:
+        """
+        Update the delete buttons on nodes as tree grows.
+        So that only leaf nodes can be deleted (not root).
+        """
+        for node in self.nodes:
+            is_leaf: bool = len(self.node_children.get(node, {})) == 0
+            is_root: bool = (node == self.root_node)
+            node.set_delete_visible(is_leaf and not is_root)
+
+    def delete_leaf_node(self, node: NodeWidget) -> None:
+        """
+        Delete leaf node.
+        """
+        # find parent and remove from the children
+        for parent, children in self.node_children.items():
+            for side, child in list(children.items()):
+                if child == node:
+                    del self.node_children[parent][side]
+                    break
+        
+        # remove from all node tracking
+        self.nodes.remove(node)
+        self.node_coords_dict.pop(node, None)
+        self.node_children.pop(node, None)
+
+        # remove from proxy (the canvas)
+        proxy = getattr(node, "_proxy", None)
+        if proxy:
+            self.scene.removeItem(proxy)
+            proxy.deleteLater()
+        node.deleteLater()
+
+        self._update_delete_buttons()
 
     def _build_game_graph(self) -> Optional[Node]:
         """
@@ -220,7 +260,8 @@ class GameCreationPage(QtWidgets.QWidget):
                     # Add right child                    
                     self._create_child_node(node_widget, OptionSide.RIGHT)                    
                     queue.append((child_node, x + config.CHILD_NODE_RIGHT_X_OFFSET, y + config.CHILD_NODE_Y_OFFSET))
-        pass
+
+        self._update_delete_buttons()
 
     def _populate_widget_from_node(self, node_widget: NodeWidget, node: Node) -> None:
         """
