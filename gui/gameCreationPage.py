@@ -175,6 +175,7 @@ class GameCreationPage(QtWidgets.QWidget):
             right_text = node_widget.right_option.text().strip()
             
             game_graph_node = Node(main_text, left_text, right_text)
+            game_graph_node.is_win = node_widget.win_button.isChecked()
             widget_node[node_widget] = game_graph_node
 
 
@@ -286,6 +287,8 @@ class GameCreationPage(QtWidgets.QWidget):
         node_widget.text.setPlainText(node.getText())
         node_widget.left_option.setText(node.left_option)
         node_widget.right_option.setText(node.right_option)
+        node_widget.win_button.setChecked(node.is_win)
+        node_widget.win_button.setStyleSheet("background-color: #f0c040;" if node.is_win else "")
         
 
 def run():

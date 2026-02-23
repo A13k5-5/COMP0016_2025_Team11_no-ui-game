@@ -9,6 +9,7 @@ class Node:
         self.right_option = right_option
         self.audio_filename = None
         self.adjacencyList: dict[EnumGesture, Node] = {}
+        self.is_win: bool = False
 
     def getText(self):
         return self._text

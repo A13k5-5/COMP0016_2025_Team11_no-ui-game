@@ -40,6 +40,7 @@ class GameLoader:
             )
             node.id = int(node_id)
             node.audio_filename = serial_node.audio_filename
+            node.is_win = serial_node.is_win
             nodes[node.id] = node
             if root is None:
                 root = node

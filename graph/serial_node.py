@@ -10,3 +10,4 @@ class SerialNode(BaseModel):
     right_option: str = ""
     audio_filename: str
     adjacency_list: dict[EnumGesture, int]
+    is_win: bool = False
