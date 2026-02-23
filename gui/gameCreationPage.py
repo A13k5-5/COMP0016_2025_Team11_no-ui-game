@@ -32,6 +32,8 @@ class GameCreationPage(QtWidgets.QWidget):
         self.node_coords_dict: dict[NodeWidget, tuple[float, float]] = {}
         # parent_node -> {"left": child_node, "right": child_node}
         self.node_children: dict[NodeWidget, dict[str, NodeWidget]] = {}
+        # node -> (depth, position)
+        self.node_depth_pos: dict[NodeWidget, tuple[int, int]] = {}
 
         self._setup_window_layout("No-UI-Game Creator")
         self._title_entry()
@@ -99,22 +101,22 @@ class GameCreationPage(QtWidgets.QWidget):
         return node
 
     def _add_root_node(self) -> None:
-        self._create_node_at(50,50)
+        x, y = self._get_node_position(0, 0)
+        node = self._create_node_at(x, y)
+        self.node_depth_pos[node] = (0, 0)
     
     def _create_child_node(self, parent: NodeWidget, side: OptionSide) -> None:
         parent_coords = self.node_coords_dict.get(parent)
         if not parent_coords:
             return
         
-        y_offset = config.CHILD_NODE_Y_OFFSET
-        if side == OptionSide.LEFT: 
-            x_offset = config.CHILD_NODE_LEFT_X_OFFSET
-        else: #side == OptionSide.RIGHT
-            x_offset = config.CHILD_NODE_RIGHT_X_OFFSET
+        parent_depth, parent_pos = self.node_depth_pos.get(parent, (0, 0))
+        child_depth = parent_depth + 1
+        child_pos = parent_pos * 2 if side == OptionSide.LEFT else parent_pos * 2 + 1
         
-        new_x = parent_coords[0] + x_offset
-        new_y = parent_coords[1] + y_offset
+        new_x, new_y = self._get_node_position(child_depth, child_pos)
         child = self._create_node_at(new_x, new_y)
+        self.node_depth_pos[child] = (child_depth, child_pos)
 
         # record connection for saving graph
         if parent not in self.node_children:
@@ -234,32 +236,46 @@ class GameCreationPage(QtWidgets.QWidget):
         except Exception as e:
             QtWidgets.QMessageBox.critical(self, "Error", f"Failed to load game: {e}")
 
+    def _get_node_position(self, depth: int, position: int, total_width: int = config.GAME_TREE_WIDTH) -> tuple[float, float]:
+        """
+        Total window width is divided into 2^depth equal slots(/sections) at each depth level,
+        and the node is centered in its slot.
+        So nodes do not overlap as tree grows.
+        """
+        slots = 2 ** depth
+        slot_width = total_width / slots
+        x = slot_width * position + slot_width / 2
+        y = depth * config.CHILD_NODE_Y_OFFSET + config.TREE_Y_OFFSET
+        return x, y
+
     def _populate_graph(self, root_node: Node):
         """
         Recursively build UI widgets from loaded Node graph.
         """
-        queue = [(root_node, 50, 50)]
+        queue = [(root_node, 0, 0, None, None)]  # (node, depth, pos, parent_widget, side)
         self.root_node = None
 
         while queue:
-            node, x, y = queue.pop(0)
+            node, depth, pos, parent_widget, side = queue.pop(0)
 
-            node_widget: NodeWidget = self._create_node_at(x, y)            
-            #node_widget.text.setPlainText(node.getText())
+            x, y = self._get_node_position(depth, pos)
+            node_widget: NodeWidget = self._create_node_at(x, y)
             self._populate_widget_from_node(node_widget, node)
+            self.node_depth_pos[node_widget] = (depth, pos)
 
-            if not self.root_node:                
-                self.root_node = node_widget 
+            if not self.root_node:
+                self.root_node = node_widget
 
-            for gesture, child_node in node.adjacencyList.items():             
-                if gesture == EnumGesture.ILoveYou_Left:                    
-                    # Add left child                    
-                    self._create_child_node(node_widget, OptionSide.LEFT)                    
-                    queue.append((child_node, x + config.CHILD_NODE_LEFT_X_OFFSET, y + config.CHILD_NODE_Y_OFFSET))             
-                elif gesture == EnumGesture.ILoveYou_Right:                    
-                    # Add right child                    
-                    self._create_child_node(node_widget, OptionSide.RIGHT)                    
-                    queue.append((child_node, x + config.CHILD_NODE_RIGHT_X_OFFSET, y + config.CHILD_NODE_Y_OFFSET))
+            if parent_widget is not None and side is not None:
+                if parent_widget not in self.node_children:
+                    self.node_children[parent_widget] = {}
+                self.node_children[parent_widget][side] = node_widget
+
+            for gesture, child_node in node.adjacencyList.items():
+                if gesture == EnumGesture.ILoveYou_Left:
+                    queue.append((child_node, depth + 1, pos * 2, node_widget, OptionSide.LEFT))
+                elif gesture == EnumGesture.ILoveYou_Right:
+                    queue.append((child_node, depth + 1, pos * 2 + 1, node_widget, OptionSide.RIGHT))
 
         self._update_delete_buttons()
 
