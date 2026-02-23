@@ -16,7 +16,7 @@ class HomePage(QtWidgets.QWidget):
         Set the window title, size and layout.
         """
         self.setWindowTitle(window_title)
-        self.resize(config.WINDOW_HEIGHT, config.WINDOW_WIDTH)
+        self.resize(config.WINDOW_WIDTH, config.WINDOW_HEIGHT)
         self.layout = QtWidgets.QVBoxLayout(self)
 
     def _create_widgets(self) -> None:

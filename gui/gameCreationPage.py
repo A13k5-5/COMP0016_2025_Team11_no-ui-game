@@ -48,7 +48,7 @@ class GameCreationPage(QtWidgets.QWidget):
         Set the window title, size and layout.
         """
         self.setWindowTitle(window_title)
-        self.resize(config.WINDOW_HEIGHT, config.WINDOW_WIDTH)
+        self.resize(config.WINDOW_WIDTH, config.WINDOW_HEIGHT)
         self.layout = QtWidgets.QVBoxLayout(self)
         self.layout.setAlignment(QtCore.Qt.AlignTop)
         
@@ -103,7 +103,7 @@ class GameCreationPage(QtWidgets.QWidget):
     
     def _create_child_node(self, parent: NodeWidget, side: OptionSide) -> None:
         parent_coords = self.node_coords_dict.get(parent)
-        if not parent:
+        if not parent_coords:
             return
         
         y_offset = config.CHILD_NODE_Y_OFFSET
@@ -181,8 +181,8 @@ class GameCreationPage(QtWidgets.QWidget):
         for parent_widget, children in self.node_children.items():
             parent_node = widget_node[parent_widget]
 
-            left_child = children.get("left")
-            right_child = children.get("right")
+            left_child = children.get(OptionSide.LEFT)
+            right_child = children.get(OptionSide.RIGHT)
 
             if left_child:
                 parent_node.addNode(EnumGesture.ILoveYou_Left, widget_node[left_child])
