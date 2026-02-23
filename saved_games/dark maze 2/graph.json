@@ -1,0 +1,55 @@
+{
+    "nodes": {
+        "10970371360": {
+            "id": 10970371360,
+            "text": "you are in a maze, its dark. There are two paths ahead of you.",
+            "left_option": "turn left and walk through the vines",
+            "right_option": "go right and swim through the lake",
+            "audio_filename": "node_10970371360.wav",
+            "adjacency_list": {
+                "1": 10970379664,
+                "0": 10970380576
+            },
+            "is_win": false
+        },
+        "10970379664": {
+            "id": 10970379664,
+            "text": "the vines give way to another fork in the path. theres light coming in through the bushes on the left",
+            "left_option": "try to crawl out of the maze through the bushes",
+            "right_option": "ignore the light and walk straight",
+            "audio_filename": "node_10970379664.wav",
+            "adjacency_list": {
+                "1": 10970380672,
+                "0": 10970380624
+            },
+            "is_win": false
+        },
+        "10970380672": {
+            "id": 10970380672,
+            "text": "you made it out",
+            "left_option": "",
+            "right_option": "",
+            "audio_filename": "node_10970380672.wav",
+            "adjacency_list": {},
+            "is_win": true
+        },
+        "10970380624": {
+            "id": 10970380624,
+            "text": "you got further into the dark maze and reach a dead end. you dont know where to gp. you lost",
+            "left_option": "",
+            "right_option": "",
+            "audio_filename": "node_10970380624.wav",
+            "adjacency_list": {},
+            "is_win": false
+        },
+        "10970380576": {
+            "id": 10970380576,
+            "text": "the lake has crocodiles. you have lsost",
+            "left_option": "",
+            "right_option": "",
+            "audio_filename": "node_10970380576.wav",
+            "adjacency_list": {},
+            "is_win": false
+        }
+    }
+}
