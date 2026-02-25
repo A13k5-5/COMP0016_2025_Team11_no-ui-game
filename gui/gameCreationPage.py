@@ -253,7 +253,8 @@ class GameCreationPage(QtWidgets.QWidget):
         """
         Recursively build UI widgets from loaded Node graph.
         """
-        queue = [(root_node, 0, 0, None, None)]  # (node, depth, pos, parent_widget, side)
+        queue: list[tuple[Node, int, int, Optional[NodeWidget], Optional[OptionSide]]] = [(root_node, 0, 0, None, None)]  
+        # (node, depth, pos, parent_widget, side)
         self.root_node = None
 
         while queue:
