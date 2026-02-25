@@ -1,0 +1,34 @@
+{
+    "nodes": {
+        "5903278608": {
+            "id": 5903278608,
+            "text": "start node test",
+            "left_option": "left option",
+            "right_option": "right option",
+            "audio_filename": "node_5903278608.wav",
+            "adjacency_list": {
+                "1": 5903281248,
+                "0": 5903282448
+            },
+            "is_win": false
+        },
+        "5903281248": {
+            "id": 5903281248,
+            "text": "loss - test",
+            "left_option": "",
+            "right_option": "",
+            "audio_filename": "node_5903281248.wav",
+            "adjacency_list": {},
+            "is_win": false
+        },
+        "5903282448": {
+            "id": 5903282448,
+            "text": "win test",
+            "left_option": "",
+            "right_option": "",
+            "audio_filename": "node_5903282448.wav",
+            "adjacency_list": {},
+            "is_win": true
+        }
+    }
+}

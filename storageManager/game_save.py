@@ -107,8 +107,11 @@ class GameSaver:
         return SerialNode(
             id=node.get_id(),
             text=node.getText(),
+            left_option=node.left_option,
+            right_option=node.right_option,
             audio_filename=self._get_node_audio_filename(node.get_id()),
-            adjacency_list={gesture: adjacent_node.get_id() for gesture, adjacent_node in node.adjacencyList.items()}
+            adjacency_list={gesture: adjacent_node.get_id() for gesture, adjacent_node in node.adjacencyList.items()},
+            is_win=node.is_win
         )
 
 
@@ -123,7 +126,15 @@ class GameSaver:
         description: str = "A calm and soothing narration voice"
 
         for node_id, serial_node in serial_graph.nodes.items():
-            text: str = serial_node.text
+            text_parts = [serial_node.text]
+            if serial_node.left_option or serial_node.right_option:
+                text_parts.append("...You have two options.")
+            if serial_node.left_option:
+                text_parts.append(f"Do {serial_node.left_option} by raising your left hand.")
+            if serial_node.right_option:
+                text_parts.append(f"Do {serial_node.right_option} by raising your right hand.")
+            
+            full_text = " ".join(text_parts).strip()
             output_file: str = os.path.join(game_path, "audio", self._get_node_audio_filename(node_id))
 
-            talker.generate_speech(text, description, output_file)
+            talker.generate_speech(full_text, description, output_file)

@@ -1,5 +1,6 @@
 from PySide6 import QtWidgets, QtCore
 from .optionSide import OptionSide
+from . import config
 
 
 class NodeWidget(QtWidgets.QFrame):
@@ -27,12 +28,20 @@ class NodeWidget(QtWidgets.QFrame):
         self.left_option = QtWidgets.QLineEdit()
         self.left_option.setPlaceholderText("Left option text")
         self.left_plus = QtWidgets.QPushButton("+")
-        self.left_plus.setFixedWidth(22)
+        self.left_plus.setFixedWidth(config.PLUS_BUTTON_WIDTH)
 
         self.right_option = QtWidgets.QLineEdit()
         self.right_option.setPlaceholderText("Right option text")
         self.right_plus = QtWidgets.QPushButton("+")
-        self.right_plus.setFixedWidth(22)
+        self.right_plus.setFixedWidth(config.PLUS_BUTTON_WIDTH)
+
+        self.delete_button = QtWidgets.QPushButton("Delete")
+        self.delete_button.setVisible(False)
+        self.delete_button.setStyleSheet("background-color: #ff6b6b; color: white;")
+
+        self.win_button = QtWidgets.QPushButton("⭐ Set as Win")
+        self.win_button.setCheckable(True)
+        self.win_button.clicked.connect(self._set_win)
     
     def _build_layout(self) -> None:
         options_row = QtWidgets.QHBoxLayout()
@@ -51,10 +60,15 @@ class NodeWidget(QtWidgets.QFrame):
         layout = QtWidgets.QVBoxLayout(self)
         layout.addWidget(self.text)
         layout.addLayout(options_row)
+        layout.addWidget(self.delete_button, alignment=QtCore.Qt.AlignRight)
+
+        layout.addWidget(self.win_button, alignment=QtCore.Qt.AlignLeft)
+        layout.addWidget(self.delete_button, alignment=QtCore.Qt.AlignRight)
 
     def _assign_button_functions(self) -> None:
         self.left_plus.clicked.connect(self._create_left_option)
         self.right_plus.clicked.connect(self._create_right_option)
+        self.delete_button.clicked.connect(self._delete_self)
 
     def _create_left_option(self) -> None:
         """
@@ -67,4 +81,19 @@ class NodeWidget(QtWidgets.QFrame):
         Tell the GameCreationPage to create a new node on the right.
         """
         self.page._create_child_node(self, OptionSide.RIGHT)
+    
+    def _delete_self(self) -> None:
+        """
+        Ask the page to delete this node (only allowed if leaf).
+        """
+        self.page.delete_leaf_node(self)
 
+    def set_delete_visible(self, visible: bool) -> None:
+        """
+        Show/hide delete button based on whether node is a leaf and not root.
+        """
+        self.delete_button.setVisible(visible)
+
+    def _set_win(self) -> None:
+        is_win = self.win_button.isChecked()
+        self.win_button.setStyleSheet("background-color: #f0c040;" if is_win else "")
