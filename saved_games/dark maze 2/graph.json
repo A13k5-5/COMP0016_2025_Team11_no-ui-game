@@ -1,53 +1,53 @@
 {
     "nodes": {
-        "10970371360": {
-            "id": 10970371360,
+        "11105264528": {
+            "id": 11105264528,
             "text": "you are in a maze, its dark. There are two paths ahead of you.",
             "left_option": "turn left and walk through the vines",
             "right_option": "go right and swim through the lake",
-            "audio_filename": "node_10970371360.wav",
+            "audio_filename": "node_11105264528.wav",
             "adjacency_list": {
-                "1": 10970379664,
-                "0": 10970380576
+                "1": 11105264384,
+                "0": 11105264480
             },
             "is_win": false
         },
-        "10970379664": {
-            "id": 10970379664,
+        "11105264384": {
+            "id": 11105264384,
             "text": "the vines give way to another fork in the path. theres light coming in through the bushes on the left",
             "left_option": "try to crawl out of the maze through the bushes",
             "right_option": "ignore the light and walk straight",
-            "audio_filename": "node_10970379664.wav",
+            "audio_filename": "node_11105264384.wav",
             "adjacency_list": {
-                "1": 10970380672,
-                "0": 10970380624
+                "1": 11105264432,
+                "0": 11105271632
             },
             "is_win": false
         },
-        "10970380672": {
-            "id": 10970380672,
-            "text": "you made it out",
+        "11105264432": {
+            "id": 11105264432,
+            "text": "you made it out. you win",
             "left_option": "",
             "right_option": "",
-            "audio_filename": "node_10970380672.wav",
+            "audio_filename": "node_11105264432.wav",
             "adjacency_list": {},
             "is_win": true
         },
-        "10970380624": {
-            "id": 10970380624,
+        "11105271632": {
+            "id": 11105271632,
             "text": "you got further into the dark maze and reach a dead end. you dont know where to gp. you lost",
             "left_option": "",
             "right_option": "",
-            "audio_filename": "node_10970380624.wav",
+            "audio_filename": "node_11105271632.wav",
             "adjacency_list": {},
             "is_win": false
         },
-        "10970380576": {
-            "id": 10970380576,
+        "11105264480": {
+            "id": 11105264480,
             "text": "the lake has crocodiles. you have lsost",
             "left_option": "",
             "right_option": "",
-            "audio_filename": "node_10970380576.wav",
+            "audio_filename": "node_11105264480.wav",
             "adjacency_list": {},
             "is_win": false
         }
