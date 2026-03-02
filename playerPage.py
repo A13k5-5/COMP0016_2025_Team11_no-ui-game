@@ -16,7 +16,7 @@ class PlayerPage(QtWidgets.QWidget):
         # Folder selection row
         folder_row = QtWidgets.QHBoxLayout()
         self.path_edit = QtWidgets.QLineEdit()
-        self.path_edit.setPlaceholderText("Select a game folder…")
+        self.path_edit.setPlaceholderText("Select a game…")
         self.path_edit.setReadOnly(True)
         browse_btn = QtWidgets.QPushButton("Browse…")
         browse_btn.clicked.connect(self._browse)
@@ -31,12 +31,12 @@ class PlayerPage(QtWidgets.QWidget):
         layout.addWidget(self.run_btn)
 
     def _browse(self):
-        folder = QtWidgets.QFileDialog.getExistingDirectory(
-            self, "Select Game Folder", os.path.expanduser("~"),
-            QtWidgets.QFileDialog.Option.ShowDirsOnly
+        path, _ = QtWidgets.QFileDialog.getOpenFileName(
+            self, "Select Game Zip", os.path.expanduser("~"),
+            "Game files (*.zip)"
         )
-        if folder:
-            self.path_edit.setText(os.path.abspath(folder))
+        if path:
+            self.path_edit.setText(os.path.abspath(path))
             self.run_btn.setEnabled(True)
 
     def _run(self):
