@@ -52,10 +52,13 @@ class GamePlayer:
             self._playAudio(game_folder, curNode.audio_filename)
 
             # Ask recognizer for a decision (expects a tuple like ("ILoveYou", "Left"))
-            decision: EnumGesture = self.recogniser.get_gesture(list(curNode.adjacencyList.keys()))
+            decision: EnumGesture = self.recogniser.get_gesture(curNode.get_possible_gestures())
+            if decision == EnumGesture.Victory:
+                break
+
             curNode = curNode.getNode(decision)
 
-            time.sleep(3)
+            time.sleep(2)
 
     def _listOptions(self, curNode: Node):
         options = list(curNode.adjacencyList.items())

@@ -23,5 +23,8 @@ class Node:
     def getNode(self, gesture: EnumGesture):
         return self.adjacencyList.get(gesture)
 
+    def get_possible_gestures(self) -> list[EnumGesture]:
+        return [gesture for gesture, node in self.adjacencyList.items() if node is not None]
+
     def __str__(self):
         return f"{self._text}, adjacent to {[node._text for node in self.adjacencyList.values()]}"
