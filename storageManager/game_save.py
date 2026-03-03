@@ -2,6 +2,7 @@ import os
 import tempfile
 import zipfile
 
+from . import config
 from graph import Node
 from graph.serial_graph import SerialGraph
 from graph.serial_node import SerialNode
@@ -22,7 +23,7 @@ class GameSaver:
         :param root: the root node of the graph representing the game
         :return:
         """
-        zip_path: str = os.path.join(path_to_save, game_name + ".zip")
+        zip_path: str = os.path.join(path_to_save, game_name + config.FILE_EXTENSION)
 
         self._check_zip_path(zip_path)
 
@@ -32,7 +33,7 @@ class GameSaver:
 
             serialized_graph: SerialGraph = self._serialize_graph(root)
             self.save_graph(stage_path, serialized_graph)
-            # self._generate_audio(serialized_graph, stage_path)
+            self._generate_audio(serialized_graph, stage_path)
 
             self._zip_folder_to(stage_path, zip_path)
 

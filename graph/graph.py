@@ -3,6 +3,11 @@ from gesture import EnumGesture
 
 class Node:
     def __init__(self, text: str, left_option: str = "", right_option: str = ""):
+        """
+        :param text: the narrative text describing the current node (e.g., "You stand before an old manor. The gate is locked.")
+        :param left_option: the text describing the left option (e.g., "Enter the shed and search")
+        :param right_option: the text describing the right option (e.g., "Follow a winding path that leads back toward the gate")
+        """
         self.id: int = id(self)
         self._text = text
         self.left_option = left_option
