@@ -23,3 +23,9 @@ if __name__ == "__main__":
     # for game engine
     from gui.homePage import run
     run()
+
+    # for game loading
+    # from storageManager.game_load import GameLoader
+    # loader = GameLoader()
+    # root, game_folder = loader.load_graph("./saved_games/adventure_game.zip")
+    # print(root)

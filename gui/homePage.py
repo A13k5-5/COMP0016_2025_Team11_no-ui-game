@@ -44,15 +44,16 @@ class HomePage(QtWidgets.QWidget):
 
     def open_file_dialog(self) -> None:
         """
-        Open Finder file picker. No file handling yet.
+        Open file picker for a zipped game file.
         """
-        game_dir = QtWidgets.QFileDialog.getExistingDirectory(
+        game_zip, _ = QtWidgets.QFileDialog.getOpenFileName(
             self,
-            "Select Game Folder",
-            "All Files (*.*)"
+            "Select Game Zip",
+            "",
+            "Game files (*.zip)"
         )
-        if game_dir:
-            self._creation_window = GameCreationPage(game_folder=game_dir)
+        if game_zip:
+            self._creation_window = GameCreationPage(game_path=game_zip)
             self._creation_window.show()
 
 
