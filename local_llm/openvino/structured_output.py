@@ -4,52 +4,39 @@
 
 import argparse
 import json
-from typing import Literal
 
 from openvino_genai import GenerationConfig, LLMPipeline, StructuredOutputConfig, ChatHistory
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
+
+from enum_gesture import EnumGesture
 
 
-class Person(BaseModel):
-    name: str = Field(pattern=r"^[A-Z][a-z]{1,20}$")
-    surname: str = Field(pattern=r"^[A-Z][a-z]{1,20}$")
-    age: int
-    city: Literal["Dublin", "Dubai", "Munich"]
+class SerialNode(BaseModel):
+    id: int
+    text: str
+    left_option: str = ""
+    right_option: str = ""
+    adjacency_list: dict[EnumGesture, int]
+    is_win: bool = False
 
+class SerialGraph(BaseModel):
+    nodes: dict[int, SerialNode]
 
-class Car(BaseModel):
-    model: str = Field(pattern=r"^[A-Z][a-z]{1,20} ?[A-Z][a-z]{0,20} ?.?$")
-    year: int
-    engine_type: Literal["diesel", "petrol", "electric", "hybrid"]
-
-
-class Transaction(BaseModel):
-    id: int = Field(ge=1000, le=10_000_000)
-    amount: float
-    currency: Literal["EUR", "PLN", "RUB", "AED", "CHF", "GBP", "USD"]
-
-
-class ItemQuantities(BaseModel):
-    person: int = Field(ge=0, le=100)
-    car: int = Field(ge=0, le=100)
-    transaction: int = Field(ge=0, le=100)
-
-
-items_map = {"person": Person, "car": Car, "transaction": Transaction}
-
-sys_message = (
-    "You generate JSON objects based on the user's request. You can generate JSON objects with different types of objects: person, car, transaction. "
-    "If the user requested a different type, the JSON fields should remain zero. "
-    "Please note that the words 'individual', 'person', 'people', 'man', 'human', 'woman', 'inhabitant', 'citizen' are synonyms and can be used interchangeably. "
-    'E.g. if the user wants 5 houses, then the JSON must be {"person": 0, "car": 0, "transaction": 0}. '
-    'E.g. if the user wants 5 people, 3 cars, and 10 transactions then the JSON must be {"person": 5, "car": 3, "transaction": 10}. '
-    'If the user wants 3 people and 1 house, then the JSON must be {"person": 3, "car": 0, "transaction": 0}. '
-    "Make sure that the JSON contains the numbers that the user requested. If the user asks for specific attributes, like 'surname', 'model', etc., "
-    "ignore this information and generate JSON objects with the same fields as in the schema. "
+sys_message: str = (
+    "You generate JSON objects based on the user's request. You will generate a list of JSON objects that follow the SerialNode schema. "
+    "A SerialNode object represents a node in a graph of a text-based game. The user will give you their ideas"
+    " about how many nodes should be in the game, and what should be their high-level content. "
+    "It is your job to generate the full story. Make sure to follow the JSON schema for the SerialNode. "
+    "To help you understand the SerialNode class better, i will explain what each field means: "
+    "- id: a unique integer identifier for the node. It should start from 0 and increment by 1 for each new node. "
+    "- text: the text that will be shown to the player when they reach this node."
+    "- left_option: the text that will be shown to the player for the left option. This field can be empty if there is no left option. "
+    "- right_option: the text that will be shown to the player for the right option."
+    "adjacency_list: a dictionary that maps the player's choice left(1) or right(0) to the id of the next node. "    
+    "it is absolutely necessary to make sure that the id of the next node exists in the generated JSON objects. "
+    "- is_win: a boolean that indicates whether this node is a winning node or not."
     "Please use double quotes for JSON keys and values. "
 )
-
-sys_message_for_items = "Please try to avoid generating the same JSON objects multiple times."
 
 
 def main():
@@ -61,7 +48,6 @@ def main():
     pipe = LLMPipeline(args.model_dir, device)
 
     config = GenerationConfig()
-    config.max_new_tokens = 300
 
     print(
         "This is a smart assistant that generates structured output in JSON format. "
@@ -75,40 +61,19 @@ def main():
         except EOFError:
             break
 
+        # configuring the system message and the structured output config for the pipeline
         history = ChatHistory()
         history.append({"role": "system", "content": sys_message})
         config.structured_output_config = StructuredOutputConfig(
-            json_schema=json.dumps(ItemQuantities.model_json_schema())
+            json_schema=json.dumps(SerialGraph.model_json_schema())
         )
-        config.do_sample = False
-        history.append({"role": "user", "content": prompt})
-        decoded_results = pipe.generate(history, config)
-        json_response = decoded_results.texts[0]
-        res = json.loads(json_response)
-        print(f"Generated JSON with item quantities: {json_response}")
-
         config.do_sample = True
         config.temperature = 0.8
-
-        history.clear()
-        history.append({"role": "system", "content": sys_message_for_items})
         history.append({"role": "user", "content": prompt})
 
-        generate_has_run = False
-        for item, quantity in res.items():
-            config.structured_output_config = StructuredOutputConfig(
-                json_schema=json.dumps(items_map[item].model_json_schema())
-            )
-            for _ in range(quantity):
-                generate_has_run = True
-                decoded_results = pipe.generate(history, config)
-                json_strs = decoded_results.texts[0]
-                # Validate generated JSON
-                json.loads(json_strs)
-                print(json_strs)
-
-        if not generate_has_run:
-            print("No items generated. Please try again with a different request.")
+        decoded_results = pipe.generate(history, config)
+        json_response = decoded_results.texts[0]
+        print(json_response)
 
 
 if "__main__" == __name__:
