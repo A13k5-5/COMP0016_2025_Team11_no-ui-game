@@ -21,8 +21,8 @@ if __name__ == "__main__":
     #     playerPage.run()
 
     # for game engine
-    # from gui.homePage import run
-    # run()
+    from gui.homePage import run
+    run()
 
     # for game loading
     # from storageManager.game_load import GameLoader
@@ -31,12 +31,12 @@ if __name__ == "__main__":
     # print(root)
 
     # for game saving
-    import os
-    from storageManager.game_save import GameSaver
-    import storageManager.test_graphs
-    from graph import Node
-
-    saver = GameSaver()
-    root: Node = storageManager.test_graphs.build_default_story_graph()
-    saver.save_game(os.path.join(os.path.dirname(__file__), "saved_games"), "lord_of_the_rings", root)
+    # import os
+    # from storageManager.game_save import GameSaver
+    # import storageManager.test_graphs
+    # from graph import Node
+    #
+    # saver = GameSaver()
+    # root: Node = storageManager.test_graphs.build_default_story_graph()
+    # saver.save_game(os.path.join(os.path.dirname(__file__), "saved_games"), "lord_of_the_rings", root)
 

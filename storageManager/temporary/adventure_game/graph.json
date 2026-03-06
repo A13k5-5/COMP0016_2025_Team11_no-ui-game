@@ -1,74 +1,74 @@
 {
     "nodes": {
-        "2943855937920": {
-            "id": 2943855937920,
+        "2900907771808": {
+            "id": 2900907771808,
             "text": "You find yourself at the ruined gate of an old manor. Two paths lie ahead:Options: - Left: Go through the garden (leads to the shed). - Right: Go down the cellar stairs (leads to the cellar).",
             "left_option": "",
             "right_option": "",
-            "audio_filename": "node_2943855937920.wav",
+            "audio_filename": "node_2900907771808.wav",
             "adjacency_list": {
-                "1": 2943883236208,
-                "0": 2943416574720
+                "1": 2900557517872,
+                "0": 2900907862272
             },
             "is_win": false
         },
-        "2943883236208": {
-            "id": 2943883236208,
+        "2900557517872": {
+            "id": 2900557517872,
             "text": "You slip through the garden, tangled roses parting around you. Moonlight reveals a hidden tool shed.Options: - Left: Enter the shed and search (leads to finding a lantern and rope). - Right: Follow a winding path that leads back toward the gate.",
             "left_option": "",
             "right_option": "",
-            "audio_filename": "node_2943883236208.wav",
+            "audio_filename": "node_2900557517872.wav",
             "adjacency_list": {
-                "1": 2943416574192,
-                "0": 2943416574336
+                "1": 2900562286336,
+                "0": 2899599114752
             },
             "is_win": false
         },
-        "2943416574192": {
-            "id": 2943416574192,
+        "2900562286336": {
+            "id": 2900562286336,
             "text": "Inside the shed you find a lantern and rope. This may help later.Options: - Left: Leave the shed and return toward the gate. - Right: Take a different path that leads toward the cellar encounter.",
             "left_option": "",
             "right_option": "",
-            "audio_filename": "node_2943416574192.wav",
+            "audio_filename": "node_2900562286336.wav",
             "adjacency_list": {
-                "1": 2943416574336,
-                "0": 2943416574480
+                "1": 2899599114752,
+                "0": 2899771603232
             },
             "is_win": false
         },
-        "2943416574336": {
-            "id": 2943416574336,
+        "2899599114752": {
+            "id": 2899599114752,
             "text": "The path leads back to the gate. You may choose again.Options: - Left: Reattempt the gate choices (Left -> garden). - Right: Reattempt the gate choices (Right -> cellar).",
             "left_option": "",
             "right_option": "",
-            "audio_filename": "node_2943416574336.wav",
+            "audio_filename": "node_2899599114752.wav",
             "adjacency_list": {
-                "1": 2943855937920,
-                "0": 2943855937920
+                "1": 2900907771808,
+                "0": 2900907771808
             },
             "is_win": false
         },
-        "2943416574480": {
-            "id": 2943416574480,
+        "2899771603232": {
+            "id": 2899771603232,
             "text": "A shadow rustles — a friendly stray dog wags its tail, offering companionship.Options: - Left: Escort the dog back toward the gate. - Right: Continue on a path that also leads back toward the gate.",
             "left_option": "",
             "right_option": "",
-            "audio_filename": "node_2943416574480.wav",
+            "audio_filename": "node_2899771603232.wav",
             "adjacency_list": {
-                "1": 2943416574336,
-                "0": 2943416574336
+                "1": 2899599114752,
+                "0": 2899599114752
             },
             "is_win": false
         },
-        "2943416574720": {
-            "id": 2943416574720,
+        "2900907862272": {
+            "id": 2900907862272,
             "text": "You descend the stone stair into a cold cellar. The air smells of dust and old paper; something moves in the corner.Options: - Left: Retreat and head back toward the gate. - Right: Approach the corner (may reveal an encounter).",
             "left_option": "",
             "right_option": "",
-            "audio_filename": "node_2943416574720.wav",
+            "audio_filename": "node_2900907862272.wav",
             "adjacency_list": {
-                "1": 2943416574336,
-                "0": 2943416574480
+                "1": 2899599114752,
+                "0": 2899771603232
             },
             "is_win": false
         }

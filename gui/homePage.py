@@ -48,9 +48,8 @@ class HomePage(QtWidgets.QWidget):
         """
         game_zip, _ = QtWidgets.QFileDialog.getOpenFileName(
             self,
-            "Select Game Zip",
+            "Select Game",
             "",
-            "Game files (*.zip)"
         )
         if game_zip:
             self._creation_window = GameCreationPage(game_path=game_zip)
