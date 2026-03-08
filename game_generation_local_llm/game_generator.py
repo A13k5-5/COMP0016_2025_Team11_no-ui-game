@@ -3,9 +3,9 @@ import os
 from openvino_genai import LLMPipeline
 
 from graph.serial_graph import SerialGraph
-from local_llm.graph_blueprint.blueprint import GraphBlueprint
-from local_llm.graph_blueprint.blueprint_generator import BlueprintGenerator
-from local_llm.story_generator.story_generator import StoryGenerator
+from game_generation_local_llm.graph_blueprint.blueprint import GraphBlueprint
+from game_generation_local_llm.graph_blueprint.blueprint_generator import BlueprintGenerator
+from game_generation_local_llm.story_generator.story_generator import StoryGenerator
 
 
 class GameGenerator:

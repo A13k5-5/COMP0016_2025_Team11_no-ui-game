@@ -41,5 +41,5 @@ if __name__ == "__main__":
     # saver.save_game(os.path.join(os.path.dirname(__file__), "saved_games"), "lord_of_the_rings", root)
 
     # for structured output
-    from local_llm import structured_output
+    from game_generation_local_llm import structured_output
     structured_output.main()

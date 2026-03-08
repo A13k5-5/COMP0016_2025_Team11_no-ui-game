@@ -3,8 +3,8 @@ import json
 from openvino_genai import GenerationConfig, LLMPipeline, StructuredOutputConfig, ChatHistory
 
 from graph.serial_graph import SerialGraph
-from local_llm.story_generator.prompts import SYS_MESSAGE
-from local_llm.graph_blueprint.blueprint import GraphBlueprint
+from game_generation_local_llm.story_generator.prompts import SYS_MESSAGE
+from game_generation_local_llm.graph_blueprint.blueprint import GraphBlueprint
 
 
 class StoryGenerator:
