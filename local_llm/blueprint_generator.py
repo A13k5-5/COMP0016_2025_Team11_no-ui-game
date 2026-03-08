@@ -9,7 +9,8 @@ from openvino_genai import GenerationConfig, LLMPipeline, \
     StructuredOutputConfig, ChatHistory
 
 from models import GraphBlueprint
-from prompts import SYS_BLUEPRINT, BLUEPRINT_CORRECTION
+from graph_template import GraphTemplate
+from prompts import SYS_BLUEPRINT, BLUEPRINT_CORRECTION, build_blueprint_prompt
 
 # Minimum fraction of non-leaf nodes that must have more than one incoming edge.
 _MIN_CONVERGENCE_RATIO = 0.35
@@ -97,7 +98,8 @@ class BlueprintGenerator:
         :param temperature:     sampling temperature for the LLM call.
         :returns:               sanitised :class:`GraphBlueprint`.
         """
-        history = self._build_initial_history(total_num_nodes, user_prompt)
+        user_turn, template = build_blueprint_prompt(total_num_nodes, user_prompt)
+        history = self._build_initial_history(user_turn)
         config = self._build_config(temperature)
 
         blueprint: GraphBlueprint | None = None
@@ -106,7 +108,7 @@ class BlueprintGenerator:
             raw = self._call_llm(history, config)
             blueprint = self._sanitise(raw, total_num_nodes)
 
-            violations = self._convergence_violations(blueprint, total_num_nodes)
+            violations = self._convergence_violations(blueprint, total_num_nodes, template)
             if not violations:
                 print(f"[BlueprintGenerator] Valid blueprint on attempt {attempt}.")
                 return blueprint
@@ -124,16 +126,10 @@ class BlueprintGenerator:
     # LLM interaction helpers
     # ------------------------------------------------------------------
 
-    def _build_initial_history(self, total_num_nodes: int, user_prompt: str) -> ChatHistory:
+    def _build_initial_history(self, user_turn: str) -> ChatHistory:
         history = ChatHistory()
         history.append({"role": "system", "content": SYS_BLUEPRINT})
-        history.append({
-            "role": "user",
-            "content": (
-                f"Design a graph blueprint for a {total_num_nodes}-node text adventure. "
-                f"Story description: {user_prompt}"
-            ),
-        })
+        history.append({"role": "user", "content": user_turn})
         return history
 
     def _build_config(self, temperature: float) -> GenerationConfig:
@@ -169,7 +165,11 @@ class BlueprintGenerator:
     # ------------------------------------------------------------------
 
     @staticmethod
-    def _convergence_violations(blueprint: GraphBlueprint, total_num_nodes: int) -> list[str]:
+    def _convergence_violations(
+        blueprint: GraphBlueprint,
+        total_num_nodes: int,
+        template: GraphTemplate,
+    ) -> list[str]:
         """
         Orchestrates all structural checks and returns a combined list of
         human-readable violation strings.  An empty list means the blueprint
@@ -177,10 +177,35 @@ class BlueprintGenerator:
         """
         analysis = _BlueprintAnalysis(adj=blueprint.adjacency, total_num_nodes=total_num_nodes)
         return (
-            BlueprintGenerator._check_convergence_ratio(analysis)
+            BlueprintGenerator._check_required_edges(blueprint, template)
+            + BlueprintGenerator._check_convergence_ratio(analysis)
             + BlueprintGenerator._check_funnel(analysis)
             + BlueprintGenerator._check_reconvergence(analysis)
         )
+
+    @staticmethod
+    def _check_required_edges(blueprint: GraphBlueprint, template: GraphTemplate) -> list[str]:
+        """
+        Fail for every required edge from the template that is missing in the blueprint.
+        A required edge (node → target) is satisfied if *target* appears as either
+        gesture-0 or gesture-1 for *node* in the adjacency.
+        """
+        missing: list[str] = []
+        for node_id, required_targets in template.required_edges.items():
+            actual_targets = set(blueprint.adjacency.get(node_id, {}).values())
+            for target in required_targets:
+                if target not in actual_targets:
+                    role = template.roles.get(node_id, "?")
+                    missing.append(
+                        f"node {node_id} ({role.name}) must have an edge to {target}, "
+                        f"but its targets are {sorted(actual_targets)}."
+                    )
+        if not missing:
+            return []
+        return [
+            f"HARD CONSTRAINT violations ({len(missing)} missing required edge(s)):\n"
+            + "\n".join(f"  • {m}" for m in missing)
+        ]
 
     @staticmethod
     def _check_convergence_ratio(analysis: _BlueprintAnalysis) -> list[str]:

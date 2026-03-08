@@ -1,0 +1,76 @@
+{
+    "nodes": {
+        "2892740835520": {
+            "id": 2892740835520,
+            "text": "You find yourself at the ruined gate of an old manor. Two paths lie ahead:Options: - Left: Go through the garden (leads to the shed). - Right: Go down the cellar stairs (leads to the cellar).",
+            "left_option": "",
+            "right_option": "",
+            "audio_filename": "node_2892740835520.wav",
+            "adjacency_list": {
+                "1": 2894419523200,
+                "0": 2894420712368
+            },
+            "is_win": false
+        },
+        "2894419523200": {
+            "id": 2894419523200,
+            "text": "You slip through the garden, tangled roses parting around you. Moonlight reveals a hidden tool shed.Options: - Left: Enter the shed and search (leads to finding a lantern and rope). - Right: Follow a winding path that leads back toward the gate.",
+            "left_option": "",
+            "right_option": "",
+            "audio_filename": "node_2894419523200.wav",
+            "adjacency_list": {
+                "1": 2894420712464,
+                "0": 2894420712704
+            },
+            "is_win": false
+        },
+        "2894420712464": {
+            "id": 2894420712464,
+            "text": "Inside the shed you find a lantern and rope. This may help later.Options: - Left: Leave the shed and return toward the gate. - Right: Take a different path that leads toward the cellar encounter.",
+            "left_option": "",
+            "right_option": "",
+            "audio_filename": "node_2894420712464.wav",
+            "adjacency_list": {
+                "1": 2894420712704,
+                "0": 2894420712752
+            },
+            "is_win": false
+        },
+        "2894420712704": {
+            "id": 2894420712704,
+            "text": "The path leads back to the gate. You may choose again.Options: - Left: Reattempt the gate choices (Left -> garden). - Right: Reattempt the gate choices (Right -> cellar).",
+            "left_option": "",
+            "right_option": "",
+            "audio_filename": "node_2894420712704.wav",
+            "adjacency_list": {
+                "1": 2892740835520,
+                "0": 2892740835520
+            },
+            "is_win": false
+        },
+        "2894420712752": {
+            "id": 2894420712752,
+            "text": "A shadow rustles — a friendly stray dog wags its tail, offering companionship.Options: - Left: Escort the dog back toward the gate. - Right: Continue on a path that also leads back toward the gate.",
+            "left_option": "",
+            "right_option": "",
+            "audio_filename": "node_2894420712752.wav",
+            "adjacency_list": {
+                "1": 2894420712704,
+                "0": 2894420712704
+            },
+            "is_win": false
+        },
+        "2894420712368": {
+            "id": 2894420712368,
+            "text": "You descend the stone stair into a cold cellar. The air smells of dust and old paper; something moves in the corner.Options: - Left: Retreat and head back toward the gate. - Right: Approach the corner (may reveal an encounter).",
+            "left_option": "",
+            "right_option": "",
+            "audio_filename": "node_2894420712368.wav",
+            "adjacency_list": {
+                "1": 2894420712704,
+                "0": 2894420712752
+            },
+            "is_win": false
+        }
+    }
+}

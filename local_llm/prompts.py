@@ -4,6 +4,7 @@ local LLM pipeline.
 """
 import json
 from models import GraphBlueprint
+from graph_template import GraphTemplate, NodeRole, build_template
 
 
 SYS_QUANTITIES: str = (
@@ -17,109 +18,27 @@ SYS_QUANTITIES: str = (
 )
 
 SYS_BLUEPRINT: str = (
-    "You are a graph-design assistant. "
-    "Your task is to design the STRUCTURE of a text-based adventure game as a directed graph. "
-    "You will be given the total number of nodes (N) and a story description. "
-    "Output a GraphBlueprint JSON object with two fields: 'adjacency' and 'win_nodes'.\n\n"
+    "You are a graph-structure assistant for a text-based adventure game. "
+    "You will be given a story description and a complete list of HARD CONSTRAINTS "
+    "specifying exactly which node ids must be connected to which. "
+    "Your only job is to output a valid GraphBlueprint JSON that satisfies every constraint.\n\n"
 
-    "═══════════════════════════════════════════════════════════\n"
-    "CORE DESIGN PHILOSOPHY\n"
-    "═══════════════════════════════════════════════════════════\n"
-    "Think of the graph like a RIVER WITH TRIBUTARIES. "
-    "The story has a clear overall flow from start to end, but at key dramatic moments "
-    "the path forks briefly and then FLOWS BACK TOGETHER into shared waypoints. "
-    "This gives the player meaningful choices without making every player's experience "
-    "completely different — they will all pass through the same major story beats.\n\n"
-    "You MUST use a MIX of the following topology patterns within a single graph. "
-    "No single pattern should dominate the whole graph.\n\n"
+    "OUTPUT FORMAT:\n"
+    "  A JSON object with exactly two keys:\n"
+    "  • 'adjacency': maps every node id (0 … N-1) to a dict with keys '0' and '1', "
+    "each holding an integer target node id or -1 (for a terminal leaf node).\n"
+    "  • 'win_nodes': a JSON array of the winning leaf node ids.\n\n"
 
-    "  PATTERN — BUS (linear spine)\n"
-    "    A straight chain: A→B→C. Use this for unavoidable story beats that "
-    "every player must experience (e.g. the opening scene, the final confrontation).\n\n"
+    "RULES:\n"
+    "  1. Every node id from 0 to N-1 must appear exactly once as a key in adjacency.\n"
+    "  2. Every HARD CONSTRAINT edge listed in the prompt MUST appear in your adjacency "
+    "as at least one of the two gesture targets ('0' or '1') for that node.\n"
+    "  3. For the second gesture target of each node you have creative freedom — "
+    "pick any valid node id that fits the story, including another hub or an already-used target.\n"
+    "  4. Leaf nodes must map BOTH gestures to -1.\n"
+    "  5. Use only node ids in the range [0, N-1] or -1. No other values.\n\n"
 
-    "  PATTERN — TREE BRANCH (short-lived fork, STRICTLY LIMITED)\n"
-    "    One node splits into two paths. RULE: the two branches MUST reconverge "
-    "onto the SAME node within AT MOST 2 hops. This means:\n"
-    "      fork→branchA→merge   AND   fork→branchB→merge\n"
-    "    (both branchA and branchB point to 'merge' — the same node id).\n"
-    "    A fork whose branches never meet again is FORBIDDEN.\n\n"
-
-    "  PATTERN — STAR (hub with many incoming edges)\n"
-    "    Several nodes all point to the same hub node. Use this for major "
-    "story waypoints that the player always reaches regardless of earlier choices.\n\n"
-
-    "  PATTERN — RING (loop / cycle)\n"
-    "    A node eventually points back to an earlier node. Use sparingly for "
-    "exploration loops (e.g. 'search the room again').\n\n"
-
-    "  PATTERN — MESH (dense cross-connections)\n"
-    "    Nodes freely cross-link to previously visited or upcoming shared nodes. "
-    "Use in the mid-game to create a rich web of consequences.\n\n"
-
-    "═══════════════════════════════════════════════════════════\n"
-    "STEP 1 — PLAN THE MACRO STRUCTURE (do this before any node ids)\n"
-    "═══════════════════════════════════════════════════════════\n"
-    "  a) Divide the N nodes into three ACTS: early (~25%), mid (~50%), late (~25%).\n"
-    "  b) Choose 2-4 BOTTLENECK (hub) nodes — one in mid-act, one in late-act — "
-    "that ALL paths must pass through. These are your STAR hubs.\n"
-    "  c) Plan 1-2 short TREE forks in the early/mid act. Each fork has exactly 2 "
-    "branch nodes that BOTH point back to the same bottleneck hub within 2 hops.\n"
-    "  d) Add 1-2 RING back-edges in the mid act for exploration flavour.\n"
-    "  e) Choose 1-3 LEAF nodes for win/lose endings. Leaves map both gestures to -1.\n"
-    "  Write down: [bottleneck ids] [fork ids] [branch ids] [leaf ids] before step 2.\n\n"
-
-    "═══════════════════════════════════════════════════════════\n"
-    "STEP 2 — FILL IN ADJACENCY\n"
-    "═══════════════════════════════════════════════════════════\n"
-    "  * Every id from 0 to N-1 must appear exactly ONCE as a key.\n"
-    "  * For EVERY non-leaf node, AT LEAST ONE of its two gesture targets must be "
-    "a bottleneck hub or a node already targeted by another node. "
-    "NEVER let both targets be fresh, never-before-used ids.\n"
-    "  * Each tree fork must have both its branch nodes reconverge to the same hub "
-    "within 2 hops — verify this before writing the JSON.\n"
-    "  * At least 35% of all non-leaf nodes must have 2 or more incoming edges.\n\n"
-
-    "═══════════════════════════════════════════════════════════\n"
-    "WORKED EXAMPLE  N=12, win=10, lose=11\n"
-    "═══════════════════════════════════════════════════════════\n"
-    "  Bottlenecks: 4 (mid-act hub), 8 (late-act hub).\n"
-    "  Early fork: node 1 branches to 2 and 3; both 2 and 3 point to hub 4.  ← TREE (depth 1)\n"
-    "  Mid fork:   node 5 branches to 6 and 7; both 6 and 7 point to hub 8.  ← TREE (depth 1)\n"
-    "  Ring:       node 9 has one gesture pointing back to hub 4.             ← RING\n"
-    "  Mesh cross: node 8 has one gesture pointing to node 5 (already visited path). ← MESH\n\n"
-    "  adjacency:\n"
-    "    0->{0:1,  1:2 }   (opening — bus step, but shortcut straight to 2)\n"
-    "    1->{0:2,  1:3 }   (early fork)\n"
-    "    2->{0:4,  1:3 }   (branch A — converges at hub 4 within 1 hop)\n"
-    "    3->{0:4,  1:2 }   (branch B — converges at hub 4 within 1 hop; cross-link to 2)\n"
-    "    4->{0:5,  1:6 }   (mid-act hub — star: receives edges from 2 and 3)\n"
-    "    5->{0:6,  1:7 }   (mid fork)\n"
-    "    6->{0:8,  1:7 }   (branch C — converges at hub 8 within 1 hop)\n"
-    "    7->{0:8,  1:6 }   (branch D — converges at hub 8 within 1 hop; cross-link to 6)\n"
-    "    8->{0:9,  1:5 }   (late-act hub — mesh: one gesture loops back to 5)\n"
-    "    9->{0:10, 1:4 }   (ring: one gesture loops back to mid-act hub 4)\n"
-    "   10->{0:-1, 1:-1}   (WIN leaf)\n"
-    "   11->{0:-1, 1:-1}   (LOSE leaf — reachable if sanitiser adds it)\n"
-    "  win_nodes: [10]\n\n"
-    "  Convergence check: nodes 4 receives edges from {2,3,9} = 3 sources. "
-    "Node 8 receives from {6,7} = 2 sources. "
-    "Node 6 receives from {5,7} = 2 sources. "
-    "Node 7 receives from {5,6} = 2 sources. ✓\n\n"
-
-    "═══════════════════════════════════════════════════════════\n"
-    "STRICTLY FORBIDDEN\n"
-    "═══════════════════════════════════════════════════════════\n"
-    "  1. Tree branches that never reconverge (depth > 2 before merging). FORBIDDEN.\n"
-    "  2. A graph that is ENTIRELY one pattern (all tree, all bus, all mesh…). FORBIDDEN.\n"
-    "  3. Single-funnel: ALL paths collapsing onto ONE node just before the leaves. FORBIDDEN.\n"
-    "  4. Referencing a node id that is not a key in adjacency. FORBIDDEN.\n\n"
-
-    "ADJACENCY FORMAT:\n"
-    "  adjacency maps each node id (integer) to a dict with exactly two keys: "
-    "'0' (right-hand gesture) and '1' (left-hand gesture), "
-    "each mapping to an integer target node id or -1 for a leaf.\n\n"
-
-    "OUTPUT ONLY the GraphBlueprint JSON. No story text, no explanation. "
+    "Output ONLY the GraphBlueprint JSON. No story text, no explanation. "
     "Use double quotes for all JSON keys and string values."
 )
 
@@ -136,30 +55,107 @@ NODE_WRITER_PRIMER: str = (
 )
 
 BLUEPRINT_CORRECTION: str = (
-    "The blueprint you just produced FAILS the convergence check. "
+    "The blueprint you produced FAILS the structural checks. "
     "Here are the specific violations:\n{violations}\n\n"
-    "Please redesign the graph from SCRATCH and fix ALL of these issues.\n\n"
-    "REMINDER — the graph must use a MIX of topology patterns, like a river with tributaries:\n"
-    "  • BUS: unavoidable linear beats every player passes through.\n"
-    "  • TREE BRANCH (strictly limited): a fork into 2 paths that MUST reconverge "
-    "onto the same node within AT MOST 2 hops. "
-    "A fork whose branches never meet again is FORBIDDEN.\n"
-    "  • STAR: 2-4 bottleneck hub nodes that many paths funnel into.\n"
-    "  • RING: one or two back-edges that let the player revisit an earlier hub.\n"
-    "  • MESH: mid-game cross-links between non-adjacent nodes.\n\n"
-    "No single pattern should dominate. Do NOT use only tree structure.\n\n"
-    "Mandatory rules:\n"
-    "  1. Every tree fork must have its two branches reconverge within 2 hops.\n"
-    "  2. At least 35% of all non-leaf nodes must have 2 or more incoming edges.\n"
-    "  3. No single node may receive edges from more than 60% of the non-leaf nodes "
-    "(single-funnel anti-pattern — FORBIDDEN).\n"
-    "  4. You must NOT produce a pure binary tree (every node has exactly one parent).\n\n"
+    "You MUST produce a new GraphBlueprint JSON that satisfies ALL of the original "
+    "HARD CONSTRAINTS listed above. Each HARD CONSTRAINT specifies a required edge "
+    "that must appear as at least one gesture target ('0' or '1') for that node. "
+    "Do not ignore any constraint.\n\n"
+    "Reminder of what the constraints enforce:\n"
+    "  • BRANCH nodes must point to their convergence hub (prevents un-reconverged trees).\n"
+    "  • RING_SRC nodes must point back to an earlier hub (creates a loop).\n"
+    "  • MESH nodes must cross-link to a hub (creates dense connections).\n\n"
     "Output only the corrected GraphBlueprint JSON."
 )
 
 
-def build_node_prompt(
-    total_num_nodes: int,
+def build_blueprint_prompt(n: int, user_prompt: str) -> tuple[str, GraphTemplate]:
+    """
+    Build the user-turn prompt for the blueprint LLM call.
+
+    This function pre-computes a :class:`GraphTemplate` that deterministically
+    assigns every node a structural role and a set of required edges.  Those
+    required edges are rendered as explicit, numbered HARD CONSTRAINTS in the
+    prompt so the LLM cannot ignore them.
+
+    :returns: (prompt_string, template) — the template is also returned so the
+              caller can pass it to the validator without recomputing it.
+    """
+    template = build_template(n)
+    lines: list[str] = []
+
+    lines.append(f"Design a GraphBlueprint for a {n}-node text adventure.")
+    lines.append(f"Story description: {user_prompt}\n")
+    lines.append(f"Total nodes: {n}  (ids 0 to {n - 1})")
+    lines.append(f"Win leaf node(s): {template.win_leaves}")
+    lines.append(f"Lose leaf node(s): {template.lose_leaves}")
+    lines.append(f"Hub (bottleneck) nodes: {template.hubs}  "
+                 f"← these must receive edges from many other nodes\n")
+
+    lines.append("NODE ROLES (every node listed, role is informational):")
+    for node_id in range(n):
+        role = template.roles.get(node_id, NodeRole.BUS)
+        lines.append(f"  node {node_id:>3} — {role.name}")
+    lines.append("")
+
+    lines.append("HARD CONSTRAINTS (you MUST obey every line below):")
+    lines.append("  Each constraint says: node X must have at least one gesture pointing to Y.")
+    lines.append("  Use the other gesture freely — point it to any valid node that fits the story.\n")
+
+    constraint_num = 1
+
+    # Leaf constraints
+    for leaf in template.all_leaves:
+        lines.append(f"  [{constraint_num}] node {leaf} is a LEAF → adjacency MUST be "
+                     f'{{\"0\": -1, \"1\": -1}}')
+        constraint_num += 1
+
+    # Branch convergence constraints
+    for fg in template.fork_groups:
+        lines.append(
+            f"  [{constraint_num}] node {fg.branch_a} (BRANCH) → at least one gesture "
+            f"MUST point to hub {fg.converge_hub}  "
+            f"[tree fork {fg.fork_node}→({fg.branch_a},{fg.branch_b})→{fg.converge_hub}]"
+        )
+        constraint_num += 1
+        lines.append(
+            f"  [{constraint_num}] node {fg.branch_b} (BRANCH) → at least one gesture "
+            f"MUST point to hub {fg.converge_hub}  "
+            f"[same fork, other branch]"
+        )
+        constraint_num += 1
+
+    # Ring back-edge constraints
+    if template.hubs:
+        for rs in template.ring_sources:
+            lines.append(
+                f"  [{constraint_num}] node {rs} (RING_SRC) → at least one gesture "
+                f"MUST point back to hub {template.hubs[0]}  [loop / cycle back-edge]"
+            )
+            constraint_num += 1
+
+    # Mesh cross-link constraints
+    if template.hubs:
+        for mn in template.mesh_nodes:
+            lines.append(
+                f"  [{constraint_num}] node {mn} (MESH) → at least one gesture "
+                f"MUST point to hub {template.hubs[-1]}  [cross-link]"
+            )
+            constraint_num += 1
+
+    lines.append("")
+    lines.append(
+        "Fill in ALL remaining edges however you like, as long as every target is a valid "
+        f"node id in [0, {n - 1}] or -1 for a leaf. "
+        "For non-leaf nodes avoid pointing both gestures to brand-new, never-before-used ids — "
+        "prefer reusing hub ids or other already-constrained targets."
+    )
+
+    return "\n".join(lines), template
+
+
+
+def build_node_prompt(total_num_nodes: int,
     cur_node_num: int,
     blueprint: GraphBlueprint,
 ) -> str:
