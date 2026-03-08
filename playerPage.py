@@ -33,7 +33,7 @@ class PlayerPage(QtWidgets.QWidget):
     def _browse(self):
         path, _ = QtWidgets.QFileDialog.getOpenFileName(
             self, "Select Game Zip", os.path.expanduser("~"),
-            "Game files (*.zip)"
+            "Game files (*.noui)"
         )
         if path:
             self.path_edit.setText(os.path.abspath(path))

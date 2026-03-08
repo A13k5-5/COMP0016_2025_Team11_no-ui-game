@@ -21,8 +21,8 @@ if __name__ == "__main__":
     #     playerPage.run()
 
     # for game engine
-    # from gui.homePage import run
-    # run()
+    from gui.homePage import run
+    run()
 
     # for game loading
     # from storageManager.game_load import GameLoader
