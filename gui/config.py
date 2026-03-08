@@ -11,3 +11,6 @@ PLUS_BUTTON_WIDTH = 22
 # made up estimates - can be changed
 GAME_TREE_WIDTH = 3000
 TREE_Y_OFFSET = 50
+
+# for connector lines
+LINE_WIDTH = 2

@@ -16,7 +16,6 @@ from .optionSide import OptionSide
 # Colours for the connector lines
 LINE_COLOR_LEFT  = QtGui.QColor("#2a7ae2") # left opt = blue
 LINE_COLOR_RIGHT = QtGui.QColor("#e22d2a") # right opt = red
-LINE_WIDTH = 2
 
 
 class GameCreationPage(QtWidgets.QWidget):
@@ -300,7 +299,7 @@ class GameCreationPage(QtWidgets.QWidget):
 
         line = QtWidgets.QGraphicsLineItem(QtCore.QLineF(p1, p2))
         color = LINE_COLOR_LEFT if side == OptionSide.LEFT else LINE_COLOR_RIGHT
-        pen = QtGui.QPen(color, LINE_WIDTH)
+        pen = QtGui.QPen(color, config.LINE_WIDTH)
         pen.setStyle(QtCore.Qt.SolidLine)
         line.setPen(pen)
         line.setZValue(-1)   # draw behind node widgets
