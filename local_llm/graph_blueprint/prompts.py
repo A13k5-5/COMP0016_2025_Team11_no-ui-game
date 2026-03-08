@@ -9,13 +9,17 @@ Build the graph using this exact method:
 STEP 1 — Choose two bottleneck node IDs, call them B1 and B2.
 STEP 2 — Node 0 splits into branch A (starts at node 1) and branch B.
           Both branches must be 2+ nodes long and both must end by pointing TO B1.
-          Example: nodes 3 and 6 both have {"0": B1, "1": B1}.
 STEP 3 — B1 splits into branch C and branch D.
           Both branches must be 2+ nodes long and both must end by pointing TO B2.
-          Example: nodes 10 and 13 both have {"0": B2, "1": B2}.
 STEP 4 — B2 has one edge going to the WIN node and one edge going to a LOSE node.
 STEP 5 — Inside any branch, one edge may go to a LOSE node instead of forward,
           but the other edge must continue the branch normally.
+
+CRITICAL: Branches are LINEAR CHAINS — no sub-branching inside a branch.
+Inside a branch, a non-last node sends BOTH edges to the SAME next node:
+  CORRECT: "1": {"0": 2, "1": 2}   <- both edges go to node 2 (linear, no split)
+  WRONG:   "1": {"0": 2, "1": 5}   <- edges go to different nodes (this creates a sub-branch)
+The ONLY exception is when ONE edge goes to a LOSE node (step 5 above).
 
 Here is a complete example where B1=7 and B2=14:
 
@@ -47,12 +51,18 @@ Here is a complete example where B1=7 and B2=14:
 }
 ```
 
-Notice: "7" appears as a target in nodes 3 AND 6. "14" appears as a target in nodes 10 AND 13.
-These repeated targets are the bottlenecks. Every valid output must have this property.
+In this example: B1=7, B2=14.
+- Node 0 splits: branch A starts at 1, branch B starts at 4.
+- Nodes 1, 4, 8, 11: both edges go to the same next node (linear, no sub-branch).
+- Nodes 2, 5, 9, 12: good choice goes forward, bad choice goes to a lose node.
+- Nodes 3, 6: branch ends — both edges go to B1 (node 7).
+- Nodes 10, 13: branch ends — both edges go to B2 (node 14).
+- Node 14 (B2): one edge -> win (18), one edge -> lose (17).
 
 Verify before outputting:
-- [ ] B1 appears as a target in at least 2 different nodes.
-- [ ] B2 appears as a target in at least 2 different nodes.
+- [ ] B1 appears as a target in at least 2 different nodes (nodes 3 and 6 in the example).
+- [ ] B2 appears as a target in at least 2 different nodes (nodes 10 and 13 in the example).
+- [ ] Every non-last branch node has BOTH edges pointing to the same target (linear chain).
 - [ ] Exactly 1 win node. At most 4 lose nodes.
 - [ ] At least one path from node 0 reaches the win node.
 
