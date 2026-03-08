@@ -1,22 +1,21 @@
-#!/usr/bin/env python3
-# Copyright (C) 2025 Intel Corporation
-# SPDX-License-Identifier: Apache-2.0
-
 import argparse
+import json
+
 from openvino_genai import LLMPipeline
 
 from local_llm.GameGenerator import GameGenerator
-
+from local_llm.graph_blueprint.blueprint_generator import BlueprintGenerator
 
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("model_dir", help="Path to the model directory. It should contain the OpenVINO model files.")
+    parser.add_argument("model_dir",
+                        help="Path to the model directory. It should contain the OpenVINO model files.")
     args = parser.parse_args()
 
     pipe: LLMPipeline = LLMPipeline(args.model_dir, "CPU")
+    blueprint_generator: BlueprintGenerator = BlueprintGenerator(pipe)
     game_generator: GameGenerator = GameGenerator(pipe)
-
 
     print(
         "This is a smart assistant that generates an adventure game graph."
@@ -28,9 +27,11 @@ def main():
         if prompt in ["exit", "quit", "bye"]:
             break
 
-        # configuring the system message and the structured output config for the pipeline
-        story: str = game_generator.generate_game(prompt)
-        print(f"\nGenerated story graph: \n{story}")
+        blueprint = blueprint_generator.generate_blueprint(prompt)
+        print(f"\nGenerated blueprint: \n{blueprint.model_dump_json(indent=2)}")
+
+        # story: str = game_generator.generate_game(prompt)
+        # print(f"\nGenerated story graph: \n{story}")
 
 
 if "__main__" == __name__:
