@@ -2,7 +2,7 @@ import argparse
 
 from openvino_genai import LLMPipeline
 
-from local_llm.GameGenerator import GameGenerator
+from local_llm.game_generator import GameGenerator
 from local_llm.graph_blueprint.blueprint_generator import BlueprintGenerator
 
 
