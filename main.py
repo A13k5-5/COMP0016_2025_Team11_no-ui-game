@@ -7,13 +7,13 @@
 # nuitka-project: --enable-plugin=pyside6
 # nuitka-project: --include-qt-plugins=qml
 
-import sys
-
-import gamePlayer
-import playerPage
 
 if __name__ == "__main__":
     # for game player
+    # import sys
+    #
+    # import gamePlayer
+    # import playerPage
     # if len(sys.argv) > 1:
     #     player = gamePlayer.GamePlayer()
     #     player.playGame(sys.argv[1])
