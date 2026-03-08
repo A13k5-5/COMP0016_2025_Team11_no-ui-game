@@ -30,7 +30,7 @@ class NodeQuantityResolver:
         self._pipe = pipe
 
     def resolve(self, user_prompt: str) -> int:
-        """Return the number of nodes (always ≥ 2)."""
+        """Return the number of nodes (always ≥ 2) parsed from the user prompt."""
         history: ChatHistory = ChatHistory()
         history.append({"role": "system", "content": SYS_QUANTITIES})
         history.append({"role": "user", "content": user_prompt})

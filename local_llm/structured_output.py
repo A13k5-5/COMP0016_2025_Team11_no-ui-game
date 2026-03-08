@@ -22,7 +22,7 @@ def main() -> None:
     )
     args = parser.parse_args()
 
-    pipe = LLMPipeline(args.model_dir, "GPU")
+    pipe = LLMPipeline(args.model_dir, "CPU")
     generator = GameGenerator(pipe)
 
     print(
@@ -40,9 +40,6 @@ def main() -> None:
             continue
 
         nodes = generator.generate(prompt)
-
-        print("\n=== Full game graph ===")
-        print(json.dumps(nodes, indent=2))
 
 
 if __name__ == "__main__":
