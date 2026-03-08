@@ -17,7 +17,7 @@ class GameCreationPage(QtWidgets.QWidget):
     """
     Main page for creating a no-ui game.
     """
-    def __init__(self, game_folder: Optional[str] = None) -> None:
+    def __init__(self, game_path: Optional[str] = None) -> None:
         super().__init__()
 
         self.game_title: str= ""
@@ -40,8 +40,8 @@ class GameCreationPage(QtWidgets.QWidget):
 
         self._setup_canvas()
 
-        if game_folder:
-            self._load_game(game_folder)
+        if game_path:
+            self._load_game(game_path)
         else:
             self._add_root_node()
     
@@ -221,14 +221,14 @@ class GameCreationPage(QtWidgets.QWidget):
 
         return progress
 
-    def _load_game(self, game_folder: str) -> None:
+    def _load_game(self, game_path: str) -> None:
         """
         Load an existing game onto the creation page and populate the graph nodes.
         """
-        print(f"load game from {game_folder}")
+        print(f"load game from {game_path}")
         try:
-            root_node = self.game_loader.load_graph(game_folder)
-            
+            root_node, game_folder = self.game_loader.load_graph(game_path)
+
             game_name = os.path.basename(game_folder)
             self.game_title = game_name
             self.title_entry.setText(game_name)
@@ -253,12 +253,16 @@ class GameCreationPage(QtWidgets.QWidget):
         """
         Recursively build UI widgets from loaded Node graph.
         """
-        queue: list[tuple[Node, int, int, Optional[NodeWidget], Optional[OptionSide]]] = [(root_node, 0, 0, None, None)]  
+        queue: list[tuple[Node, int, int, Optional[NodeWidget], Optional[OptionSide]]] = [(root_node, 0, 0, None, None)]
         # (node, depth, pos, parent_widget, side)
         self.root_node = None
+        visited: set[Node] = set()
 
         while queue:
             node, depth, pos, parent_widget, side = queue.pop(0)
+            if node in visited:
+                continue
+            visited.add(node)
 
             x, y = self._get_node_position(depth, pos)
             node_widget: NodeWidget = self._create_node_at(x, y)

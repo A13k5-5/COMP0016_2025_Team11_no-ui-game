@@ -1,19 +1,46 @@
 import os
+import shutil
+import zipfile
 
 from graph import Node
 from graph.serial_graph import SerialGraph
 
+TEMP_FOLDER = os.path.join(os.path.dirname(__file__), "temporary")
+
 
 class GameLoader:
     """
-    Class responsible for loading a game from a game 'folder' (containing the graph and corresponding audio files).
+    Class responsible for loading a game from a zipped game folder (containing the graph and corresponding audio files).
     """
-    def load_graph(self, game_folder: str) -> Node:
+
+    def _prepare_temp_folder(self, zip_path: str) -> str:
         """
-        Loads the graph from a JSON file and reconstructs the game structure. The JSON file should contain the serialized graph.
-        :param game_folder: path to the game folder containing the graph.json file
+        Wipes and recreates the 'temporary' folder, then extracts the given zip archive into it.
+        :param zip_path: path to the zipped game folder
+        :return: path to the extracted game folder inside 'temporary'
+        """
+        if os.path.exists(TEMP_FOLDER):
+            shutil.rmtree(TEMP_FOLDER)
+        os.makedirs(TEMP_FOLDER)
+
+        with zipfile.ZipFile(zip_path, 'r') as zf:
+            zf.extractall(TEMP_FOLDER)
+
+        # If the zip contained a single top-level folder, return that folder
+        extracted = os.listdir(TEMP_FOLDER)
+        if len(extracted) == 1 and os.path.isdir(os.path.join(TEMP_FOLDER, extracted[0])):
+            return os.path.join(TEMP_FOLDER, extracted[0])
+        return TEMP_FOLDER
+
+    def load_graph(self, game_zip: str) -> tuple[Node, str]:
+        """
+        Loads the graph from a zipped game folder and reconstructs the game structure.
+        The zip should contain a graph.json file and corresponding audio files.
+        :param game_zip: path to the zipped game folder
         :return:
         """
+        game_folder = self._prepare_temp_folder(game_zip)
+
         graph_path = os.path.join(game_folder, "graph.json")
         with open(graph_path, 'r') as file:
             serial_graph: SerialGraph = SerialGraph.model_validate_json(file.read().strip())
@@ -21,7 +48,7 @@ class GameLoader:
         root, nodes = self._load_nodes(serial_graph)
         self._establish_connections(serial_graph, nodes)
 
-        return root
+        return root, game_folder
 
 
     def _load_nodes(self, serial_graph: SerialGraph) -> tuple[Node, dict[int, Node]]:
