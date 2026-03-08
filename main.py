@@ -4,6 +4,10 @@
 #     player = GamePlayer()
 #     player.playGame(os.path.join(os.path.dirname(__file__), "saved_games", "Lord of the rings"))
 
+# if __name__ == "__main__":
+#     from gui.homePage import run
+#     run()
+
 if __name__ == "__main__":
-    from gui.homePage import run
-    run()
+    from local_llm import structured_output
+    structured_output.main()

@@ -6,21 +6,8 @@ import argparse
 import json
 
 from openvino_genai import GenerationConfig, LLMPipeline, StructuredOutputConfig, ChatHistory
-from pydantic import BaseModel
+from graph.serial_graph import SerialGraph
 
-from enum_gesture import EnumGesture
-
-
-class SerialNode(BaseModel):
-    id: int
-    text: str
-    left_option: str = ""
-    right_option: str = ""
-    adjacency_list: dict[EnumGesture, int]
-    is_win: bool = False
-
-class SerialGraph(BaseModel):
-    nodes: dict[int, SerialNode]
 
 sys_message: str = (
     "You generate JSON objects based on the user's request. You will generate a list of JSON objects that follow the SerialNode schema. "
@@ -59,6 +46,9 @@ def main():
         try:
             prompt = input("> ")
         except EOFError:
+            break
+
+        if prompt in ["exit", "quit", "bye"]:
             break
 
         # configuring the system message and the structured output config for the pipeline
