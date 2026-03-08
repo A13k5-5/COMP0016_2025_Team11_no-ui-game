@@ -1,46 +1,37 @@
-"""
-Entry point for the local LLM game-generation pipeline.
-
-Run with:
-    python structured_output.py <path_to_model_dir>
-"""
 import argparse
-import json
 
 from openvino_genai import LLMPipeline
 
-from game_generator import GameGenerator
+from local_llm.GameGenerator import GameGenerator
+from local_llm.graph_blueprint.blueprint_generator import BlueprintGenerator
 
 
-def main() -> None:
-    parser = argparse.ArgumentParser(
-        description="Generate a text-adventure game using a local LLM."
-    )
-    parser.add_argument(
-        "model_dir",
-        help="Path to the OpenVINO model directory.",
-    )
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("model_dir",
+                        help="Path to the model directory. It should contain the OpenVINO model files.")
     args = parser.parse_args()
 
-    pipe = LLMPipeline(args.model_dir, "CPU")
-    generator = GameGenerator(pipe)
+    pipe: LLMPipeline = LLMPipeline(args.model_dir, "CPU")
+    blueprint_generator: BlueprintGenerator = BlueprintGenerator(pipe)
+    game_generator: GameGenerator = GameGenerator(pipe)
 
     print(
-        "Local LLM game generator ready. "
-        "Describe your game and press Enter (Ctrl-D to quit)."
+        "This is a smart assistant that generates an adventure game graph."
     )
 
     while True:
-        try:
-            prompt = input("> ").strip()
-        except EOFError:
+        prompt = input("> ")
+
+        if prompt in ["exit", "quit", "bye"]:
             break
 
-        if not prompt:
-            continue
+        blueprint = blueprint_generator.generate_blueprint(prompt)
+        print(f"\nGenerated blueprint: \n{blueprint.model_dump_json(indent=2)}")
 
-        nodes = generator.generate(prompt)
+        # story: str = game_generator.generate_game(prompt)
+        # print(f"\nGenerated story graph: \n{story}")
 
 
-if __name__ == "__main__":
+if "__main__" == __name__:
     main()

@@ -1,6 +1,8 @@
 import os
-import shutil
+import tempfile
+import zipfile
 
+from . import config
 from graph import Node
 from graph.serial_graph import SerialGraph
 from graph.serial_node import SerialNode
@@ -9,51 +11,79 @@ from text2speech import Talker
 
 class GameSaver:
     """
-    Class responsible for saving the game into a game 'folder' (containing the graph and corresponding audio files).
+    Class responsible for saving the game into a zipped game folder (containing the graph and corresponding audio files).
     """
 
     def save_game(self, path_to_save: str, game_name: str, root: Node):
         """
-        Saves the game to the given path.
-        :param path_to_save: the directory where the game folder should be created
-        :param game_name: the name of the game, which will be used as the name of the game folder
+        Saves the game to the given path as a zip archive. Only the zip file is written to path_to_save;
+        a temporary directory is used for staging and is removed afterwards.
+        :param path_to_save: the directory where the game zip should be created
+        :param game_name: the name of the game, which will be used as the name of the zip file
         :param root: the root node of the graph representing the game
         :return:
         """
-        game_path: str = os.path.join(path_to_save, game_name)
+        zip_path: str = os.path.join(path_to_save, game_name + config.FILE_EXTENSION)
 
-        self._prepare_game_folder(game_path)
+        self._check_zip_path(zip_path)
 
-        serialized_graph: SerialGraph = self._serialize_graph(root)
-        self.save_graph(game_path, serialized_graph)
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            stage_path: str = os.path.join(tmp_dir, game_name)
+            os.makedirs(os.path.join(stage_path, "audio"))
 
-        self._generate_audio(serialized_graph, game_path)
+            serialized_graph: SerialGraph = self._serialize_graph(root)
+            self.save_graph(stage_path, serialized_graph)
+            self._generate_audio(serialized_graph, stage_path)
+
+            self._zip_folder_to(stage_path, zip_path)
 
 
-    def _prepare_game_folder(self, game_path: str):
+    def _check_zip_path(self, zip_path: str):
         """
-        Prepares the game folder by creating the necessary directory structure. If a folder with the same name already exists,
-        an exception is raised to prevent overwriting existing data.
-        :param game_path:
+        Ensures the destination zip path is available. If a valid game zip already exists it is removed so it can be
+        overwritten. If an unrelated file occupies the path, an exception is raised.
+        :param zip_path: full path to the target zip file
         :return:
         """
-        if os.path.exists(game_path):
-            if not self._is_game_folder(game_path):
-                raise Exception(f"A folder {game_path} already exists, but it not a valid game folder. Please choose a different name or delete the existing folder.")
-            # if a game folder, we can proceed to overwrite it
-            shutil.rmtree(game_path)
-        audio_dir: str = os.path.join(game_path, "audio")
-        os.makedirs(audio_dir)
+        if os.path.exists(zip_path):
+            if not self._is_game_zip(zip_path):
+                raise Exception(
+                    f"A file '{zip_path}' already exists but is not a valid game zip. "
+                    "Please choose a different name or delete the existing file."
+                )
+            os.remove(zip_path)
 
-    def _is_game_folder(self, path: str) -> bool:
+
+    def _zip_folder_to(self, folder_path: str, zip_path: str):
         """
-        Checks if the given path is a valid game folder by verifying the presence of the graph.json file and the audio directory.
+        Writes the contents of folder_path into a new zip archive at zip_path.
+        The archive entries are relative to folder_path's parent so the game name
+        is preserved as the top-level folder inside the zip.
+        :param folder_path: the staging folder to zip
+        :param zip_path: destination zip file path
+        :return:
+        """
+        with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zf:
+            for dirpath, _, filenames in os.walk(folder_path):
+                for filename in filenames:
+                    file_full_path = os.path.join(dirpath, filename)
+                    arcname = os.path.relpath(file_full_path, os.path.dirname(folder_path))
+                    zf.write(file_full_path, arcname)
+
+    def _is_game_zip(self, path: str) -> bool:
+        """
+        Checks if the given path is a valid game zip by verifying the presence of a graph.json entry
+        and at least one audio/ entry inside the archive.
         :param path:
-        :return: True if the path is a valid game folder, False otherwise
+        :return: True if the path is a valid game zip, False otherwise
         """
-        graph_path: str = os.path.join(path, "graph.json")
-        audio_dir: str = os.path.join(path, "audio")
-        return os.path.isfile(graph_path) and os.path.isdir(audio_dir)
+        if not zipfile.is_zipfile(path):
+            return False
+        with zipfile.ZipFile(path, 'r') as zf:
+            names = zf.namelist()
+            has_graph = any(n.endswith("graph.json") for n in names)
+            has_audio = any("audio/" in n for n in names)
+            return has_graph and has_audio
 
 
     def save_graph(self, path_to_save: str, serialized_graph: SerialGraph):
