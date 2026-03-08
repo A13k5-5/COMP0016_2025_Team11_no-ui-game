@@ -1,8 +1,12 @@
 import argparse
+import json
+import os
 
 from openvino_genai import LLMPipeline
 
+from graph.serial_graph import SerialGraph
 from local_llm.game_generator import GameGenerator
+from local_llm.graph_blueprint.blueprint import GraphBlueprint
 from local_llm.graph_blueprint.blueprint_generator import BlueprintGenerator
 
 
@@ -26,11 +30,17 @@ def main():
         if prompt in ["exit", "quit", "bye"]:
             break
 
-        blueprint = blueprint_generator.generate_blueprint(prompt)
-        print(f"\nGenerated blueprint: \n{blueprint.model_dump_json(indent=2)}")
+        # blueprint = blueprint_generator.generate_blueprint(prompt)
+        # print(f"\nGenerated blueprint: \n{blueprint.model_dump_json(indent=2)}")
 
-        # story: str = game_generator.generate_game(prompt)
-        # print(f"\nGenerated story graph: \n{story}")
+        with open(os.path.join(os.path.dirname(__file__), "graph_blueprint", "generated_blueprint.json"), "r") as f:
+            blueprint_json: dict = json.load(f)
+
+        blueprint: GraphBlueprint = GraphBlueprint.model_validate(blueprint_json)
+        print(blueprint.model_dump_json(indent=2))
+
+        story: SerialGraph = game_generator.generate_game(prompt, blueprint)
+        print(f"\nGenerated story graph: \n{story.model_dump_json(indent=2)}")
 
 
 if "__main__" == __name__:
