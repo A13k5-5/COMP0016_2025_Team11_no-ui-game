@@ -13,27 +13,43 @@ from .nodeWidget import NodeWidget
 from .optionSide import OptionSide
 
 
+# Colours for the connector lines
+LINE_COLOR_LEFT  = QtGui.QColor("#2a7ae2") # left opt = blue
+LINE_COLOR_RIGHT = QtGui.QColor("#e22d2a") # right opt = red
+
+
 class GameCreationPage(QtWidgets.QWidget):
     """
     Main page for creating a no-ui game.
+
+    Nodes are arranged in a tree by default (using the + buttons).
+
+    The 🔗 buttons enter link mode: click any existing node to wire
+    that option to it instead of creating a new child. A coloured line
+    is drawn between connected nodes so the graph structure is visible.
     """
     def __init__(self, game_path: Optional[str] = None) -> None:
         super().__init__()
 
-        self.game_title: str= ""
-
+        self.game_title: str = ""
         self.game_loader: GameLoader = GameLoader()
         self.game_saver: GameSaver = GameSaver()
 
-        # list of all nodes in the game
+        # Ordered list of all node widgets
         self.nodes: list[NodeWidget] = []
         self.root_node: Optional[NodeWidget] = None
-        # node -> (x,y)
+        # node -> (x, y) scene position
         self.node_coords_dict: dict[NodeWidget, tuple[float, float]] = {}
-        # parent_node -> {"left": child_node, "right": child_node}
-        self.node_children: dict[NodeWidget, dict[str, NodeWidget]] = {}
-        # node -> (depth, position)
+        # parent -> {OptionSide: child}   (covers both tree-created and linked children)
+        self.node_children: dict[NodeWidget, dict[OptionSide, NodeWidget]] = {}
+        # node -> (depth, position)  — used for tree layout only
         self.node_depth_pos: dict[NodeWidget, tuple[int, int]] = {}
+
+        # Drawn connector lines: (parent, side) -> QGraphicsLineItem
+        self._lines: dict[tuple[NodeWidget, OptionSide], QtWidgets.QGraphicsLineItem] = {}
+
+        # Link-mode state: None when inactive
+        self._link_source: Optional[tuple[NodeWidget, OptionSide]] = None
 
         self._setup_window_layout("No-UI-Game Creator")
         self._title_entry()
@@ -53,7 +69,7 @@ class GameCreationPage(QtWidgets.QWidget):
         self.resize(config.WINDOW_WIDTH, config.WINDOW_HEIGHT)
         self.layout = QtWidgets.QVBoxLayout(self)
         self.layout.setAlignment(QtCore.Qt.AlignTop)
-        
+
     def _title_entry(self) -> None:
         # create title entry bar and save button
         self.title_entry = QtWidgets.QLineEdit()
@@ -70,34 +86,128 @@ class GameCreationPage(QtWidgets.QWidget):
         self.scene = QtWidgets.QGraphicsScene(self)
         self.view = ZoomableGraphicsView(self.scene)
         self.view.setMinimumHeight(config.CANVAS_HEIGHT)
+
+        # intercept mouse-press on the scene to handle link-mode clicks
+        self.scene.installEventFilter(self)
+
         self.layout.addWidget(self.view)
 
         self.save_game_button = QtWidgets.QPushButton("Save Game")
         self.save_game_button.clicked.connect(self.save_game)
         self.layout.addWidget(self.save_game_button)
 
+
+    def keyPressEvent(self, event: QtGui.QKeyEvent) -> None:
+        if event.key() == QtCore.Qt.Key_Escape:
+            self._cancel_link_mode()
+        super().keyPressEvent(event)
+
+    def eventFilter(self, watched, event) -> bool:
+        """
+        When in link mode, a mouse-press on the scene checks whether the user
+        clicked on a node proxy and completes (or cancels) the link.
+        """
+        if (self._link_source is not None
+                and watched is self.scene
+                and event.type() == QtCore.QEvent.GraphicsSceneMousePress):
+
+            # Find which proxy (if any) was clicked
+            items = self.scene.items(event.scenePos())
+            clicked_node = self._proxy_to_node(items)
+
+            if clicked_node is not None:
+                source_node, side = self._link_source
+                if clicked_node is not source_node:          # can't link to yourself
+                    self._complete_link(source_node, side, clicked_node)
+                    return True                               # consume the event
+            # Clicked on empty space → cancel
+            self._cancel_link_mode()
+            return True
+
+        return super().eventFilter(watched, event)
+
+    def _proxy_to_node(self, items) -> Optional[NodeWidget]:
+        """
+        Return the NodeWidget for the topmost proxy in the item list, or None.
+        """
+        for item in items:
+            if isinstance(item, QtWidgets.QGraphicsProxyWidget):
+                widget = item.widget()
+                if isinstance(widget, NodeWidget):
+                    return widget
+                # click landed on a child widget inside the proxy
+                if widget is not None:
+                    parent = widget.parent()
+                    while parent is not None:
+                        if isinstance(parent, NodeWidget):
+                            return parent
+                        parent = parent.parent()
+        return None
+
+    def enter_link_mode(self, source: NodeWidget, side: OptionSide) -> None:
+        """
+        Activate link mode: highlight all other nodes as targets and wait
+        for the user to click one (or press Escape to cancel).
+        """
+        # Cancel any active link mode first
+        self._cancel_link_mode()
+        self._link_source = (source, side)
+
+        for node in self.nodes:
+            if node is not source:
+                node.set_link_mode_highlight(True)
+
+        # Visual feedback on the source node's link button
+        btn = source.left_link if side == OptionSide.LEFT else source.right_link
+        btn.setStyleSheet("background-color: #f0a000; color: white;")
+
+        self.view.setFocus()   # so Escape is captured
+
+    def _cancel_link_mode(self) -> None:
+        if self._link_source is None:
+            return
+        source, side = self._link_source
+        btn = source.left_link if side == OptionSide.LEFT else source.right_link
+        btn.setStyleSheet("")
+        for node in self.nodes:
+            node.set_link_mode_highlight(False)
+        self._link_source = None
+
+    def _complete_link(self, source: NodeWidget, side: OptionSide, target: NodeWidget) -> None:
+        """
+        Wire source → target on the given side, replacing any previous connection,
+        draw a line between them, and exit link mode.
+        """
+        # Remove any existing connection on this side (line + child record)
+        self._remove_connection(source, side)
+
+        # Record the new connection
+        if source not in self.node_children:
+            self.node_children[source] = {}
+        self.node_children[source][side] = target
+
+        # Draw the connector line
+        self._draw_line(source, side, target)
+
+        self._cancel_link_mode()
+        self._update_delete_buttons()
+
+
     def _create_node_at(self, x: float, y: float) -> NodeWidget:
-        """
-        Create a NodeWidget, wrap it in a proxy, and add it to the scene.
-        A proxy (QGraphicsProxyWidget) is a wrapper that allows a widget to be placed 
-        inside a scene (QGraphicsScene).
-        """
         node = NodeWidget(self)
 
         proxy = QtWidgets.QGraphicsProxyWidget()
         proxy.setWidget(node)
-        proxy.setPos(x,y)
+        proxy.setPos(x, y)
         self.scene.addItem(proxy)
 
-        # store proxy for deletion later
-        node._proxy = proxy  
-
-        self.node_coords_dict[node] = (x,y)
+        node._proxy = proxy
+        self.node_coords_dict[node] = (x, y)
         self.nodes.append(node)
 
         if self.root_node is None:
             self.root_node = node
-        
+
         return node
 
     def _add_root_node(self) -> None:
@@ -106,25 +216,30 @@ class GameCreationPage(QtWidgets.QWidget):
         self.node_depth_pos[node] = (0, 0)
     
     def _create_child_node(self, parent: NodeWidget, side: OptionSide) -> None:
-        parent_coords = self.node_coords_dict.get(parent)
-        if not parent_coords:
+        """
+        Create a brand-new child node in the tree and connect it.
+        """
+        if not self.node_coords_dict.get(parent):
             return
-        
+
         parent_depth, parent_pos = self.node_depth_pos.get(parent, (0, 0))
         child_depth = parent_depth + 1
         child_pos = parent_pos * 2 if side == OptionSide.LEFT else parent_pos * 2 + 1
-        
+
         new_x, new_y = self._get_node_position(child_depth, child_pos)
         child = self._create_node_at(new_x, new_y)
         self.node_depth_pos[child] = (child_depth, child_pos)
 
-        # record connection for saving graph
+        # Remove any previous connection on this side before adding the new one
+        self._remove_connection(parent, side)
+
         if parent not in self.node_children:
             self.node_children[parent] = {}
         self.node_children[parent][side] = child
 
+        self._draw_line(parent, side, child)
         self._update_delete_buttons()
-    
+
     def _update_delete_buttons(self) -> None:
         """
         Update the delete buttons on nodes as tree grows.
@@ -143,15 +258,14 @@ class GameCreationPage(QtWidgets.QWidget):
         for parent, children in self.node_children.items():
             for side, child in list(children.items()):
                 if child == node:
-                    del self.node_children[parent][side]
+                    self._remove_connection(parent, side)
                     break
-        
-        # remove from all node tracking
+
         self.nodes.remove(node)
         self.node_coords_dict.pop(node, None)
         self.node_children.pop(node, None)
+        self.node_depth_pos.pop(node, None)
 
-        # remove from proxy (the canvas)
         proxy = getattr(node, "_proxy", None)
         if proxy:
             self.scene.removeItem(proxy)
@@ -160,39 +274,75 @@ class GameCreationPage(QtWidgets.QWidget):
 
         self._update_delete_buttons()
 
+    def _node_centre_bottom(self, node: NodeWidget) -> QtCore.QPointF:
+        """Scene coordinates of the bottom-centre of a node's proxy."""
+        x, y = self.node_coords_dict[node]
+        w = node.width()
+        h = node.height()
+        return QtCore.QPointF(x + w / 2, y + h)
+
+    def _node_centre_top(self, node: NodeWidget) -> QtCore.QPointF:
+        """Scene coordinates of the top-centre of a node's proxy."""
+        x, y = self.node_coords_dict[node]
+        w = node.width()
+        return QtCore.QPointF(x + w / 2, y)
+
+    def _draw_line(self, parent: NodeWidget, side: OptionSide, child: NodeWidget) -> None:
+        """Draw (or redraw) the connector line for this parent-side pair."""
+        key = (parent, side)
+        # Remove old line if present
+        if key in self._lines:
+            self.scene.removeItem(self._lines[key])
+
+        p1 = self._node_centre_bottom(parent)
+        p2 = self._node_centre_top(child)
+
+        line = QtWidgets.QGraphicsLineItem(QtCore.QLineF(p1, p2))
+        color = LINE_COLOR_LEFT if side == OptionSide.LEFT else LINE_COLOR_RIGHT
+        pen = QtGui.QPen(color, config.LINE_WIDTH)
+        pen.setStyle(QtCore.Qt.SolidLine)
+        line.setPen(pen)
+        line.setZValue(-1)   # draw behind node widgets
+
+        self.scene.addItem(line)
+        self._lines[key] = line
+
+    def _remove_connection(self, parent: NodeWidget, side: OptionSide) -> None:
+        """Remove the visual line and child record for a given parent-side."""
+        key = (parent, side)
+        if key in self._lines:
+            self.scene.removeItem(self._lines.pop(key))
+        children = self.node_children.get(parent, {})
+        children.pop(side, None)
+
     def _build_game_graph(self) -> Optional[Node]:
         """
         Build a backend graph tree from the UI nodes.
         """
         if not self.root_node:
             return None
-        
+
         widget_node: dict[NodeWidget, Node] = {}
-        # 1. create backend nodes
-        for node_widget in self.nodes:
-            main_text = node_widget.text.toPlainText().strip()
-            left_text = node_widget.left_option.text().strip()
-            right_text = node_widget.right_option.text().strip()
-            
-            game_graph_node = Node(main_text, left_text, right_text)
-            game_graph_node.is_win = node_widget.win_button.isChecked()
-            widget_node[node_widget] = game_graph_node
+        for nw in self.nodes:
+            n = Node(
+                nw.text.toPlainText().strip(),
+                nw.left_option.text().strip(),
+                nw.right_option.text().strip(),
+            )
+            n.is_win = nw.win_button.isChecked()
+            widget_node[nw] = n
 
-
-        # 2. loop through the node widgets 
-        # for each node create connections to their children as Node objects
         for parent_widget, children in self.node_children.items():
             parent_node = widget_node[parent_widget]
-
-            left_child = children.get(OptionSide.LEFT)
+            left_child  = children.get(OptionSide.LEFT)
             right_child = children.get(OptionSide.RIGHT)
-
             if left_child:
-                parent_node.addNode(EnumGesture.ILoveYou_Left, widget_node[left_child])
+                parent_node.addNode(EnumGesture.ILoveYou_Left,  widget_node[left_child])
             if right_child:
                 parent_node.addNode(EnumGesture.ILoveYou_Right, widget_node[right_child])
+
         return widget_node[self.root_node]
-    
+
     def save_title(self) -> None:
         self.game_title = self.title_entry.text().strip()
         print(f"Title: {self.game_title}")
@@ -206,12 +356,16 @@ class GameCreationPage(QtWidgets.QWidget):
         game_path = os.path.join(os.path.dirname(__file__), os.pardir, "saved_games")
 
         progress = self._show_saving_popup()
-
-        self.game_saver.save_game(game_path, title, root)
+        try:
+            self.game_saver.save_game(game_path, title, root)
+        except Exception as e:
+            progress.close()
+            QtWidgets.QMessageBox.critical(self, "Save failed", str(e))
+            return
         progress.close()
         QtWidgets.QMessageBox.information(self, "Success", f"Game saved to {game_path}/{title}")
-    
-    def _show_saving_popup(self):
+
+    def _show_saving_popup(self) -> QtWidgets.QProgressDialog:
         progress = QtWidgets.QProgressDialog("Saving game...", None, 0, 0, self)
         progress.setWindowTitle("Saving")
         progress.setWindowModality(QtCore.Qt.WindowModal)
@@ -225,10 +379,8 @@ class GameCreationPage(QtWidgets.QWidget):
         """
         Load an existing game onto the creation page and populate the graph nodes.
         """
-        print(f"load game from {game_path}")
         try:
             root_node, game_folder = self.game_loader.load_graph(game_path)
-
             game_name = os.path.basename(game_folder)
             self.game_title = game_name
             self.title_entry.setText(game_name)
@@ -237,64 +389,75 @@ class GameCreationPage(QtWidgets.QWidget):
         except Exception as e:
             QtWidgets.QMessageBox.critical(self, "Error", f"Failed to load game: {e}")
 
-    def _get_node_position(self, depth: int, position: int, total_width: int = config.GAME_TREE_WIDTH) -> tuple[float, float]:
-        """
-        Total window width is divided into 2^depth equal slots(/sections) at each depth level,
-        and the node is centered in its slot.
-        So nodes do not overlap as tree grows.
-        """
+    def _get_node_position(self, depth: int, position: int,
+                           total_width: int = config.GAME_TREE_WIDTH) -> tuple[float, float]:
         slots = 2 ** depth
         slot_width = total_width / slots
         x = slot_width * position + slot_width / 2
         y = depth * config.CHILD_NODE_Y_OFFSET + config.TREE_Y_OFFSET
         return x, y
 
-    def _populate_graph(self, root_node: Node):
+    def _populate_graph(self, root_node: Node) -> None:
         """
-        Recursively build UI widgets from loaded Node graph.
+        BFS over the loaded backend graph, creating NodeWidgets.
+        Tree edges are placed with tree layout; back-edges (links to already-visited
+        nodes) are drawn as connector lines to their existing widgets.
         """
-        queue: list[tuple[Node, int, int, Optional[NodeWidget], Optional[OptionSide]]] = [(root_node, 0, 0, None, None)]
-        # (node, depth, pos, parent_widget, side)
+        # backend Node -> NodeWidget
+        backend_to_widget: dict[int, NodeWidget] = {}
+
+        queue: list[tuple[Node, int, int, Optional[NodeWidget], Optional[OptionSide]]] = [
+            (root_node, 0, 0, None, None)
+        ]
         self.root_node = None
-        visited: set[Node] = set()
+        visited: set[int] = set()
 
         while queue:
             node, depth, pos, parent_widget, side = queue.pop(0)
-            if node in visited:
+            node_id = node.get_id()
+
+            if node_id in visited:
+                # This node already has a widget — just draw the link line
+                if parent_widget is not None and side is not None:
+                    target_widget = backend_to_widget[node_id]
+                    if parent_widget not in self.node_children:
+                        self.node_children[parent_widget] = {}
+                    self.node_children[parent_widget][side] = target_widget
+                    self._draw_line(parent_widget, side, target_widget)
                 continue
-            visited.add(node)
+
+            visited.add(node_id)
 
             x, y = self._get_node_position(depth, pos)
-            node_widget: NodeWidget = self._create_node_at(x, y)
-            self._populate_widget_from_node(node_widget, node)
-            self.node_depth_pos[node_widget] = (depth, pos)
+            nw = self._create_node_at(x, y)
+            self._populate_widget_from_node(nw, node)
+            self.node_depth_pos[nw] = (depth, pos)
+            backend_to_widget[node_id] = nw
 
-            if not self.root_node:
-                self.root_node = node_widget
+            if self.root_node is None:
+                self.root_node = nw
 
             if parent_widget is not None and side is not None:
                 if parent_widget not in self.node_children:
                     self.node_children[parent_widget] = {}
-                self.node_children[parent_widget][side] = node_widget
+                self.node_children[parent_widget][side] = nw
+                self._draw_line(parent_widget, side, nw)
 
             for gesture, child_node in node.adjacencyList.items():
                 if gesture == EnumGesture.ILoveYou_Left:
-                    queue.append((child_node, depth + 1, pos * 2, node_widget, OptionSide.LEFT))
+                    queue.append((child_node, depth + 1, pos * 2,     nw, OptionSide.LEFT))
                 elif gesture == EnumGesture.ILoveYou_Right:
-                    queue.append((child_node, depth + 1, pos * 2 + 1, node_widget, OptionSide.RIGHT))
+                    queue.append((child_node, depth + 1, pos * 2 + 1, nw, OptionSide.RIGHT))
 
         self._update_delete_buttons()
 
-    def _populate_widget_from_node(self, node_widget: NodeWidget, node: Node) -> None:
-        """
-        Fill in the main text and the options of a node widget from the node object
-        """
-        node_widget.text.setPlainText(node.getText())
-        node_widget.left_option.setText(node.left_option)
-        node_widget.right_option.setText(node.right_option)
-        node_widget.win_button.setChecked(node.is_win)
-        node_widget.win_button.setStyleSheet("background-color: #f0c040;" if node.is_win else "")
-        
+    def _populate_widget_from_node(self, nw: NodeWidget, node: Node) -> None:
+        nw.text.setPlainText(node.getText())
+        nw.left_option.setText(node.left_option)
+        nw.right_option.setText(node.right_option)
+        nw.win_button.setChecked(node.is_win)
+        nw.win_button.setStyleSheet("background-color: #f0c040;" if node.is_win else "")
+
 
 def run():
     app = QtWidgets.QApplication([])
@@ -304,6 +467,7 @@ def run():
     widget.show()
 
     sys.exit(app.exec())
+
 
 if __name__ == "__main__":
     run()
