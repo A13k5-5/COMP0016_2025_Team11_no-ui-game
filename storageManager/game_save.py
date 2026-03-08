@@ -2,6 +2,7 @@ import os
 import tempfile
 import zipfile
 
+from multipledispatch import dispatch
 from . import config
 from graph import Node
 from graph.serial_graph import SerialGraph
@@ -14,13 +15,19 @@ class GameSaver:
     Class responsible for saving the game into a zipped game folder (containing the graph and corresponding audio files).
     """
 
+    @dispatch(str, str, Node)
     def save_game(self, path_to_save: str, game_name: str, root: Node):
+        serialized_graph: SerialGraph = self._serialize_graph(root)
+        self.save_game(path_to_save, game_name, serialized_graph)
+
+    @dispatch(str, str, SerialGraph)
+    def save_game(self, path_to_save: str, game_name: str, serialized_graph: SerialGraph):
         """
         Saves the game to the given path as a zip archive. Only the zip file is written to path_to_save;
         a temporary directory is used for staging and is removed afterwards.
         :param path_to_save: the directory where the game zip should be created
         :param game_name: the name of the game, which will be used as the name of the zip file
-        :param root: the root node of the graph representing the game
+        :param serialized_graph: the graph in a serialized format (dictionary) to be saved as JSON
         :return:
         """
         zip_path: str = os.path.join(path_to_save, game_name + config.FILE_EXTENSION)
@@ -31,12 +38,10 @@ class GameSaver:
             stage_path: str = os.path.join(tmp_dir, game_name)
             os.makedirs(os.path.join(stage_path, "audio"))
 
-            serialized_graph: SerialGraph = self._serialize_graph(root)
             self.save_graph(stage_path, serialized_graph)
-            self._generate_audio(serialized_graph, stage_path)
+            # self._generate_audio(serialized_graph, stage_path)
 
             self._zip_folder_to(stage_path, zip_path)
-
 
     def _check_zip_path(self, zip_path: str):
         """
@@ -52,7 +57,6 @@ class GameSaver:
                     "Please choose a different name or delete the existing file."
                 )
             os.remove(zip_path)
-
 
     def _zip_folder_to(self, folder_path: str, zip_path: str):
         """
@@ -85,7 +89,6 @@ class GameSaver:
             has_audio = any("audio/" in n for n in names)
             return has_graph and has_audio
 
-
     def save_graph(self, path_to_save: str, serialized_graph: SerialGraph):
         """
         Saves the graph to a JSON file.
@@ -96,7 +99,6 @@ class GameSaver:
         graph_path: str = os.path.join(path_to_save, "graph.json")
         with open(graph_path, 'w') as file:
             file.write(serialized_graph.model_dump_json(indent=4))
-
 
     def _serialize_graph(self, root: Node) -> SerialGraph:
         """
@@ -118,7 +120,6 @@ class GameSaver:
         dfs(root)
         return serial_graph
 
-
     def _get_node_audio_filename(self, node_id: int) -> str:
         """
         Generates the file path for the audio file corresponding to a given node.
@@ -126,7 +127,6 @@ class GameSaver:
         :return: the file path for the node's audio file
         """
         return f"node_{node_id}.wav"
-
 
     def _serialize_node(self, node: Node) -> SerialNode:
         """
@@ -139,11 +139,11 @@ class GameSaver:
             text=node.getText(),
             left_option=node.left_option,
             right_option=node.right_option,
-            audio_filename=self._get_node_audio_filename(node.get_id()),
-            adjacency_list={gesture: adjacent_node.get_id() for gesture, adjacent_node in node.adjacencyList.items()},
+            adjacency_list={gesture: adjacent_node.get_id() for
+                            gesture, adjacent_node in
+                            node.adjacencyList.items()},
             is_win=node.is_win
         )
-
 
     def _generate_audio(self, serial_graph: SerialGraph, game_path: str):
         """
@@ -160,10 +160,12 @@ class GameSaver:
             if serial_node.left_option or serial_node.right_option:
                 text_parts.append("...You have two options.")
             if serial_node.left_option:
-                text_parts.append(f"Do {serial_node.left_option} by raising your left hand.")
+                text_parts.append(
+                    f"Do {serial_node.left_option} by raising your left hand.")
             if serial_node.right_option:
-                text_parts.append(f"Do {serial_node.right_option} by raising your right hand.")
-            
+                text_parts.append(
+                    f"Do {serial_node.right_option} by raising your right hand.")
+
             full_text = " ".join(text_parts).strip()
             output_file: str = os.path.join(game_path, "audio", self._get_node_audio_filename(node_id))
 
