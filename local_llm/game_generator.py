@@ -1,40 +1,31 @@
-import json
+import os
 
-from openvino_genai import GenerationConfig, LLMPipeline, StructuredOutputConfig, ChatHistory
+from openvino_genai import LLMPipeline
 
 from graph.serial_graph import SerialGraph
-from local_llm.prompts import SYS_MESSAGE
-from .graph_blueprint.blueprint import GraphBlueprint
+from local_llm.graph_blueprint.blueprint import GraphBlueprint
+from local_llm.graph_blueprint.blueprint_generator import BlueprintGenerator
+from local_llm.story_generator.story_generator import StoryGenerator
 
 
 class GameGenerator:
-    def __init__(self, llm: LLMPipeline):
-        self.llm: LLMPipeline = llm
-        self.config: GenerationConfig = GenerationConfig()
-        self.history: ChatHistory = ChatHistory()
+    def __init__(self):
+        model_path: str = os.path.join(os.path.dirname(__file__), "model_path")
+        self.pipe: LLMPipeline = LLMPipeline(model_path, "CPU")
+        self.blueprint_generator: BlueprintGenerator = BlueprintGenerator(self.pipe)
+        self.game_generator: StoryGenerator = StoryGenerator(self.pipe)
 
-    def _build_config(self):
-        self.config: GenerationConfig = GenerationConfig()
-        self.config.do_sample = True
-        self.config.temperature = 0.8
-        self.config.structured_output_config = StructuredOutputConfig(
-            json_schema=json.dumps(SerialGraph.model_json_schema())
-        )
+    def generate_game(self, prompt: str, blueprint: GraphBlueprint = None) -> SerialGraph:
+        """
+        Generates the game graph based on users prompt. If the blueprint not provided,
+        it will be generated based on the prompt.
+        :param prompt:
+        :param blueprint:
+        :return:
+        """
+        # sanitise blueprint
+        if blueprint is None:
+            blueprint: GraphBlueprint = self.blueprint_generator.generate_blueprint(prompt)
 
-    def _build_history(self, user_prompt: str, game_blueprint: GraphBlueprint):
-        blueprint_json: str = game_blueprint.model_dump_json(indent=2)
-        full_prompt: str = (
-            f"BLUEPRINT:\n{blueprint_json}\n\n"
-            f"THEME:\n{user_prompt}"
-        )
-        self.history: ChatHistory = ChatHistory()
-        self.history.append({"role": "system", "content": SYS_MESSAGE})
-        self.history.append({"role": "user", "content": full_prompt})
-
-    def generate_game(self, user_prompt: str, game_blueprint: GraphBlueprint) -> SerialGraph:
-        self._build_config()
-        self._build_history(user_prompt, game_blueprint)
-
-        decoded_results = self.llm.generate(self.history, self.config)
-        generated_graph: SerialGraph = SerialGraph.model_validate_json(decoded_results.texts[0])
-        return generated_graph
+        story: SerialGraph = self.game_generator.generate_game(prompt, blueprint)
+        return story

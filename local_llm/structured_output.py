@@ -5,7 +5,7 @@ import os
 from openvino_genai import LLMPipeline
 
 from graph.serial_graph import SerialGraph
-from local_llm.game_generator import GameGenerator
+from local_llm.story_generator.story_generator import StoryGenerator
 from local_llm.graph_blueprint.blueprint import GraphBlueprint
 from local_llm.graph_blueprint.blueprint_generator import BlueprintGenerator
 
@@ -18,7 +18,7 @@ def main():
 
     pipe: LLMPipeline = LLMPipeline(args.model_dir, "CPU")
     blueprint_generator: BlueprintGenerator = BlueprintGenerator(pipe)
-    game_generator: GameGenerator = GameGenerator(pipe)
+    game_generator: StoryGenerator = StoryGenerator(pipe)
 
     print(
         "This is a smart assistant that generates an adventure game graph."
