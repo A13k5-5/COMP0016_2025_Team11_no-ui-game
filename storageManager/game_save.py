@@ -17,7 +17,7 @@ class GameSaver:
 
     @dispatch(str, str, Node)
     def save_game(self, path_to_save: str, game_name: str, root: Node):
-        serialized_graph: SerialGraph = self._serialize_graph(root)
+        serialized_graph: SerialGraph = SerialGraph.serialize_graph(root)
         self.save_game(path_to_save, game_name, serialized_graph)
 
     @dispatch(str, str, SerialGraph)
@@ -42,6 +42,18 @@ class GameSaver:
             # self._generate_audio(serialized_graph, stage_path)
 
             self._zip_folder_to(stage_path, zip_path)
+
+    def save_graph(self, path_to_save: str, serialized_graph: SerialGraph):
+        """
+        Saves the graph to a JSON file.
+        :param path_to_save: path to the directory where the graph should be saved
+        :param serialized_graph: the graph in a serialized format (dictionary) to be saved as JSON
+        :return:
+        """
+        graph_path: str = os.path.join(path_to_save, "graph.json")
+        with open(graph_path, 'w') as file:
+            file.write(serialized_graph.model_dump_json(indent=4))
+
 
     def _check_zip_path(self, zip_path: str):
         """
@@ -89,37 +101,6 @@ class GameSaver:
             has_audio = any("audio/" in n for n in names)
             return has_graph and has_audio
 
-    def save_graph(self, path_to_save: str, serialized_graph: SerialGraph):
-        """
-        Saves the graph to a JSON file.
-        :param path_to_save: path to the directory where the graph should be saved
-        :param serialized_graph: the graph in a serialized format (dictionary) to be saved as JSON
-        :return:
-        """
-        graph_path: str = os.path.join(path_to_save, "graph.json")
-        with open(graph_path, 'w') as file:
-            file.write(serialized_graph.model_dump_json(indent=4))
-
-    def _serialize_graph(self, root: Node) -> SerialGraph:
-        """
-        Serializes the graph starting from the root node using DFS. Each node is stored in a dictionary with its ID as
-        the key and its details (text, audio path, adjacency list) as the value. The adjacency list is represented as a
-        dictionary mapping gesture strings to adjacent node IDs.
-        :param root:
-        :return: dictionary of serialized nodes
-        """
-        serial_graph: SerialGraph = SerialGraph(nodes={})
-
-        def dfs(node: Node):
-            if node.get_id() in serial_graph.nodes:
-                return
-            serial_graph.nodes[node.get_id()] = self._serialize_node(node)
-            for adjacent_node in node.adjacencyList.values():
-                dfs(adjacent_node)
-
-        dfs(root)
-        return serial_graph
-
     def _get_node_audio_filename(self, node_id: int) -> str:
         """
         Generates the file path for the audio file corresponding to a given node.
@@ -127,23 +108,6 @@ class GameSaver:
         :return: the file path for the node's audio file
         """
         return f"node_{node_id}.wav"
-
-    def _serialize_node(self, node: Node) -> SerialNode:
-        """
-        Serializes a single node into a dictionary format, including its text, audio path, and adjacency list.
-        :param node: node to be serialised
-        :return: serialised node as a dictionary
-        """
-        return SerialNode(
-            id=node.get_id(),
-            text=node.getText(),
-            left_option=node.left_option,
-            right_option=node.right_option,
-            adjacency_list={gesture: adjacent_node.get_id() for
-                            gesture, adjacent_node in
-                            node.adjacencyList.items()},
-            is_win=node.is_win
-        )
 
     def _generate_audio(self, serial_graph: SerialGraph, game_path: str):
         """
