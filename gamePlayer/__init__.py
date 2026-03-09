@@ -1,1 +1,1 @@
-from .gamePlayer import GamePlayer
+from .game_player import GamePlayer
