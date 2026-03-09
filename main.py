@@ -20,6 +20,7 @@ if __name__ == "__main__":
     #    playerPage.run()
 
     # for game engine
+    import kokoro
     from gui.homePage import run
     run()
 
