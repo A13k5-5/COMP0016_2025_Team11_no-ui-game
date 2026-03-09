@@ -6,7 +6,6 @@ from multipledispatch import dispatch
 from . import config
 from graph import Node
 from graph.serial_graph import SerialGraph
-from graph.serial_node import SerialNode
 from text2speech import Talker
 
 

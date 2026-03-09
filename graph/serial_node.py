@@ -33,3 +33,16 @@ class SerialNode(BaseModel):
             is_win=node.is_win,
             is_losing=node.is_losing
         )
+
+    @classmethod
+    def deserialize_node(cls, serial_node: Self) -> Node:
+        node: Node = Node(
+            serial_node.text,
+            serial_node.left_option,
+            serial_node.right_option
+        )
+        node.id = serial_node.id
+        node.is_win = serial_node.is_win
+        node.is_losing = serial_node.is_losing
+
+        return node

@@ -1,6 +1,5 @@
 from typing import Self
 from gesture import EnumGesture
-from graph.serial_node import SerialNode
 
 
 class Node:
@@ -35,17 +34,3 @@ class Node:
 
     def __str__(self):
         return f"{self._text}, adjacent to {[node._text for node in self.adjacencyList.values()]}"
-
-    @classmethod
-    def deserialize_node(cls, serial_node: SerialNode) -> Self:
-        node: Node = Node(
-            serial_node.text,
-            serial_node.left_option,
-            serial_node.right_option
-        )
-        node.id = serial_node.id
-        node.is_win = serial_node.is_win
-        node.is_losing = serial_node.is_losing
-
-        return node
-

@@ -4,6 +4,7 @@ import zipfile
 
 from graph import Node
 from graph.serial_graph import SerialGraph
+from graph.serial_node import SerialNode
 
 TEMP_FOLDER = os.path.join(os.path.dirname(__file__), "temporary")
 
@@ -62,7 +63,7 @@ class GameLoader:
         root: Node | None = None
         nodes: dict[int, Node] = {}
         for node_id, serial_node in serial_graph.nodes.items():
-            node: Node = Node.deserialize_node(serial_node)
+            node: Node = SerialNode.deserialize_node(serial_node)
 
             nodes[node.id] = node
             if root is None:
