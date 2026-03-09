@@ -37,4 +37,18 @@ class StoryGenerator:
 
         decoded_results = self.llm.generate(self.history, self.config)
         generated_graph: SerialGraph = SerialGraph.model_validate_json(decoded_results.texts[0])
-        return generated_graph
+        sanitised_graph: SerialGraph = self._sanitise_generated_graph(generated_graph)
+        return sanitised_graph
+
+    def _sanitise_generated_graph(self, graph: SerialGraph) -> SerialGraph:
+        """
+        Checks that every node referenced in adjacency lists actually exists in the graph.
+        Any reference to a non-existent node is replaced with a self-loop (the node's own ID).
+        """
+        existing_ids = set(graph.nodes.keys())
+        for node_id, node in graph.nodes.items():
+            node.adjacency_list = {
+                gesture: target if target in existing_ids else node_id
+                for gesture, target in node.adjacency_list.items()
+            }
+        return graph
