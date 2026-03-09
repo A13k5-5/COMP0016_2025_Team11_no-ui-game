@@ -100,6 +100,14 @@ class GameSaver:
             has_audio = any("audio/" in n for n in names)
             return has_graph and has_audio
 
+    def _get_node_audio_filename(self, node_id: int) -> str:
+        """
+        Generates the file path for the audio file corresponding to a given node.
+        :param node_id: the ID of the node for which to generate the audio file path
+        :return: the file path for the node's audio file
+        """
+        return f"node_{node_id}.wav"
+
     def _generate_audio(self, serial_graph: SerialGraph, game_path: str):
         """
         Generates audio files for each node in the graph using the Talker class. The audio files are saved in the specified
@@ -108,14 +116,13 @@ class GameSaver:
         :return:
         """
         talker: Talker = Talker()
-        description: str = "A calm and soothing narration voice"
 
         for node_id, serial_node in serial_graph.nodes.items():
             # generate the main text audio
             main_text_audio_file: str = os.path.join(game_path, "audio", Node.get_main_text_audio_filename(node_id))
-            talker.generate_speech(serial_node.text, description, main_text_audio_file)
+            talker.generate_speech(serial_node.text, main_text_audio_file)
 
             # generate the options audio
             options_audio_file: str = serial_node.get_options_text()
             output_file = os.path.join(game_path, "audio", Node.get_options_audio_filename(node_id))
-            talker.generate_speech(options_audio_file, description, output_file)
+            talker.generate_speech(options_audio_file, output_file)
