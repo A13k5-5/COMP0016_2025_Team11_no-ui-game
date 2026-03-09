@@ -23,6 +23,7 @@ class NodeWidget(QtWidgets.QFrame):
     def _setup_frame(self) -> None:
         self.setFrameShape(QtWidgets.QFrame.Box)
         self.setLineWidth(2)
+        self.setFixedSize(config.NODE_WIDTH, config.NODE_HEIGHT)
 
     def _create_widgets(self) -> None:
         self.text = QtWidgets.QPlainTextEdit()
