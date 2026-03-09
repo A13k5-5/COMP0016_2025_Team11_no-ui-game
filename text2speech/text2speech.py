@@ -1,24 +1,28 @@
-from parler_tts import ParlerTTSForConditionalGeneration
-from transformers import AutoTokenizer
+from kokoro import KPipeline
 import soundfile as sf
 
+import warnings
+warnings.filterwarnings('ignore')  # Suppress all warnings
+
 class Talker:
-    def __init__(self, model_name="parler-tts/parler_tts_mini_v0.1", device="cpu"):
-        self.device = device
-        self.model = ParlerTTSForConditionalGeneration.from_pretrained(model_name).to(device)
-        self.tokenizer = AutoTokenizer.from_pretrained(model_name)
+    def __init__(self):
+        # 'b' - for British English
+        self.pipeline: KPipeline = KPipeline(lang_code='b', repo_id="hexgrad/Kokoro-82M")
 
-    def generate_speech(self, text, description, output_file="output.wav"):
-        input_ids = self.tokenizer(description, return_tensors="pt").input_ids.to(self.device)
-        prompt_input_ids = self.tokenizer(text, return_tensors="pt").input_ids.to(self.device)
+    def generate_speech(self, text: str, output_file="output.wav"):
+        generator = self.pipeline(text, voice='bm_lewis')
 
-        generation = self.model.generate(input_ids=input_ids, prompt_input_ids=prompt_input_ids)
-        audio_arr = generation.cpu().numpy().squeeze()
-        sf.write(output_file, audio_arr, self.model.config.sampling_rate)
-        print(f"Audio saved to {output_file}")
+        audio_chunks = []
+        for gs, ps, audio in generator:
+            audio_chunks.append(audio)
+
+        if audio_chunks:
+            import numpy as np
+            full_audio = np.concatenate(audio_chunks)
+            sf.write(output_file, full_audio, 24000)
+            print("Generated speech saved to: ", output_file)
 
 if __name__ == "__main__":
     talker = Talker()
     prompt = "Once upon a time in a land far away"
-    description = "A calm and soothing narration voice"
-    talker.generate_speech(prompt, description, "story.wav")
+    talker.generate_speech(prompt, "story.wav")

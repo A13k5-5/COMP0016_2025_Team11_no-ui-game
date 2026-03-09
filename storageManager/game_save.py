@@ -116,7 +116,6 @@ class GameSaver:
         :return:
         """
         talker: Talker = Talker()
-        description: str = "A calm and soothing narration voice"
 
         for node_id, serial_node in serial_graph.nodes.items():
             text_parts = [serial_node.text]
@@ -132,4 +131,4 @@ class GameSaver:
             full_text = " ".join(text_parts).strip()
             output_file: str = os.path.join(game_path, "audio", self._get_node_audio_filename(node_id))
 
-            talker.generate_speech(full_text, description, output_file)
+            talker.generate_speech(full_text, output_file)
