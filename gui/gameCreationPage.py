@@ -36,6 +36,10 @@ class GameCreationPage(QtWidgets.QWidget):
         self.game_loader: GameLoader = GameLoader()
         self.game_saver: GameSaver = GameSaver()
 
+        # AI
+        from game_generation_local_llm.game_generator import GameGenerator
+        self._game_generator: GameGenerator = GameGenerator()
+
         # Ordered list of all node widgets
         self.nodes: list[NodeWidget] = []
         self.root_node: Optional[NodeWidget] = None
@@ -180,9 +184,6 @@ class GameCreationPage(QtWidgets.QWidget):
         """
         Send prompt to GameGenerator and load generated graph from json.
         """ 
-        from game_generation_local_llm.game_generator import GameGenerator
-        self._game_generator: GameGenerator = GameGenerator()
-
         prompt = self._ai_prompt.toPlainText().strip()
         if not prompt:
             self._ai_status.setText("Please enter a prompt first.")
