@@ -50,7 +50,7 @@ class GamePlayer:
             self._listOptions(curNode)
             
             # Play current scene audio
-            self._playAudio(game_folder, curNode.audio_filename)
+            self._playAudio(game_folder, curNode.get_id())
 
             # Ask recognizer for a decision (expects a tuple like ("ILoveYou", "Left"))
             decision: EnumGesture = self.recogniser.get_gesture(curNode.get_possible_gestures())
