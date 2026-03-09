@@ -39,7 +39,7 @@ class GameSaver:
             os.makedirs(os.path.join(stage_path, "audio"))
 
             self.save_graph(stage_path, serialized_graph)
-            # self._generate_audio(serialized_graph, stage_path)
+            self._generate_audio(serialized_graph, stage_path)
 
             self._zip_folder_to(stage_path, zip_path)
 
