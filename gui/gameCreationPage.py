@@ -395,15 +395,12 @@ class GameCreationPage(QtWidgets.QWidget):
     def _node_centre_bottom(self, node: NodeWidget) -> QtCore.QPointF:
         """Scene coordinates of the bottom-centre of a node's proxy."""
         x, y = self.node_coords_dict[node]
-        w = node.width()
-        h = node.height()
-        return QtCore.QPointF(x + w / 2, y + h)
+        return QtCore.QPointF(x + config.NODE_WIDTH / 2, y + config.NODE_HEIGHT)
 
     def _node_centre_top(self, node: NodeWidget) -> QtCore.QPointF:
         """Scene coordinates of the top-centre of a node's proxy."""
         x, y = self.node_coords_dict[node]
-        w = node.width()
-        return QtCore.QPointF(x + w / 2, y)
+        return QtCore.QPointF(x + config.NODE_WIDTH / 2, y)
 
     def _draw_line(self, parent: NodeWidget, side: OptionSide, child: NodeWidget) -> None:
         """Draw (or redraw) the connector line for this parent-side pair."""
@@ -514,39 +511,49 @@ class GameCreationPage(QtWidgets.QWidget):
     def _populate_graph(self, root_node: Node) -> None:
         """
         BFS over the loaded backend graph, creating NodeWidgets.
-        Tree edges are placed with tree layout; back-edges (links to already-visited
-        nodes) are drawn as connector lines to their existing widgets.
-        """
-        # backend Node -> NodeWidget
-        backend_to_widget: dict[int, NodeWidget] = {}
 
-        queue: list[tuple[Node, int, int, Optional[NodeWidget], Optional[OptionSide]]] = [
-            (root_node, 0, 0, None, None)
+        Positions are assigned in two passes:
+          1. BFS to create widgets and record depth + parent/child relationships.
+             Nodes are placed at a temporary x=0; actual x is set in pass 2.
+          2. For each depth level, nodes are spaced evenly with guaranteed
+             minimum separation of NODE_WIDTH + H_PADDING, centred around
+             the canvas midpoint.
+        """
+        H_PADDING = 40
+        MIN_SPACING = config.NODE_WIDTH + H_PADDING
+
+        backend_to_widget: dict[int, NodeWidget] = {}
+        # depth -> list of NodeWidgets in BFS order
+        depth_to_nodes: dict[int, list[NodeWidget]] = {}
+
+        queue: list[tuple[Node, int, Optional[NodeWidget], Optional[OptionSide]]] = [
+            (root_node, 0, None, None)
         ]
         self.root_node = None
         visited: set[int] = set()
 
+        # ── pass 1: create widgets, record relationships ──────────────
         while queue:
-            node, depth, pos, parent_widget, side = queue.pop(0)
+            node, depth, parent_widget, side = queue.pop(0)
             node_id = node.get_id()
 
             if node_id in visited:
-                # This node already has a widget — just draw the link line
+                # back-edge: wire the link but don't create a new widget
                 if parent_widget is not None and side is not None:
                     target_widget = backend_to_widget[node_id]
                     if parent_widget not in self.node_children:
                         self.node_children[parent_widget] = {}
                     self.node_children[parent_widget][side] = target_widget
-                    self._draw_line(parent_widget, side, target_widget)
                 continue
 
             visited.add(node_id)
 
-            x, y = self._get_node_position(depth, pos)
-            nw = self._create_node_at(x, y)
+            y = depth * config.CHILD_NODE_Y_OFFSET + config.TREE_Y_OFFSET
+            nw = self._create_node_at(0, y)   # x will be set in pass 2
             self._populate_widget_from_node(nw, node)
-            self.node_depth_pos[nw] = (depth, pos)
+            self.node_depth_pos[nw] = (depth, 0)
             backend_to_widget[node_id] = nw
+            depth_to_nodes.setdefault(depth, []).append(nw)
 
             if self.root_node is None:
                 self.root_node = nw
@@ -555,11 +562,10 @@ class GameCreationPage(QtWidgets.QWidget):
                 if parent_widget not in self.node_children:
                     self.node_children[parent_widget] = {}
                 self.node_children[parent_widget][side] = nw
-                self._draw_line(parent_widget, side, nw)
 
             for gesture, child_node in node.adjacencyList.items():
                 if gesture == EnumGesture.ILoveYou_Left:
-                    queue.append((child_node, depth + 1, pos * 2,     nw, OptionSide.LEFT))
+                    queue.append((child_node, depth + 1, nw, OptionSide.LEFT))
                 elif gesture == EnumGesture.ILoveYou_Right:
                     queue.append((child_node, depth + 1, pos * 2 + 1, nw, OptionSide.RIGHT))
 
