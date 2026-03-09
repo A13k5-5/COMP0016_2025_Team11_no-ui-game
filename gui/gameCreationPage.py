@@ -114,8 +114,7 @@ class GameCreationPage(QtWidgets.QWidget):
         panel.setFixedWidth(config.AI_PANEL_WIDTH)
         panel.setStyleSheet(
             "QWidget#aiPanel {"
-            "  background: white;"
-            "  border-left: 1px solid #c0c0c0;"
+            "  border-left: 1px;"
             "}"
         )
         panel.setObjectName("aiPanel")
@@ -149,7 +148,6 @@ class GameCreationPage(QtWidgets.QWidget):
         self._ai_prompt.setFixedHeight(80)
         self._ai_prompt.setStyleSheet(
             "QTextEdit {"
-            "  background: white;"
             "  border: 1px solid #c0c0c0;"
             "  border-radius: 4px;"
             "  padding: 4px;"
@@ -161,13 +159,11 @@ class GameCreationPage(QtWidgets.QWidget):
         self._ai_generate_btn = QtWidgets.QPushButton("Generate Game")
         self._ai_generate_btn.setStyleSheet(
             "QPushButton {"
-            "  background: #f0f0f0;"
             "  border: 1px solid #c0c0c0;"
             "  border-radius: 4px;"
             "  padding: 6px;"
             "  font-size: 12px;"
             "}"
-            "QPushButton:hover { background: #e0e0e0; }"
             "QPushButton:disabled { color: #aaa; }"
         )
         self._ai_generate_btn.clicked.connect(self._on_AIgenerate_clicked)
@@ -175,7 +171,7 @@ class GameCreationPage(QtWidgets.QWidget):
 
         self._ai_status = QtWidgets.QLabel("")
         self._ai_status.setWordWrap(True)
-        self._ai_status.setStyleSheet("font-size: 11px; color: #666; background: transparent;")
+        self._ai_status.setStyleSheet("font-size: 11px; background: transparent;")
         layout.addWidget(self._ai_status)
 
         return panel
