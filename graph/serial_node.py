@@ -30,5 +30,6 @@ class SerialNode(BaseModel):
             adjacency_list={gesture: adjacent_node.get_id() for
                             gesture, adjacent_node in
                             node.adjacencyList.items()},
-            is_win=node.is_win
+            is_win=node.is_win,
+            is_losing=node.is_losing
         )
