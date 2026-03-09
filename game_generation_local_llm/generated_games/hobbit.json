@@ -1,0 +1,232 @@
+{
+  "nodes": {
+    "0": {
+      "id": 0,
+      "text": "You find yourself in the comfort of your hobbit hole, the Shire stretching out in verdant tranquility. The smell of fresh-baked cakes from your pantry teases your senses. Gandalf the Grey stands in your doorway, his eyes gleaming with an adventurous spark. 'Join me, Bilbo,' he urges, 'I’m looking for someone to share in an adventure.'",
+      "left_option": "Stay home",
+      "right_option": "Join Gandalf",
+      "adjacency_list": {
+        "0": 1,
+        "1": 4
+      },
+      "is_win": false,
+      "is_losing": false
+    },
+    "1": {
+      "id": 1,
+      "text": "You decide to follow Gandalf on his mysterious journey. The path ahead is lined with towering trees, dappled sunlight filtering through their leaves. You feel a mix of apprehension and excitement stirring within you as a new chapter begins.",
+      "left_option": "Proceed",
+      "right_option": "Turn back",
+      "adjacency_list": {
+        "0": 2,
+        "1": 2
+      },
+      "is_win": false,
+      "is_losing": false
+    },
+    "2": {
+      "id": 2,
+      "text": "You reach the edge of the Wood-Under-Heap, where the weathered sign reads 'BAG-END.' Gandalf leads you into the forest, and the familiar Shire fades into a more rugged, ancient landscape.",
+      "left_option": "Continue into the forest",
+      "right_option": "Head to Rivendell",
+      "adjacency_list": {
+        "0": 3,
+        "1": 9
+      },
+      "is_win": false,
+      "is_losing": false
+    },
+    "3": {
+      "id": 3,
+      "text": "As you traverse the woods, you encounter the trolls Gollum and his kin. They make loud and menacing threats, but Gandalf’s magic keeps them at bay for the moment. You feel the thrill of danger tinged with fear.",
+      "left_option": "Stay hidden",
+      "right_option": "Confront trolls",
+      "adjacency_list": {
+        "0": 7,
+        "1": 7
+      },
+      "is_win": false,
+      "is_losing": false
+    },
+    "4": {
+      "id": 4,
+      "text": "You return home, diligently baking cakes and brewing tea. Gandalf’s visit becomes a tale to share with the other hobbits, but deep down, the call of adventure is still echoing.",
+      "left_option": "Reflect on journey",
+      "right_option": "Lock doors",
+      "adjacency_list": {
+        "0": 5,
+        "1": 5
+      },
+      "is_win": false,
+      "is_losing": false
+    },
+    "5": {
+      "id": 5,
+      "text": "The next day, Bilbo’s door creaks open once more. Gandalf returns, along with a company of dwarves led by Thorin Oakenshield. Their faces are rugged, their eyes alight with purpose. 'The Fellowship,' Gandalf announces, 'is looking for a burglar.'",
+      "left_option": "Join the company",
+      "right_option": "Stay behind",
+      "adjacency_list": {
+        "0": 6,
+        "1": 10
+      },
+      "is_win": false,
+      "is_losing": false
+    },
+    "6": {
+      "id": 6,
+      "text": "You grow nervous as the dwarves discuss plans and pack their gear. Yet, there’s a part of you that can’t resist the pull of what lies beyond. The Shire becomes a distant memory as you step forward with the company.",
+      "left_option": "Say goodbye to the Shire",
+      "right_option": "Pack your belongings",
+      "adjacency_list": {
+        "0": 7,
+        "1": 7
+      },
+      "is_win": false,
+      "is_losing": false
+    },
+    "7": {
+      "id": 7,
+      "text": "The road winds through darkling forests now, and you find yourself at the Misty Mountains’ entrance. Frost giants guard the pass, their massive forms almost tangible in the mist.",
+      "left_option": "Find a safe path",
+      "right_option": "Seek guidance from Gandalf",
+      "adjacency_list": {
+        "0": 8,
+        "1": 11
+      },
+      "is_win": false,
+      "is_losing": false
+    },
+    "8": {
+      "id": 8,
+      "text": "With the help of a mysterious Elven rope, Gandalf leads the group across the chasm, narrowly escaping the clutches of the giants. You hang on tightly, heart pounding, relieved as you reach solid ground on the other side.",
+      "left_option": "Rest",
+      "right_option": "Continue",
+      "adjacency_list": {
+        "0": 9,
+        "1": 9
+      },
+      "is_win": false,
+      "is_losing": false
+    },
+    "9": {
+      "id": 9,
+      "text": "After the harrowing journey through the mountains, you find yourselves in the lush valley of Rivendell. Elrond opens his elven-house to all, including you, Bilbo. It’s a moment of respite, a brief interlude before the adventure continues into the unknown.",
+      "left_option": "Rest in Rivendell",
+      "right_option": "Continue the quest",
+      "adjacency_list": {
+        "0": 10,
+        "1": 10
+      },
+      "is_win": false,
+      "is_losing": false
+    },
+    "10": {
+      "id": 10,
+      "text": "The road now leads into the shadowy depths of the goblin tunnels. You feel a primal fear as the trolls’ taunts echo in the dark, but Gandalf’s presence is a steadying force.",
+      "left_option": "Stay close to Gandalf",
+      "right_option": "Explore cautiously",
+      "adjacency_list": {
+        "0": 12,
+        "1": 13
+      },
+      "is_win": false,
+      "is_losing": false
+    },
+    "11": {
+      "id": 11,
+      "text": "Led by Gandalf’s wisdom, you navigate through the dangerous tunnels, finally escaping the clutches of the goblins. The surface greets you with a shaft of sunlight, a symbol of hope.",
+      "left_option": "Press on",
+      "right_option": "Regroup",
+      "adjacency_list": {
+        "0": 12,
+        "1": 12
+      },
+      "is_win": false,
+      "is_losing": false
+    },
+    "12": {
+      "id": 12,
+      "text": "The journey leads you to the Lonely Mountain, its peak shrouded in mist and mystery. The promise of treasure and danger alike draws you onward, heart racing with anticipation.",
+      "left_option": "Seek the mountain’s secrets",
+      "right_option": "Question your decisions",
+      "adjacency_list": {
+        "0": 14,
+        "1": 17
+      },
+      "is_win": false,
+      "is_losing": false
+    },
+    "13": {
+      "id": 13,
+      "text": "A sudden ambush by goblins traps you in their lair. Overwhelmed and outnumbered, shadows close in around you, and you can do little but wait for fate to decide.",
+      "left_option": "Resign to fate",
+      "right_option": "Fight back",
+      "adjacency_list": {
+        "0": 15,
+        "1": 16
+      },
+      "is_win": false,
+      "is_losing": true
+    },
+    "14": {
+      "id": 14,
+      "text": "As you approach the mountain, the air thickens with enchantment and old promises. You stand at the threshold of adventure’s greatest treasure: the end of the journey and the beginning of legend.",
+      "left_option": "Reflect on journey",
+      "right_option": "Prepare for the final quest",
+      "adjacency_list": {
+        "0": 18,
+        "1": 17
+      },
+      "is_win": true,
+      "is_losing": false
+    },
+    "15": {
+      "id": 15,
+      "text": "The goblins succeed, and darkness engulfs you. Your adventure ends here, a lore for the Shire.",
+      "left_option": "",
+      "right_option": "",
+      "adjacency_list": {
+        "0": 15,
+        "1": 15
+      },
+      "is_win": false,
+      "is_losing": true
+    },
+    "16": {
+      "id": 16,
+      "text": "The strength of your spirit rallies the company, and you escape the goblin grasp, but the cost is high. You stumble, injured and alone, as the path behind you closes.",
+      "left_option": "",
+      "right_option": "",
+      "adjacency_list": {
+        "0": 16,
+        "1": 16
+      },
+      "is_win": false,
+      "is_losing": true
+    },
+    "17": {
+      "id": 17,
+      "text": "Despite your bravery, the mountain’s magic overwhelms you. Your journey ends here, a tale of caution for others.",
+      "left_option": "",
+      "right_option": "",
+      "adjacency_list": {
+        "0": 17,
+        "1": 17
+      },
+      "is_win": false,
+      "is_losing": true
+    },
+    "18": {
+      "id": 18,
+      "text": "You stand triumphant at the Lonely Mountain, your heart swelling with pride and the thrill of adventure fulfilled. This is but the beginning of your legendary tale.",
+      "left_option": "",
+      "right_option": "",
+      "adjacency_list": {
+        "0": 18,
+        "1": 18
+      },
+      "is_win": true,
+      "is_losing": false
+    }
+  }
+}

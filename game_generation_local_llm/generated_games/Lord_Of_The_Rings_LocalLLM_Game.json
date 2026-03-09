@@ -1,0 +1,112 @@
+[
+  {
+    "id": 0,
+    "text": "You find yourself in the Shire, a peaceful land filled with rolling hills and quaint hobbit-holes. The scent of fresh grass and earth fills the air. Your journey begins at Bag End, home to Bilbo Baggins, who has recently disappeared on an unexpected adventure. Gandalf the Grey stands at your side, hinting that the time has come for the journey he once proposed to Bilbo. 'The ring must be destroyed,' he says, his voice grave with urgency. A path winds through the Shire towards the East Road. Do you follow it now or stay behind, gathering more information about your quest?",
+    "left_option": "Follow the path",
+    "right_option": "Stay and gather information",
+    "adjacency_list": {
+      "0": 1,
+      "1": 2
+    },
+    "is_win": false
+  },
+  {
+    "id": 1,
+    "text": "You decide to follow the path, leaving the comfort of the Shire behind. As you walk, Gandalf narrates tales of old, rich with lore and mystery. The path takes a turn towards the Old Forest, a place known for its eerie quiet and the ancient trees that seem to watch your every move. You hear faint rustling among the leaves as if something unseen is stirring. Do you venture deeper into the forest or take a cautious step back to consult Gandalf?",
+    "left_option": "Venture deeper",
+    "right_option": "Consult Gandalf",
+    "adjacency_list": {
+      "0": 3,
+      "1": 4
+    },
+    "is_win": false
+  },
+  {
+    "id": 2,
+    "text": "Deciding to stay behind, you seek to gather more information. You explore the quaint Hobbiton, listening to the tales shared over cups of tea and tales of Bilbo\u2019s adventures. Old tales of the One Ring and its dark history resurface, as do stories of shadows growing in the East. You learn of creatures stirring in the wild, and the urgency of your quest becomes clearer. Gandalf soon finds you, telling you it's time to leave. Do you gather more information, hoping to uncover something useful, or do you now decide to follow the path with Gandalf?",
+    "left_option": "Gather more information",
+    "right_option": "Follow Gandalf",
+    "adjacency_list": {
+      "0": 5,
+      "1": 6
+    },
+    "is_win": false
+  },
+  {
+    "id": 3,
+    "text": "Intrigued by the whispers of the forest, you decide to venture deeper. The trees loom overhead, their branches casting dancing shadows. The air is thick with an ancient silence, broken only by the soft rustling of leaves. As you push forward, a shadow flits through the trees, and you sense a presence. Suddenly, you come upon a clearing where a mysterious figure stands, cloaked and hooded. It is an Elf, and he beckons you to follow him. Do you trust this new ally and follow, or stay cautious and investigate the clearing further?",
+    "left_option": "Follow the Elf",
+    "right_option": "Investigate the clearing",
+    "adjacency_list": {
+      "0": 7,
+      "1": 8
+    },
+    "is_win": false
+  },
+  {
+    "id": 4,
+    "text": "You turn to Gandalf, seeking his wisdom in this unfamiliar place. He listens quietly, his eyes reflecting the ancient knowledge they hold. 'The path is treacherous,' he says. 'But it is the only way to fulfill this quest. The ring must be destroyed.' With resolve, you follow him through the Old Forest. The trees seem to close in, whispering secrets of old. As you traverse deeper, the forest opens up into a vast expanse. Gandalf stops, pointing to the mist-covered mountains in the distance. Do you press on with him towards the mountains, or turn back to the safety of the Shire?",
+    "left_option": "Press on towards the mountains",
+    "right_option": "Turn back to the Shire",
+    "adjacency_list": {
+      "0": 9,
+      "1": -1
+    },
+    "is_win": false
+  },
+  {
+    "id": 5,
+    "text": "Determined to gather more information, you spend days in Hobbiton, listening to tales and rumors. Old Gaffer Gamgee shares stories of strange lights and distant sounds echoing through the night. The people speak of a dark power rising in Mordor, and the urgency of your mission becomes clear. Despite the growing fear, the hobbits of the Shire seem complacent, unwilling to leave their peaceful lives. Realizing the danger is too great to ignore, you know it's time to leave. As you prepare to depart with Gandalf, you know your heart aches for the Shire. Do you gather your belongings and leave or stay a bit longer to bid farewell to your friends?",
+    "left_option": "",
+    "right_option": "",
+    "adjacency_list": {
+      "0": -1,
+      "1": -1
+    },
+    "is_win": false
+  },
+  {
+    "id": 6,
+    "text": "With a heavy heart, you decide to follow Gandalf. Leaving the Shire feels like abandoning everything you've known, but the path laid out feels inevitable. As you step onto the East Road, the familiar peace of the Shire fades behind you, replaced by the unknown. Gandalf's presence is a reassuring anchor through the uncertainty that lies ahead. He speaks of the perils that await, of the Ring's dark influence, and how crucial it is for you to join the others. As you move forward, your resolve solidifies. There is no turning back, and your journey truly begins now. Do you ask Gandalf about the immediate dangers you'll face, or simply follow without question?",
+    "left_option": "",
+    "right_option": "",
+    "adjacency_list": {
+      "0": -1,
+      "1": -1
+    },
+    "is_win": false
+  },
+  {
+    "id": 7,
+    "text": "Following the mysterious Elf, you enter a hidden grove. The Elf introduces himself as Glorfindel, and he explains that you are near the Ford of Bruinen, a crucial crossing on your journey. 'Here, the waters flow strong and true,' he says, 'and it is from this place that we must begin our quest together.' With newfound determination, you understand that this alliance is vital. You stand beside him, feeling the weight of your mission coalescing with the power of ancient wisdom. As the sun dips below the horizon, the Elf gifts you with a token of protection, a Silmaril brooch. 'May it guide you,' he says. Through his strength and your courage, you know you are ready to face the challenges ahead. You have found your path. Victory is within reach.",
+    "left_option": "",
+    "right_option": "",
+    "adjacency_list": {
+      "0": -1,
+      "1": -1
+    },
+    "is_win": true
+  },
+  {
+    "id": 8,
+    "text": "In the clearing, the Elf stands motionless, radiating an aura of quiet authority. As you approach cautiously, he extends a hand, gesturing towards the forest beyond. 'You must not linger here,' he warns softly. 'The forest is filled with things that are not our friends.' A gentle breeze stirs the leaves, and a distant howl echoes through the trees. Trusting his wisdom, you decide to follow him into the forest, leaving the eerie stillness behind. The forest path is narrow and winding, but the Elf's steady presence is a guide through the uncertainty. As you step forward, a sense of purpose fills your heart. The path is treacherous, but you know it leads to the Ford of Bruinen. Do you press onward with determination, or ask the Elf more about the dangers ahead?",
+    "left_option": "",
+    "right_option": "",
+    "adjacency_list": {
+      "0": -1,
+      "1": -1
+    },
+    "is_win": false
+  },
+  {
+    "id": 9,
+    "text": "You and Gandalf press on, leaving the Shire behind. The journey is arduous, with the path often narrow and winding. As night falls, you find shelter in an abandoned stone hut among the hills. The fire you build provides much-needed warmth, and the stars above remind you of the vast world awaiting your steps. Gandalf shares tales of distant lands and forgotten magic, each word casting a spell of wonder and courage. As dawn breaks, you find yourself filled with a renewed sense of purpose. The weight of your quest feels heavier, yet your resolve is unbreakable. You continue your journey, knowing that each step brings you closer to the destiny that awaits. Do you reflect on Gandalf's stories, or focus on the path ahead, eager to begin the next leg of your journey?",
+    "left_option": "",
+    "right_option": "",
+    "adjacency_list": {
+      "0": -1,
+      "1": -1
+    },
+    "is_win": false
+  }
+]

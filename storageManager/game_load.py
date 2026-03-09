@@ -39,12 +39,14 @@ class GameLoader:
         :param game_zip: path to the zipped game folder
         :return:
         """
-        game_folder = self._prepare_temp_folder(game_zip)
+        game_folder: str = self._prepare_temp_folder(game_zip)
 
+        # load the serial graph from the graph.json file
         graph_path = os.path.join(game_folder, "graph.json")
         with open(graph_path, 'r') as file:
             serial_graph: SerialGraph = SerialGraph.model_validate_json(file.read().strip())
 
+        # reconstruct the graph structure from the serial graph
         root, nodes = self._load_nodes(serial_graph)
         self._establish_connections(serial_graph, nodes)
 
@@ -60,14 +62,8 @@ class GameLoader:
         root: Node | None = None
         nodes: dict[int, Node] = {}
         for node_id, serial_node in serial_graph.nodes.items():
-            node: Node = Node(
-                serial_node.text,
-                serial_node.left_option,
-                serial_node.right_option
-            )
-            node.id = int(node_id)
-            node.audio_filename = serial_node.audio_filename
-            node.is_win = serial_node.is_win
+            node: Node = Node.deserialize_node(serial_node)
+
             nodes[node.id] = node
             if root is None:
                 root = node
@@ -86,4 +82,3 @@ class GameLoader:
             for gesture, adjacent_node_id in serial_node.adjacency_list.items():
                 adjacent_node = nodes[int(adjacent_node_id)]
                 node.addNode(gesture, adjacent_node)
-

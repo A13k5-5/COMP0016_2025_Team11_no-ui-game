@@ -18,11 +18,12 @@ class GamePlayer:
 
         self.recogniser: myGestureRecognizer.VideoGestureRecogniser = myGestureRecognizer.VideoGestureRecogniser()
 
-    def _playAudio(self, game_path: str, audio_filename: str):
+    def _playAudio(self, game_path: str, node_id: int):
         """
         Play the audio file.
         """
-        audio_full_path = os.path.join(game_path, "audio", audio_filename)
+        audio_filename: str = f"node_{node_id}.wav"
+        audio_full_path: str = os.path.join(game_path, "audio", audio_filename)
         try:
             playsound(audio_full_path)
         except Exception as e:

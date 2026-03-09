@@ -1,0 +1,112 @@
+[
+  {
+    "id": 0,
+    "text": "You find yourself at the entrance of a dark, foreboding cave. Two paths stretch out before you: one veiled in shadow to the left, the other bathed in a faint, eerie glow to the right.",
+    "left_option": "Enter the shadows",
+    "right_option": "Walk the light",
+    "adjacency_list": {
+      "0": 1,
+      "1": 2
+    },
+    "is_win": false
+  },
+  {
+    "id": 1,
+    "text": "The shadows thicken as you venture deeper into the cave. Ahead, two narrow passages diverge. One descends into what seems like an abyss, while the other winds upward into a faintly lit crevice.",
+    "left_option": "Descend into the abyss",
+    "right_option": "Climb the crevice",
+    "adjacency_list": {
+      "0": 3,
+      "1": 4
+    },
+    "is_win": false
+  },
+  {
+    "id": 2,
+    "text": "You emerge into a cavern filled with glittering stalagmites and stalactites. A narrow tunnel leads southwest, and a wider path extends to the northeast.",
+    "left_option": "Explore the tunnel",
+    "right_option": "Follow the wider path",
+    "adjacency_list": {
+      "0": 3,
+      "1": 5
+    },
+    "is_win": false
+  },
+  {
+    "id": 3,
+    "text": "The narrow passage forces you to crawl. It splits into two paths: one twists downward, while the other continues horizontally.",
+    "left_option": "Go downward",
+    "right_option": "Continue horizontally",
+    "adjacency_list": {
+      "0": 6,
+      "1": 7
+    },
+    "is_win": false
+  },
+  {
+    "id": 4,
+    "text": "The crevice gradually widens into a small grotto, where two routes emerge: one spirals up a rock face, the other leads into a shadowy alcove.",
+    "left_option": "Spiral up the rock face",
+    "right_option": "Enter the alcove",
+    "adjacency_list": {
+      "0": 7,
+      "1": 8
+    },
+    "is_win": false
+  },
+  {
+    "id": 5,
+    "text": "As you continue northeast, you reach a large open chamber with a slender tunnel to the south and a winding path toward an increasingly bright passage to the east.",
+    "left_option": "Venture through the tunnel",
+    "right_option": "Follow the bright passage",
+    "adjacency_list": {
+      "0": 6,
+      "1": 8
+    },
+    "is_win": false
+  },
+  {
+    "id": 6,
+    "text": "The path leads you into a narrow, cramped passage. To your left, a faint light beckons, while the right turns into a dead-end.",
+    "left_option": "Head towards the light",
+    "right_option": "Go right",
+    "adjacency_list": {
+      "0": 9,
+      "1": -1
+    },
+    "is_win": false
+  },
+  {
+    "id": 7,
+    "text": "The path opens into a rocky alcove where two routes diverge. The left seems to ascend into a natural chimney, while the right descends into a deeper darkness.",
+    "left_option": "Ascend into the chimney",
+    "right_option": "Descend into the darkness",
+    "adjacency_list": {
+      "0": 9,
+      "1": -1
+    },
+    "is_win": false
+  },
+  {
+    "id": 8,
+    "text": "You've reached a precarious ledge lit by a beam of sunlight from above. To the left is a sheer drop, while a rickety ladder goes up to another passageway.",
+    "left_option": "Peer over the edge",
+    "right_option": "Climb the ladder",
+    "adjacency_list": {
+      "0": -1,
+      "1": 9
+    },
+    "is_win": false
+  },
+  {
+    "id": 9,
+    "text": "Emerging from the cave's mouth, you find yourself bathed in sunlight. The air is fresh and filled with the sounds of wildlife. You've successfully navigated the cave and found your way out.",
+    "left_option": "",
+    "right_option": "",
+    "adjacency_list": {
+      "0": -1,
+      "1": -1
+    },
+    "is_win": true
+  }
+]

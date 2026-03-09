@@ -7,24 +7,21 @@
 # nuitka-project: --enable-plugin=pyside6
 # nuitka-project: --include-qt-plugins=qml
 
-import sys
-
-import gamePlayer
-import playerPage
-
 if __name__ == "__main__":
     # for game player
-    """
+    import sys
+    import gamePlayer
+    import playerPage
+
     if len(sys.argv) > 1:
         player = gamePlayer.GamePlayer()
         player.playGame(sys.argv[1])
     else:
         playerPage.run()
-    """
 
     # for game engine
-    from gui.homePage import run
-    run()
+    # from gui.homePage import run
+    # run()
 
     # for game loading
     # from storageManager.game_load import GameLoader
@@ -37,8 +34,13 @@ if __name__ == "__main__":
     # from storageManager.game_save import GameSaver
     # import storageManager.test_graphs
     # from graph import Node
-    #
+    # from graph.serial_graph import SerialGraph
+    # with serial graph
     # saver = GameSaver()
-    # root: Node = storageManager.test_graphs.build_default_story_graph()
+    # root: SerialGraph = SerialGraph.serialize_graph(storageManager.test_graphs.build_default_story_graph())
     # saver.save_game(os.path.join(os.path.dirname(__file__), "saved_games"), "lord_of_the_rings", root)
+
+    # for structured output
+    # from game_generation_local_llm import structured_output
+    # structured_output.main()
 
