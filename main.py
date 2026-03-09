@@ -32,13 +32,12 @@ if __name__ == "__main__":
     # for game saving
     # import os
     # from storageManager.game_save import GameSaver
-    # import storageManager.test_graphs
-    # from graph import Node
     # from graph.serial_graph import SerialGraph
-    # with serial graph
+    #
+    # with open(os.path.join(os.path.dirname(__file__), "game_generation_local_llm\\generated_games", "hobbit.json"), 'r') as file:
+    #     serialized_graph: SerialGraph = SerialGraph.model_validate_json(file.read().strip())
     # saver = GameSaver()
-    # root: SerialGraph = SerialGraph.serialize_graph(storageManager.test_graphs.build_default_story_graph())
-    # saver.save_game(os.path.join(os.path.dirname(__file__), "saved_games"), "lord_of_the_rings", root)
+    # saver.save_game(os.path.join(os.path.dirname(__file__), "saved_games"), "hobbit", serialized_graph)
 
     # for structured output
     # from game_generation_local_llm import structured_output
