@@ -6,6 +6,7 @@ from PySide6 import QtWidgets, QtCore, QtGui
 
 from gesture import EnumGesture
 from graph import Node
+from graph.serial_graph import SerialGraph
 from storageManager import GameLoader, GameSaver
 from . import config
 from .zoomableGraphicsView import ZoomableGraphicsView
@@ -180,7 +181,46 @@ class GameCreationPage(QtWidgets.QWidget):
         return panel
 
     def _on_AIgenerate_clicked(self) -> None:
-        pass
+        """
+        Send prompt to GameGenerator and load generated graph from json.
+        """ 
+        from game_generation_local_llm.game_generator import GameGenerator
+        self._game_generator: GameGenerator = GameGenerator()
+
+        prompt = self._ai_prompt.toPlainText().strip()
+        if not prompt:
+            self._ai_status.setText("Please enter a prompt first.")
+            return
+        
+        QtWidgets.QApplication.processEvents()
+
+        try:
+            serial_graph = self.generate_game(prompt)
+            self._clear_canvas()
+            self._populate_graph_from_serial(serial_graph)
+        except Exception as e:
+            self._ai_status.setText(f"Error: {e}")
+
+    def generate_game(self, prompt: str) -> SerialGraph:
+        return self._game_generator.generate_game(prompt)
+    
+    def _clear_canvas(self) -> None:
+        """
+        Remove all nodes, lines, and reset tracking state.
+        """
+        self.scene.clear()
+        self.nodes.clear()
+        self.node_coords_dict.clear()
+        self.node_children.clear()
+        self.node_depth_pos.clear()
+        self._lines.clear()
+        self.root_node = None
+
+    def _populate_graph_from_serial(self, serial: SerialGraph) -> None:
+        root, nodes = self.game_loader._load_nodes(serial)
+        self.game_loader._establish_connections(serial, nodes)
+        self._populate_graph(root)
+    
 
     def keyPressEvent(self, event: QtGui.QKeyEvent) -> None:
         if event.key() == QtCore.Qt.Key_Escape:
