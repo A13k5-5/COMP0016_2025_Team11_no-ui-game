@@ -20,14 +20,15 @@ class GamePlayer:
 
     def _playAudio(self, game_path: str, node_id: int):
         """
-        Play the audio file.
+        Play the audio files.
         """
-        audio_filename: str = f"node_{node_id}.wav"
-        audio_full_path: str = os.path.join(game_path, "audio", audio_filename)
+        main_audio_full_path: str = os.path.join(game_path, "audio", Node.get_main_text_audio_filename(node_id))
+        options_audio_full_path: str = os.path.join(game_path, "audio", Node.get_options_audio_filename(node_id))
         try:
-            playsound(audio_full_path)
+            playsound(main_audio_full_path)
+            playsound(options_audio_full_path)
         except Exception as e:
-            print(f"Error playing audio file {audio_full_path}: {e}")
+            print(f"Error playing audio file {main_audio_full_path}: {e}")
 
     def playGame(self, game_path: str):
         try:

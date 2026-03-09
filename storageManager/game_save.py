@@ -100,14 +100,6 @@ class GameSaver:
             has_audio = any("audio/" in n for n in names)
             return has_graph and has_audio
 
-    def _get_node_audio_filename(self, node_id: int) -> str:
-        """
-        Generates the file path for the audio file corresponding to a given node.
-        :param node_id: the ID of the node for which to generate the audio file path
-        :return: the file path for the node's audio file
-        """
-        return f"node_{node_id}.wav"
-
     def _generate_audio(self, serial_graph: SerialGraph, game_path: str):
         """
         Generates audio files for each node in the graph using the Talker class. The audio files are saved in the specified
@@ -119,17 +111,11 @@ class GameSaver:
         description: str = "A calm and soothing narration voice"
 
         for node_id, serial_node in serial_graph.nodes.items():
-            text_parts = [serial_node.text]
-            if serial_node.left_option or serial_node.right_option:
-                text_parts.append("...You have two options.")
-            if serial_node.left_option:
-                text_parts.append(
-                    f"Do {serial_node.left_option} by raising your left hand.")
-            if serial_node.right_option:
-                text_parts.append(
-                    f"Do {serial_node.right_option} by raising your right hand.")
+            # generate the main text audio
+            main_text_audio_file: str = os.path.join(game_path, "audio", Node.get_main_text_audio_filename(node_id))
+            talker.generate_speech(serial_node.text, description, main_text_audio_file)
 
-            full_text = " ".join(text_parts).strip()
-            output_file: str = os.path.join(game_path, "audio", self._get_node_audio_filename(node_id))
-
-            talker.generate_speech(full_text, description, output_file)
+            # generate the options audio
+            options_audio_file: str = serial_node.get_options_text()
+            output_file = os.path.join(game_path, "audio", Node.get_options_audio_filename(node_id))
+            talker.generate_speech(options_audio_file, description, output_file)

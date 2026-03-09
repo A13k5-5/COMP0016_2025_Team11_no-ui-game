@@ -46,3 +46,15 @@ class SerialNode(BaseModel):
         node.is_losing = serial_node.is_losing
 
         return node
+
+    def get_options_text(self) -> str:
+        options_parts: list[str] = []
+        if self.left_option and self.right_option:
+            options_parts.append("...You have two options.")
+        if self.left_option:
+            options_parts.append(
+                f"Do {self.left_option} by raising your left hand.")
+        if self.right_option:
+            options_parts.append(
+                f"Do {self.right_option} by raising your right hand.")
+        return " ".join(options_parts)
