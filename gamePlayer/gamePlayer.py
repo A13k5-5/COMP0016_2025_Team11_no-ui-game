@@ -1,7 +1,7 @@
-from playsound3 import playsound
 import os
 import time
 
+from gamePlayer.audio_player import AudioPlayer
 from graph import Node
 import myGestureRecognizer
 
@@ -15,20 +15,8 @@ class GamePlayer:
     """
     def __init__(self):
         self.game_loader: storageManager.game_load.GameLoader = storageManager.game_load.GameLoader()
-
+        self.audio_player: AudioPlayer = AudioPlayer()
         self.recogniser: myGestureRecognizer.VideoGestureRecogniser = myGestureRecognizer.VideoGestureRecogniser()
-
-    def _playAudio(self, game_path: str, node_id: int):
-        """
-        Play the audio files.
-        """
-        main_audio_full_path: str = os.path.join(game_path, "audio", Node.get_main_text_audio_filename(node_id))
-        options_audio_full_path: str = os.path.join(game_path, "audio", Node.get_options_audio_filename(node_id))
-        try:
-            playsound(main_audio_full_path)
-            playsound(options_audio_full_path)
-        except Exception as e:
-            print(f"Error playing audio file {main_audio_full_path}: {e}")
 
     def playGame(self, game_path: str):
         try:
@@ -51,7 +39,7 @@ class GamePlayer:
             self._listOptions(curNode)
             
             # Play current scene audio
-            self._playAudio(game_folder, curNode.audio_filename)
+            self.audio_player.play_audio(game_folder, curNode.get_id())
 
             # Ask recognizer for a decision (expects a tuple like ("ILoveYou", "Left"))
             decision: EnumGesture = self.recogniser.get_gesture(curNode.get_possible_gestures())
