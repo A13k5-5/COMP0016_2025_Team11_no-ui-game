@@ -64,11 +64,19 @@ class GameCreationPage(QtWidgets.QWidget):
     def _setup_window_layout(self, window_title: str) -> None:
         """
         Set the window title, size and layout.
+        Top level is a horizontal split: left side is the canvas, right side is AI helper.
         """
         self.setWindowTitle(window_title)
         self.resize(config.WINDOW_WIDTH, config.WINDOW_HEIGHT)
-        self.layout = QtWidgets.QVBoxLayout(self)
+
+        h_layout = QtWidgets.QHBoxLayout(self)
+
+        canvas = QtWidgets.QWidget()
+        self.layout = QtWidgets.QVBoxLayout(canvas)
         self.layout.setAlignment(QtCore.Qt.AlignTop)
+        h_layout.addWidget(canvas, stretch=1)
+
+        h_layout.addWidget(self._build_ai_panel())
 
     def _title_entry(self) -> None:
         # create title entry bar and save button
@@ -96,6 +104,83 @@ class GameCreationPage(QtWidgets.QWidget):
         self.save_game_button.clicked.connect(self.save_game)
         self.layout.addWidget(self.save_game_button)
 
+    def _build_ai_panel(self) -> QtWidgets.QWidget:
+        """
+        AI helper side panel — white background, grey border, title and hint
+        pinned to the top, prompt box and button pinned to the bottom.
+        """
+        panel = QtWidgets.QWidget()
+        panel.setFixedWidth(config.AI_PANEL_WIDTH)
+        panel.setStyleSheet(
+            "QWidget#aiPanel {"
+            "  background: white;"
+            "  border-left: 1px solid #c0c0c0;"
+            "}"
+        )
+        panel.setObjectName("aiPanel")
+
+        layout = QtWidgets.QVBoxLayout(panel)
+        layout.setContentsMargins(16, 16, 16, 16)
+        layout.setSpacing(6)
+
+        # top: title, hint
+        header = QtWidgets.QLabel("AI Game Generator")
+        header.setStyleSheet("font-size: 22px; font-weight: bold; background: transparent;")
+        header.setAlignment(QtCore.Qt.AlignTop | QtCore.Qt.AlignLeft)
+        layout.addWidget(header)
+
+        hint = QtWidgets.QLabel("Describe your game and click Generate. The current canvas will be replaced.")
+        hint.setWordWrap(True)
+        hint.setStyleSheet("font-size: 16px; background: transparent;")
+        hint.setAlignment(QtCore.Qt.AlignTop | QtCore.Qt.AlignLeft)
+        layout.addWidget(hint)
+
+        # middle whitespace
+        layout.addStretch(1)
+
+        # bottom: label, prompt box, button
+        prompt_label = QtWidgets.QLabel("Describe your game:")
+        prompt_label.setStyleSheet("font-size: 16px; background: transparent;")
+        layout.addWidget(prompt_label)
+
+        self._ai_prompt = QtWidgets.QTextEdit()
+        self._ai_prompt.setPlaceholderText("e.g. A horror story set in an abandoned hospital...")
+        self._ai_prompt.setFixedHeight(80)
+        self._ai_prompt.setStyleSheet(
+            "QTextEdit {"
+            "  background: white;"
+            "  border: 1px solid #c0c0c0;"
+            "  border-radius: 4px;"
+            "  padding: 4px;"
+            "  font-size: 11px;"
+            "}"
+        )
+        layout.addWidget(self._ai_prompt)
+
+        self._ai_generate_btn = QtWidgets.QPushButton("Generate Game")
+        self._ai_generate_btn.setStyleSheet(
+            "QPushButton {"
+            "  background: #f0f0f0;"
+            "  border: 1px solid #c0c0c0;"
+            "  border-radius: 4px;"
+            "  padding: 6px;"
+            "  font-size: 12px;"
+            "}"
+            "QPushButton:hover { background: #e0e0e0; }"
+            "QPushButton:disabled { color: #aaa; }"
+        )
+        self._ai_generate_btn.clicked.connect(self._on_AIgenerate_clicked)
+        layout.addWidget(self._ai_generate_btn)
+
+        self._ai_status = QtWidgets.QLabel("")
+        self._ai_status.setWordWrap(True)
+        self._ai_status.setStyleSheet("font-size: 11px; color: #666; background: transparent;")
+        layout.addWidget(self._ai_status)
+
+        return panel
+
+    def _on_AIgenerate_clicked(self) -> None:
+        pass
 
     def keyPressEvent(self, event: QtGui.QKeyEvent) -> None:
         if event.key() == QtCore.Qt.Key_Escape:

@@ -12,5 +12,8 @@ PLUS_BUTTON_WIDTH = 22
 GAME_TREE_WIDTH = 3000
 TREE_Y_OFFSET = 50
 
+# ai panel
+AI_PANEL_WIDTH = 300
+
 # for connector lines
 LINE_WIDTH = 2
