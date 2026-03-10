@@ -311,7 +311,7 @@ class GameCreationPage(QtWidgets.QWidget):
         self._draw_line(source, side, target)
 
         self._cancel_link_mode()
-        self._update_delete_buttons()
+        self._update_buttons()
 
 
     def _create_node_at(self, x: float, y: float) -> NodeWidget:
@@ -353,7 +353,7 @@ class GameCreationPage(QtWidgets.QWidget):
         self.node_children[parent][side] = child
 
         self._relayout_tree()
-        self._update_delete_buttons()
+        self._update_buttons()
 
     def _relayout_tree(self) -> None:
         """
@@ -423,15 +423,17 @@ class GameCreationPage(QtWidgets.QWidget):
         y = depth * config.CHILD_NODE_Y_OFFSET + config.TREE_Y_OFFSET
         positions[node] = (x, y)
 
-    def _update_delete_buttons(self) -> None:
+    def _update_buttons(self) -> None:
         """
-        Update the delete buttons on nodes as tree grows.
+        Update the buttons on nodes as tree grows.
         So that only leaf nodes can be deleted (not root).
+        And only leaf nodes can be set as losing nodes.
         """
         for node in self.nodes:
             is_leaf: bool = len(self.node_children.get(node, {})) == 0
             is_root: bool = (node == self.root_node)
             node.set_delete_visible(is_leaf and not is_root)
+            node.set_lose_visible(is_leaf and not is_root)
 
     def delete_leaf_node(self, node: NodeWidget) -> None:
         """
@@ -455,7 +457,7 @@ class GameCreationPage(QtWidgets.QWidget):
             proxy.deleteLater()
         node.deleteLater()
 
-        self._update_delete_buttons()
+        self._update_buttons()
 
     def _node_centre_bottom(self, node: NodeWidget) -> QtCore.QPointF:
         """Scene coordinates of the bottom-centre of a node's proxy."""
@@ -513,6 +515,7 @@ class GameCreationPage(QtWidgets.QWidget):
                 nw.right_option.text().strip(),
             )
             n.is_win = nw.win_button.isChecked()
+            n.is_losing = nw.lose_button.isChecked()
             widget_node[nw] = n
 
         for parent_widget, children in self.node_children.items():
@@ -646,7 +649,7 @@ class GameCreationPage(QtWidgets.QWidget):
                 elif gesture == EnumGesture.ILoveYou_Right:
                     queue.append((child_node, depth + 1, pos * 2 + 1, nw, OptionSide.RIGHT))
 
-        self._update_delete_buttons()
+        self._update_buttons()
 
     def _populate_widget_from_node(self, nw: NodeWidget, node: Node) -> None:
         nw.text.setPlainText(node.getText())
@@ -654,6 +657,8 @@ class GameCreationPage(QtWidgets.QWidget):
         nw.right_option.setText(node.right_option)
         nw.win_button.setChecked(node.is_win)
         nw.win_button.setStyleSheet("background-color: #f0c040;" if node.is_win else "")
+        nw.lose_button.setChecked(node.is_losing)
+        nw.lose_button.setStyleSheet("background-color: #fc3d3d;" if node.is_losing else "")
 
 
 def run():
