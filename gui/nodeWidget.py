@@ -128,6 +128,9 @@ class NodeWidget(QtWidgets.QFrame):
     def _set_win(self) -> None:
         is_win = self.win_button.isChecked()
         self.win_button.setStyleSheet("background-color: #f0c040;" if is_win else "")
+        if is_win and self.lose_button.isVisible():
+            self.lose_button.setChecked(False)
+            self.lose_button.setStyleSheet("")
 
     def set_lose_visible(self, visible: bool) -> None:
         self.lose_button.setVisible(visible)
@@ -135,3 +138,6 @@ class NodeWidget(QtWidgets.QFrame):
     def _set_loss(self) -> None:
         is_loss = self.lose_button.isChecked()
         self.lose_button.setStyleSheet("background-color: #fc3d3d;" if is_loss else "")
+        if is_loss:
+            self.win_button.setChecked(False)
+            self.win_button.setStyleSheet("")
