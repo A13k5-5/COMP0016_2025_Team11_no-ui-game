@@ -8,8 +8,9 @@ import myGestureRecognizer
 
 from gesture import EnumGesture
 import storageManager.game_load
+import storageManager.game_save
 
-ALWAYS_GESTURES = [EnumGesture.PointingUp_Left, EnumGesture.PointingUp_Right]
+ALWAYS_GESTURES = [EnumGesture.ILoveYou_Left, EnumGesture.ILoveYou_Right]
 
 class GamePlayer:
     """
@@ -17,6 +18,7 @@ class GamePlayer:
     """
     def __init__(self):
         self.game_loader: storageManager.game_load.GameLoader = storageManager.game_load.GameLoader()
+        self.game_saver: storageManager.game_save.GameSaver = storageManager.game_save.GameSaver()
         self.audio_player: AudioPlayer = AudioPlayer()
         self.recogniser: myGestureRecognizer.VideoGestureRecogniser = myGestureRecognizer.VideoGestureRecogniser()
 
@@ -51,9 +53,9 @@ class GamePlayer:
             return root_node
 
         self.audio_player.play_audio_from_text("A saved game was found. Raise your left hand to resume, or your right to restart.")
-        decision = self.recogniser.get_gesture([EnumGesture.PointingUp_Left, EnumGesture.PointingUp_Right])
+        decision = self.recogniser.get_gesture([EnumGesture.ILoveYou_Left, EnumGesture.ILoveYou_Right])
 
-        if decision == EnumGesture.PointingUp_Left:
+        if decision == EnumGesture.ILoveYou_Left:
             self.audio_player.play_audio_from_text("Resuming your game.")
             return saved_node
         else:
