@@ -34,3 +34,15 @@ class AudioPlayer:
         self.play_main_audio(game_path, node_id)
         time.sleep(0.5)  # small pause between main text and options
         self.play_options_audio(game_path, node_id)
+    
+    def play_win_audio(self, game_path: str):
+        """
+        Play the win outcome audio.
+        """
+        self._play_audio_from_path(os.path.join(game_path, "audio", "win.wav"))
+
+    def play_lose_audio(self, game_path: str):
+        """
+        Play the lose outcome audio.
+        """
+        self._play_audio_from_path(os.path.join(game_path, "audio", "lose.wav"))
