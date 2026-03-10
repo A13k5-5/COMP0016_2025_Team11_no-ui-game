@@ -566,7 +566,7 @@ class GameCreationPage(QtWidgets.QWidget):
         Load an existing game onto the creation page and populate the graph nodes.
         """
         try:
-            root_node, game_folder = self.game_loader.load_graph(game_path)
+            root_node, game_folder, _ = self.game_loader.load_graph(game_path)
             game_name = os.path.basename(game_folder)
             self.game_title = game_name
             self.title_entry.setText(game_name)

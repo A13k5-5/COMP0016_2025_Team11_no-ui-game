@@ -33,7 +33,7 @@ class GameLoader:
             return os.path.join(TEMP_FOLDER, extracted[0])
         return TEMP_FOLDER
 
-    def load_graph(self, game_zip: str) -> tuple[Node, str]:
+    def load_graph(self, game_zip: str) -> tuple[Node, str, str]:
         """
         Loads the graph from a zipped game folder and reconstructs the game structure.
         The zip should contain a graph.json file and corresponding audio files.
@@ -51,8 +51,7 @@ class GameLoader:
         root, nodes = self._load_nodes(serial_graph)
         self._establish_connections(serial_graph, nodes)
 
-        return root, game_folder
-
+        return root, game_folder, game_zip
 
     def _load_nodes(self, serial_graph: SerialGraph) -> tuple[Node, dict[int, Node]]:
         """
