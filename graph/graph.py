@@ -17,6 +17,14 @@ class Node:
         self.is_win: bool = False
         self.is_losing: bool = False
 
+    @staticmethod
+    def get_main_text_audio_filename(node_id: int) -> str:
+        return f"node_{node_id}.wav"
+
+    @staticmethod
+    def get_options_audio_filename(node_id: int) -> str:
+        return f"node_{node_id}_options.wav"
+
     def getText(self):
         return self._text
 

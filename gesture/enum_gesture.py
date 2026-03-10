@@ -7,6 +7,8 @@ class EnumGesture(str, Enum):
     ILoveYou_Right = 0
     ILoveYou_Left = 1
     Victory = 2
+    PointingUp_Right = 3
+    PointingUp_Left = 4
     INVALID = None
 
     @staticmethod
@@ -17,5 +19,9 @@ class EnumGesture(str, Enum):
             return EnumGesture.ILoveYou_Left
         elif gesture_category == "Victory":
             return EnumGesture.Victory
+        elif gesture_category == "Pointing_Up" and handedness == "Right":
+            return EnumGesture.PointingUp_Right
+        elif gesture_category == "Pointing_Up" and handedness == "Left":
+            return EnumGesture.PointingUp_Left
         else:
             return EnumGesture.INVALID

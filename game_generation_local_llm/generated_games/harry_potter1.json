@@ -1,0 +1,256 @@
+{
+  "nodes": {
+    "0": {
+      "id": 0,
+      "text": "You find yourself in the entrance hall of the Dursleys, hidden away from the magical world. The walls hum with the tension of being different.",
+      "left_option": "Look at the living room",
+      "right_option": "Head to the kitchen",
+      "adjacency_list": {
+        "0": 1,
+        "1": 5
+      },
+      "is_win": false,
+      "is_losing": false
+    },
+    "1": {
+      "id": 1,
+      "text": "The living room is sparsely decorated, a stark contrast to the magical adventures that lie ahead. A painting on the wall seems oddly animated.",
+      "left_option": "Examine the painting",
+      "right_option": "Go back to the hall",
+      "adjacency_list": {
+        "0": 2,
+        "1": 2
+      },
+      "is_win": false,
+      "is_losing": false
+    },
+    "2": {
+      "id": 2,
+      "text": "As you touch the painting, it swings open to reveal a secret chamber. Staring back at you is a portrait of a stern man.",
+      "left_option": "Speak to the portrait",
+      "right_option": "Return to the living room",
+      "adjacency_list": {
+        "0": 3,
+        "1": 19
+      },
+      "is_win": false,
+      "is_losing": false
+    },
+    "3": {
+      "id": 3,
+      "text": "The portrait's eyes follow you as you leave. The man speaks, curious about your presence. He asks for your intentions.",
+      "left_option": "Tell the truth",
+      "right_option": "Lie about your intentions",
+      "adjacency_list": {
+        "0": 7,
+        "1": 7
+      },
+      "is_win": false,
+      "is_losing": false
+    },
+    "4": {
+      "id": 4,
+      "text": "This is a loop, a trap to make you reconsider your choices. The Dursleys' house feels small and confining.",
+      "left_option": "",
+      "right_option": "",
+      "adjacency_list": {
+        "0": 4,
+        "1": 4
+      },
+      "is_win": false,
+      "is_losing": true
+    },
+    "5": {
+      "id": 5,
+      "text": "The kitchen is filled with the aroma of mundane meals. A large cupboard catches your eye.",
+      "left_option": "Open the cupboard",
+      "right_option": "Head back to the hall",
+      "adjacency_list": {
+        "0": 6,
+        "1": 6
+      },
+      "is_win": false,
+      "is_losing": false
+    },
+    "6": {
+      "id": 6,
+      "text": "Inside the cupboard, you find a hidden compartment containing a mysterious locket.",
+      "left_option": "Take the locket",
+      "right_option": "Leave it and exit the cupboard",
+      "adjacency_list": {
+        "0": 8,
+        "1": 20
+      },
+      "is_win": false,
+      "is_losing": false
+    },
+    "7": {
+      "id": 7,
+      "text": "The portrait grants you access to the backyard, where the Forbidden Forest begins.",
+      "left_option": "Enter the forest",
+      "right_option": "Go back to the hall",
+      "adjacency_list": {
+        "0": 9,
+        "1": 11
+      },
+      "is_win": false,
+      "is_losing": false
+    },
+    "8": {
+      "id": 8,
+      "text": "You feel trapped, unsure of your next move. A feeling of déjà vu sets in.",
+      "left_option": "",
+      "right_option": "",
+      "adjacency_list": {
+        "0": 8,
+        "1": 8
+      },
+      "is_win": false,
+      "is_losing": true
+    },
+    "9": {
+      "id": 9,
+      "text": "You stand at the edge of the Forbidden Forest, an air of mystery surrounding it. The path ahead is inviting.",
+      "left_option": "Continue on the path",
+      "right_option": "Return to the backyard",
+      "adjacency_list": {
+        "0": 10,
+        "1": 10
+      },
+      "is_win": false,
+      "is_losing": false
+    },
+    "10": {
+      "id": 10,
+      "text": "You encounter Hagrid, who guides you through the forest to Hogwarts.",
+      "left_option": "Follow Hagrid",
+      "right_option": "Decline and head back",
+      "adjacency_list": {
+        "0": 12,
+        "1": 14
+      },
+      "is_win": false,
+      "is_losing": false
+    },
+    "11": {
+      "id": 11,
+      "text": "You find yourself back in the backyard, the forest's call unanswered.",
+      "left_option": "",
+      "right_option": "",
+      "adjacency_list": {
+        "0": 11,
+        "1": 11
+      },
+      "is_win": false,
+      "is_losing": false
+    },
+    "12": {
+      "id": 12,
+      "text": "You arrive at Hogwarts, greeted by the Great Hall's grandeur.",
+      "left_option": "Explore the castle",
+      "right_option": "Return to the forest",
+      "adjacency_list": {
+        "0": 13,
+        "1": 15
+      },
+      "is_win": false,
+      "is_losing": false
+    },
+    "13": {
+      "id": 13,
+      "text": "In the library, you find a book about the Sorcerer's Stone.",
+      "left_option": "Read the book",
+      "right_option": "Leave the library",
+      "adjacency_list": {
+        "0": 14,
+        "1": 14
+      },
+      "is_win": false,
+      "is_losing": false
+    },
+    "14": {
+      "id": 14,
+      "text": "You learn the importance of the Sorcerer's Stone and the challenges ahead.",
+      "left_option": "Decide to find the Stone",
+      "right_option": "Wander the corridors",
+      "adjacency_list": {
+        "0": 16,
+        "1": 17
+      },
+      "is_win": false,
+      "is_losing": false
+    },
+    "15": {
+      "id": 15,
+      "text": "You hesitate in the Great Hall, unsure of your next move.",
+      "left_option": "",
+      "right_option": "",
+      "adjacency_list": {
+        "0": 15,
+        "1": 15
+      },
+      "is_win": false,
+      "is_losing": true
+    },
+    "16": {
+      "id": 16,
+      "text": "Guided by your knowledge, you locate the Sorcerer's Stone.",
+      "left_option": "Take the Stone",
+      "right_option": "Leave it for now",
+      "adjacency_list": {
+        "0": 18,
+        "1": 18
+      },
+      "is_win": false,
+      "is_losing": false
+    },
+    "17": {
+      "id": 17,
+      "text": "You find yourself lost in the halls, unable to decide.",
+      "left_option": "",
+      "right_option": "",
+      "adjacency_list": {
+        "0": 17,
+        "1": 17
+      },
+      "is_win": false,
+      "is_losing": true
+    },
+    "18": {
+      "id": 18,
+      "text": "You hold the Sorcerer's Stone, victorious and ready to return to the Dursleys.",
+      "left_option": "",
+      "right_option": "",
+      "adjacency_list": {
+        "0": 18,
+        "1": 18
+      },
+      "is_win": true,
+      "is_losing": false
+    },
+    "19": {
+      "id": 19,
+      "text": "You are caught by the Dursleys, realizing your mistake.",
+      "left_option": "",
+      "right_option": "",
+      "adjacency_list": {
+        "0": 19,
+        "1": 19
+      },
+      "is_win": false,
+      "is_losing": true
+    },
+    "20": {
+      "id": 20,
+      "text": "The Forbidden Forest becomes your permanent home, as you lose your way.",
+      "left_option": "",
+      "right_option": "",
+      "adjacency_list": {
+        "0": 20,
+        "1": 20
+      },
+      "is_win": false,
+      "is_losing": true
+    }
+  }
+}

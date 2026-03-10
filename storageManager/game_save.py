@@ -118,17 +118,11 @@ class GameSaver:
         talker: Talker = Talker()
 
         for node_id, serial_node in serial_graph.nodes.items():
-            text_parts = [serial_node.text]
-            if serial_node.left_option or serial_node.right_option:
-                text_parts.append("...You have two options.")
-            if serial_node.left_option:
-                text_parts.append(
-                    f"Do {serial_node.left_option} by raising your left hand.")
-            if serial_node.right_option:
-                text_parts.append(
-                    f"Do {serial_node.right_option} by raising your right hand.")
+            # generate the main text audio
+            main_text_audio_file: str = os.path.join(game_path, "audio", Node.get_main_text_audio_filename(node_id))
+            talker.generate_speech(serial_node.text, main_text_audio_file)
 
-            full_text = " ".join(text_parts).strip()
-            output_file: str = os.path.join(game_path, "audio", self._get_node_audio_filename(node_id))
-
-            talker.generate_speech(full_text, output_file)
+            # generate the options audio
+            options_audio_file: str = serial_node.get_options_text()
+            output_file = os.path.join(game_path, "audio", Node.get_options_audio_filename(node_id))
+            talker.generate_speech(options_audio_file, output_file)
