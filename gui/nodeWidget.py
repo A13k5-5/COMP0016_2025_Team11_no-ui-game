@@ -57,6 +57,11 @@ class NodeWidget(QtWidgets.QFrame):
         self.win_button.setCheckable(True)
         self.win_button.clicked.connect(self._set_win)
 
+        self.lose_button = QtWidgets.QPushButton("❌ Set as Loss")
+        self.lose_button.setVisible(False)
+        self.lose_button.setCheckable(True)
+        self.lose_button.clicked.connect(self._set_loss)
+
     def _build_layout(self) -> None:
         options_row = QtWidgets.QHBoxLayout()
         left_col = QtWidgets.QVBoxLayout()
@@ -83,6 +88,7 @@ class NodeWidget(QtWidgets.QFrame):
         layout.addWidget(self.text)
         layout.addLayout(options_row)
         layout.addWidget(self.win_button, alignment=QtCore.Qt.AlignLeft)
+        layout.addWidget(self.lose_button,  alignment=QtCore.Qt.AlignLeft)
         layout.addWidget(self.delete_button, alignment=QtCore.Qt.AlignRight)
 
     def _assign_button_functions(self) -> None:
@@ -122,3 +128,16 @@ class NodeWidget(QtWidgets.QFrame):
     def _set_win(self) -> None:
         is_win = self.win_button.isChecked()
         self.win_button.setStyleSheet("background-color: #f0c040;" if is_win else "")
+        if is_win and self.lose_button.isVisible():
+            self.lose_button.setChecked(False)
+            self.lose_button.setStyleSheet("")
+
+    def set_lose_visible(self, visible: bool) -> None:
+        self.lose_button.setVisible(visible)
+    
+    def _set_loss(self) -> None:
+        is_loss = self.lose_button.isChecked()
+        self.lose_button.setStyleSheet("background-color: #fc3d3d;" if is_loss else "")
+        if is_loss:
+            self.win_button.setChecked(False)
+            self.win_button.setStyleSheet("")
