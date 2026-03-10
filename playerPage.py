@@ -41,7 +41,7 @@ class PlayerPage(QtWidgets.QWidget):
 
     def _run(self):
         player = gamePlayer.GamePlayer()
-        player.playGame(self.path_edit.text())
+        player.play_game(self.path_edit.text())
 
 
 def run():
