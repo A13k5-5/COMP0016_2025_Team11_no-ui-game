@@ -145,7 +145,8 @@ class GameCreationPage(QtWidgets.QWidget):
 
         self._ai_prompt = QtWidgets.QTextEdit()
         self._ai_prompt.setPlaceholderText("e.g. A horror story set in an abandoned hospital...")
-        self._ai_prompt.setFixedHeight(80)
+        self._ai_prompt.setFixedHeight(120)
+        self._ai_prompt.setLineWrapMode(QtWidgets.QTextEdit.WidgetWidth)
         self._ai_prompt.setStyleSheet(
             "QTextEdit {"
             "  border: 1px solid #c0c0c0;"
