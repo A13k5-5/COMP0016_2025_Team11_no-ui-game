@@ -1,0 +1,6 @@
+pydantic
+pyside6
+multipledispatch
+kokoro
+soundfile
+openvino-genai

@@ -7,7 +7,8 @@ from PySide6 import QtWidgets, QtCore, QtGui
 from gesture import EnumGesture
 from graph import Node
 from graph.serial_graph import SerialGraph
-from storageManager import GameLoader, GameSaver
+from storageManager.game_load import GameLoader
+from storageManager.game_save import GameSaver
 from . import config
 from .zoomableGraphicsView import ZoomableGraphicsView
 from .nodeWidget import NodeWidget
