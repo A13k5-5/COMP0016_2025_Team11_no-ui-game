@@ -6,6 +6,7 @@ from PySide6 import QtWidgets, QtCore, QtGui
 
 from gesture import EnumGesture
 from graph import Node
+from graph.serial_graph import SerialGraph
 from storageManager import GameLoader, GameSaver
 from . import config
 from .zoomableGraphicsView import ZoomableGraphicsView
@@ -34,6 +35,10 @@ class GameCreationPage(QtWidgets.QWidget):
         self.game_title: str = ""
         self.game_loader: GameLoader = GameLoader()
         self.game_saver: GameSaver = GameSaver()
+
+        # AI
+        from game_generation_local_llm.game_generator import GameGenerator
+        self._game_generator: GameGenerator = GameGenerator()
 
         # Ordered list of all node widgets
         self.nodes: list[NodeWidget] = []
@@ -64,23 +69,27 @@ class GameCreationPage(QtWidgets.QWidget):
     def _setup_window_layout(self, window_title: str) -> None:
         """
         Set the window title, size and layout.
+        Top level is a horizontal split: left side is the canvas, right side is AI helper.
         """
         self.setWindowTitle(window_title)
         self.resize(config.WINDOW_WIDTH, config.WINDOW_HEIGHT)
-        self.layout = QtWidgets.QVBoxLayout(self)
+
+        h_layout = QtWidgets.QHBoxLayout(self)
+
+        canvas = QtWidgets.QWidget()
+        self.layout = QtWidgets.QVBoxLayout(canvas)
         self.layout.setAlignment(QtCore.Qt.AlignTop)
+        h_layout.addWidget(canvas, stretch=1)
+
+        h_layout.addWidget(self._build_ai_panel())
 
     def _title_entry(self) -> None:
         # create title entry bar and save button
         self.title_entry = QtWidgets.QLineEdit()
         self.title_entry.setPlaceholderText("Enter game title...")
 
-        self.save_title_button = QtWidgets.QPushButton("Save Title")
-        self.save_title_button.clicked.connect(self.save_title)
-
         #save widgets
         self.layout.addWidget(self.title_entry)
-        self.layout.addWidget(self.save_title_button)
 
     def _setup_canvas(self) -> None:
         self.scene = QtWidgets.QGraphicsScene(self)
@@ -96,6 +105,118 @@ class GameCreationPage(QtWidgets.QWidget):
         self.save_game_button.clicked.connect(self.save_game)
         self.layout.addWidget(self.save_game_button)
 
+    def _build_ai_panel(self) -> QtWidgets.QWidget:
+        """
+        AI helper side panel — white background, grey border, title and hint
+        pinned to the top, prompt box and button pinned to the bottom.
+        """
+        panel = QtWidgets.QWidget()
+        panel.setFixedWidth(config.AI_PANEL_WIDTH)
+        panel.setStyleSheet(
+            "QWidget#aiPanel {"
+            "  border-left: 1px;"
+            "}"
+        )
+        panel.setObjectName("aiPanel")
+
+        layout = QtWidgets.QVBoxLayout(panel)
+        layout.setContentsMargins(16, 16, 16, 16)
+        layout.setSpacing(6)
+
+        # top: title, hint
+        header = QtWidgets.QLabel("AI Game Generator")
+        header.setStyleSheet("font-size: 22px; font-weight: bold; background: transparent;")
+        header.setAlignment(QtCore.Qt.AlignTop | QtCore.Qt.AlignLeft)
+        layout.addWidget(header)
+
+        hint = QtWidgets.QLabel("Describe your game and click Generate. The current canvas will be replaced.")
+        hint.setWordWrap(True)
+        hint.setStyleSheet("font-size: 16px; background: transparent;")
+        hint.setAlignment(QtCore.Qt.AlignTop | QtCore.Qt.AlignLeft)
+        layout.addWidget(hint)
+
+        # middle whitespace
+        layout.addStretch(1)
+
+        # bottom: label, prompt box, button
+        prompt_label = QtWidgets.QLabel("Describe your game:")
+        prompt_label.setStyleSheet("font-size: 16px; background: transparent;")
+        layout.addWidget(prompt_label)
+
+        self._ai_prompt = QtWidgets.QTextEdit()
+        self._ai_prompt.setPlaceholderText("e.g. A horror story set in an abandoned hospital...")
+        self._ai_prompt.setFixedHeight(120)
+        self._ai_prompt.setLineWrapMode(QtWidgets.QTextEdit.WidgetWidth)
+        self._ai_prompt.setStyleSheet(
+            "QTextEdit {"
+            "  border: 1px solid #c0c0c0;"
+            "  border-radius: 4px;"
+            "  padding: 4px;"
+            "  font-size: 11px;"
+            "}"
+        )
+        layout.addWidget(self._ai_prompt)
+
+        self._ai_generate_btn = QtWidgets.QPushButton("Generate Game")
+        self._ai_generate_btn.setStyleSheet(
+            "QPushButton {"
+            "  border: 1px solid #c0c0c0;"
+            "  border-radius: 4px;"
+            "  padding: 6px;"
+            "  font-size: 12px;"
+            "}"
+            "QPushButton:disabled { color: #aaa; }"
+        )
+        self._ai_generate_btn.clicked.connect(self._on_AIgenerate_clicked)
+        layout.addWidget(self._ai_generate_btn)
+
+        self._ai_status = QtWidgets.QLabel("")
+        self._ai_status.setWordWrap(True)
+        self._ai_status.setStyleSheet("font-size: 11px; background: transparent;")
+        layout.addWidget(self._ai_status)
+
+        return panel
+
+    def _on_AIgenerate_clicked(self) -> None:
+        """
+        Send prompt to GameGenerator and load generated graph from json.
+        """ 
+        prompt = self._ai_prompt.toPlainText().strip()
+        if not prompt:
+            self._ai_status.setText("Please enter a prompt first.")
+            return
+        
+        self._ai_status.setText("Generating…")
+        QtWidgets.QApplication.processEvents()
+
+        try:
+            serial_graph = self.generate_game(prompt)
+            self._clear_canvas()
+            self._populate_graph_from_serial(serial_graph)
+            self._ai_status.setText(f"Done — {len(serial_graph.nodes)} nodes generated.")
+        except Exception as e:
+            self._ai_status.setText(f"Error: {e}")
+
+    def generate_game(self, prompt: str) -> SerialGraph:
+        return self._game_generator.generate_game(prompt)
+    
+    def _clear_canvas(self) -> None:
+        """
+        Remove all nodes, lines, and reset tracking state.
+        """
+        self.scene.clear()
+        self.nodes.clear()
+        self.node_coords_dict.clear()
+        self.node_children.clear()
+        self.node_depth_pos.clear()
+        self._lines.clear()
+        self.root_node = None
+
+    def _populate_graph_from_serial(self, serial: SerialGraph) -> None:
+        root, nodes = self.game_loader._load_nodes(serial)
+        self.game_loader._establish_connections(serial, nodes)
+        self._populate_graph(root)
+    
 
     def keyPressEvent(self, event: QtGui.QKeyEvent) -> None:
         if event.key() == QtCore.Qt.Key_Escape:
@@ -277,15 +398,12 @@ class GameCreationPage(QtWidgets.QWidget):
     def _node_centre_bottom(self, node: NodeWidget) -> QtCore.QPointF:
         """Scene coordinates of the bottom-centre of a node's proxy."""
         x, y = self.node_coords_dict[node]
-        w = node.width()
-        h = node.height()
-        return QtCore.QPointF(x + w / 2, y + h)
+        return QtCore.QPointF(x + config.NODE_WIDTH / 2, y + config.NODE_HEIGHT)
 
     def _node_centre_top(self, node: NodeWidget) -> QtCore.QPointF:
         """Scene coordinates of the top-centre of a node's proxy."""
         x, y = self.node_coords_dict[node]
-        w = node.width()
-        return QtCore.QPointF(x + w / 2, y)
+        return QtCore.QPointF(x + config.NODE_WIDTH / 2, y)
 
     def _draw_line(self, parent: NodeWidget, side: OptionSide, child: NodeWidget) -> None:
         """Draw (or redraw) the connector line for this parent-side pair."""
@@ -342,10 +460,6 @@ class GameCreationPage(QtWidgets.QWidget):
                 parent_node.addNode(EnumGesture.ILoveYou_Right, widget_node[right_child])
 
         return widget_node[self.root_node]
-
-    def save_title(self) -> None:
-        self.game_title = self.title_entry.text().strip()
-        print(f"Title: {self.game_title}")
 
     def save_game(self) -> None:
         root = self._build_game_graph()
