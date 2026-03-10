@@ -338,28 +338,90 @@ class GameCreationPage(QtWidgets.QWidget):
     
     def _create_child_node(self, parent: NodeWidget, side: OptionSide) -> None:
         """
-        Create a brand-new child node in the tree and connect it.
+        Create a brand-new child node in the tree, connect it, then
+        re-layout the whole tree so nothing overlaps.
         """
         if not self.node_coords_dict.get(parent):
             return
 
-        parent_depth, parent_pos = self.node_depth_pos.get(parent, (0, 0))
-        child_depth = parent_depth + 1
-        child_pos = parent_pos * 2 if side == OptionSide.LEFT else parent_pos * 2 + 1
-
-        new_x, new_y = self._get_node_position(child_depth, child_pos)
-        child = self._create_node_at(new_x, new_y)
-        self.node_depth_pos[child] = (child_depth, child_pos)
-
-        # Remove any previous connection on this side before adding the new one
         self._remove_connection(parent, side)
+
+        child = self._create_node_at(0, 0)
 
         if parent not in self.node_children:
             self.node_children[parent] = {}
         self.node_children[parent][side] = child
 
-        self._draw_line(parent, side, child)
+        self._relayout_tree()
         self._update_delete_buttons()
+
+    def _relayout_tree(self) -> None:
+        """
+        Recompute positions for all nodes using the subtree-width algorithm
+        and move their proxies. Redraws all lines.
+        """
+        if self.root_node is None:
+            return
+
+        H_GAP = 60
+        slot = max(
+            config.NODE_WIDTH + H_GAP,
+            config.GAME_TREE_WIDTH / max(1, self._widget_subtree_width(self.root_node, set()))
+        )
+
+        positions: dict[NodeWidget, tuple[float, float]] = {}
+        self._assign_widget_x(self.root_node, 0.0, slot, 0, set(), positions)
+
+        for nw, (x, y) in positions.items():
+            self.node_coords_dict[nw] = (x, y)
+            nw._proxy.setPos(x, y)
+
+        for key in list(self._lines):
+            self.scene.removeItem(self._lines.pop(key))
+        for par, children in self.node_children.items():
+            for s, child in children.items():
+                self._draw_line(par, s, child)
+
+    def _widget_subtree_width(self, node: NodeWidget, visited: set) -> int:
+        """
+        Number of leaves in this widget subtree (minimum 1).
+        """
+        if id(node) in visited:
+            return 1
+        visited.add(id(node))
+        children = list(self.node_children.get(node, {}).values())
+        if not children:
+            return 1
+        return sum(self._widget_subtree_width(c, visited) for c in children)
+
+    def _assign_widget_x(self, node: NodeWidget, x_start: float, slot: float,
+                         depth: int, visited: set,
+                         positions: dict) -> None:
+        """
+        Recursively assign x positions based on subtree leaf counts.
+        """
+        if id(node) in visited:
+            return
+        visited.add(id(node))
+
+        children = self.node_children.get(node, {})
+        ordered = [(s, c) for s, c in [
+            (OptionSide.LEFT,  children.get(OptionSide.LEFT)),
+            (OptionSide.RIGHT, children.get(OptionSide.RIGHT)),
+        ] if c is not None]
+
+        if not ordered:
+            x = x_start + slot / 2
+        else:
+            widths = [self._widget_subtree_width(c, set()) for _, c in ordered]
+            x = x_start + sum(widths) * slot / 2
+            cursor = x_start
+            for (_, child), w in zip(ordered, widths):
+                self._assign_widget_x(child, cursor, slot, depth + 1, visited, positions)
+                cursor += w * slot
+
+        y = depth * config.CHILD_NODE_Y_OFFSET + config.TREE_Y_OFFSET
+        positions[node] = (x, y)
 
     def _update_delete_buttons(self) -> None:
         """
