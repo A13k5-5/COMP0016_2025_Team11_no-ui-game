@@ -52,4 +52,13 @@ class GamePlayer:
 
             cur_node = cur_node.getNode(decision)
 
+            if cur_node.is_win:
+                self.audio_player.play_audio(game_folder, cur_node.get_id())
+                self.audio_player.play_win_audio(game_folder)
+                break
+            if cur_node.is_losing:
+                self.audio_player.play_audio(game_folder, cur_node.get_id())
+                self.audio_player.play_lose_audio(game_folder)
+                break
+
             time.sleep(2)
