@@ -1,6 +1,7 @@
 import os
 import tempfile
 import zipfile
+import json
 
 from multipledispatch import dispatch
 from . import config
@@ -131,3 +132,15 @@ class GameSaver:
         talker.generate_speech("You win!", os.path.join(game_path, "audio", "win.wav"))
         talker.generate_speech("Game over!", os.path.join(game_path, "audio", "lose.wav"))
 
+
+    def save_progress(self, zip_path: str, node_id: int) -> None:
+        """
+        Write progress.json into the .noui zip with the current node ID.
+        """
+        with zipfile.ZipFile(zip_path, 'r') as zf:
+            top_level = {name.split('/')[0] for name in zf.namelist() if '/' in name}
+            game_name = next(iter(top_level))
+
+        arcname = f"{game_name}/progress.json"
+        progress_content = json.dumps({"node_id": node_id})
+        self._update_zip_entry(zip_path, arcname, progress_content)
