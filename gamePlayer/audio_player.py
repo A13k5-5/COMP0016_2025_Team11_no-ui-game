@@ -1,8 +1,10 @@
 import os
 from playsound3 import playsound
 import time
+import tempfile
 
 from graph import Node
+from text2speech import Talker
 
 
 class AudioPlayer:
@@ -46,3 +48,17 @@ class AudioPlayer:
         Play the lose outcome audio.
         """
         self._play_audio_from_path(os.path.join(game_path, "audio", "lose.wav"))
+    
+    def play_audio_from_text(self, text: str) -> None:
+        """
+        Generate speech for text using TTS and play it immediately.
+        """
+        talker = Talker()
+        with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tmp:
+            tmp_path = tmp.name
+        try:
+            talker.generate_speech(text, tmp_path)
+            self._play_audio_from_path(tmp_path)
+        finally:
+            if os.path.exists(tmp_path):
+                os.remove(tmp_path)

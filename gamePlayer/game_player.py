@@ -1,3 +1,5 @@
+import os
+import json
 import time
 
 from gamePlayer.audio_player import AudioPlayer
@@ -20,14 +22,46 @@ class GamePlayer:
 
     def play_game(self, game_path: str):
         try:
-            root_node, game_folder = self.game_loader.load_graph(game_path)
+            root_node, game_folder, zip_path = self.game_loader.load_graph(game_path)
         except Exception as e:
             print(f"Failed to load graph from file: {e}")
             return
 
-        self._start_game_loop(root_node, game_folder)
+        start_node = self._start_from(root_node, game_folder, zip_path)
+        self._start_game_loop(start_node, game_folder, zip_path)
 
-    def _start_game_loop(self, start_node: Node, game_folder: str):
+    def _start_from(self, root_node: Node, game_folder: str, zip_path: str) -> Node:
+        """
+        If a progress.json exists for this game, ask the player whether to
+        resume or restart via a Left/Right gesture.
+        """
+        progress_path = os.path.join(game_folder, "progress.json")
+        if not os.path.exists(progress_path):
+            return root_node
+
+        try:
+            with open(progress_path, "r") as f:
+                data = json.load(f)
+            saved_id = data.get("node_id")
+            saved_node = self._find_node_by_id(root_node, saved_id)
+        except Exception:
+            return root_node
+
+        if saved_node is None:
+            return root_node
+
+        self.audio_player.play_audio_from_text("A saved game was found. Raise your left hand to resume, or your right to restart.")
+        decision = self.recogniser.get_gesture([EnumGesture.PointingUp_Left, EnumGesture.PointingUp_Right])
+
+        if decision == EnumGesture.PointingUp_Left:
+            self.audio_player.play_audio_from_text("Resuming your game.")
+            return saved_node
+        else:
+            self.audio_player.play_audio_from_text("Starting a new game.")
+            self.game_saver.clear_progress(zip_path)
+            return root_node
+
+    def _start_game_loop(self, start_node: Node, game_folder: str, zip_path: str):
         """
         Throws TimeoutError if no gesture is detected within TIMEOUT_TIME seconds.
         """
@@ -39,6 +73,8 @@ class GamePlayer:
             # Ask recognizer for a decision (expects a tuple like ("ILoveYou", "Left"))
             decision: EnumGesture = self.recogniser.get_gesture(cur_node.get_possible_gestures() + ALWAYS_GESTURES)
             if decision == EnumGesture.Victory:
+                self.game_saver.save_progress(zip_path, cur_node.get_id())
+                self.audio_player.play_audio_from_text("Quitting game. Your progress has been saved.")
                 break
 
             while decision in ALWAYS_GESTURES:
@@ -62,3 +98,21 @@ class GamePlayer:
                 break
 
             time.sleep(2)
+
+    
+    def _find_node_by_id(self, root: Node, target_id: int) -> Node | None:
+        """
+        BFS from root to find the node with the given ID
+        """
+        visited: set[int] = set()
+        queue: list[Node] = [root]
+        while queue:
+            node = queue.pop(0)
+            node_id = node.get_id()
+            if node_id in visited:
+                continue
+            visited.add(node_id)
+            if node_id == target_id:
+                return node
+            queue.extend(node.adjacencyList.values())
+        return None
