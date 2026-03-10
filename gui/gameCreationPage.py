@@ -450,6 +450,7 @@ class GameCreationPage(QtWidgets.QWidget):
                 nw.right_option.text().strip(),
             )
             n.is_win = nw.win_button.isChecked()
+            n.is_losing = nw.lose_button.isChecked()
             widget_node[nw] = n
 
         for parent_widget, children in self.node_children.items():
@@ -578,6 +579,8 @@ class GameCreationPage(QtWidgets.QWidget):
         nw.right_option.setText(node.right_option)
         nw.win_button.setChecked(node.is_win)
         nw.win_button.setStyleSheet("background-color: #f0c040;" if node.is_win else "")
+        nw.lose_button.setChecked(node.is_losing)
+        nw.lose_button.setStyleSheet("background-color: #fc3d3d;" if node.is_losing else "")      
 
 
 def run():
