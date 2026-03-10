@@ -126,3 +126,8 @@ class GameSaver:
             options_audio_file: str = serial_node.get_options_text()
             output_file = os.path.join(game_path, "audio", Node.get_options_audio_filename(node_id))
             talker.generate_speech(options_audio_file, output_file)
+
+        # generate win/lose outcome audio
+        talker.generate_speech("You win!", os.path.join(game_path, "audio", "win.wav"))
+        talker.generate_speech("Game over!", os.path.join(game_path, "audio", "lose.wav"))
+
