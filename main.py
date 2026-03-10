@@ -33,11 +33,11 @@ if __name__ == "__main__":
     # import os
     # from storageManager.game_save import GameSaver
     # from graph.serial_graph import SerialGraph
-    #
-    # with open(os.path.join(os.path.dirname(__file__), "game_generation_local_llm\\generated_games", "hobbit.json"), 'r') as file:
+
+    # with open(os.path.join(os.path.dirname(__file__), "game_generation_local_llm\\generated_games", "harry_potter1.json"), 'r') as file:
     #     serialized_graph: SerialGraph = SerialGraph.model_validate_json(file.read().strip())
     # saver = GameSaver()
-    # saver.save_game(os.path.join(os.path.dirname(__file__), "saved_games"), "hobbit", serialized_graph)
+    # saver.save_game(os.path.join(os.path.dirname(__file__), "saved_games"), "harry potter", serialized_graph)
 
     # for structured output
     # from game_generation_local_llm import structured_output

@@ -7,6 +7,7 @@ import myGestureRecognizer
 from gesture import EnumGesture
 import storageManager.game_load
 
+ALWAYS_GESTURES = [EnumGesture.PointingUp_Left, EnumGesture.PointingUp_Right]
 
 class GamePlayer:
     """
@@ -32,26 +33,23 @@ class GamePlayer:
         """
         cur_node: Node = start_node
         while True:
-            # Display current scene and available choices (explicit about handedness)
-            print("\n" + cur_node.getText() + "\n")
-
-            self._list_options(cur_node)
-            
             # Play current scene audio
             self.audio_player.play_audio(game_folder, cur_node.get_id())
 
             # Ask recognizer for a decision (expects a tuple like ("ILoveYou", "Left"))
-            decision: EnumGesture = self.recogniser.get_gesture(cur_node.get_possible_gestures())
+            decision: EnumGesture = self.recogniser.get_gesture(cur_node.get_possible_gestures() + ALWAYS_GESTURES)
             if decision == EnumGesture.Victory:
                 break
+
+            while decision in ALWAYS_GESTURES:
+                if decision == EnumGesture.PointingUp_Left:
+                    self.audio_player.play_main_audio(game_folder, cur_node.get_id())
+                elif decision == EnumGesture.PointingUp_Right:
+                    self.audio_player.play_options_audio(game_folder, cur_node.get_id())
+
+                decision: EnumGesture = self.recogniser.get_gesture(cur_node.get_possible_gestures() + ALWAYS_GESTURES)
+
 
             cur_node = cur_node.getNode(decision)
 
             time.sleep(2)
-
-    def _list_options(self, cur_node: Node):
-        options = list(cur_node.adjacencyList.items())
-        print("Choices (perform a gesture with the shown hand):")
-        for idx, (gesture, node) in enumerate(options, start=1):
-            # show a short preview of the destination and the required handedness
-            print(f" {idx}. Gesture: {gesture.__str__()} -> {node.getText().split('.')[0]}")
