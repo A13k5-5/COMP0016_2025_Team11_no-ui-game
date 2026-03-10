@@ -186,12 +186,14 @@ class GameCreationPage(QtWidgets.QWidget):
             self._ai_status.setText("Please enter a prompt first.")
             return
         
+        self._ai_status.setText("Generating…")
         QtWidgets.QApplication.processEvents()
 
         try:
             serial_graph = self.generate_game(prompt)
             self._clear_canvas()
             self._populate_graph_from_serial(serial_graph)
+            self._ai_status.setText(f"Done — {len(serial_graph.nodes)} nodes generated.")
         except Exception as e:
             self._ai_status.setText(f"Error: {e}")
 
