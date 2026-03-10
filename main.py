@@ -1,5 +1,8 @@
 # nuitka-project: --mode=standalone
 
+# nuitka-project: --enable-plugin=pyside6
+# nuitka-project: --include-qt-plugins=qml
+
 # Data files required at runtime
 # nuitka-project: --include-data-files={MAIN_DIRECTORY}/myGestureRecognizer/gesture_recognizer.task=myGestureRecognizer/gesture_recognizer.task
 ## nuitka-project: --include-data-dir={MAIN_DIRECTORY}/game_generation_local_llm/model_path=game_generation_local_llm/model_path
