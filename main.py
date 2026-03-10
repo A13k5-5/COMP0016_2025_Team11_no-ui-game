@@ -1,28 +1,32 @@
-# Compilation mode, support OS-specific options
-# nuitka-project-if: {OS} in ("Windows", "Linux", "Darwin", "FreeBSD"):
-#    nuitka-project: --mode=onefile
-# nuitka-project-else:
-#    nuitka-project: --mode=standalone
-# The PySide6 plugin covers qt-plugins
-# nuitka-project: --enable-plugin=pyside6
-# nuitka-project: --include-qt-plugins=qml
+# nuitka-project: --mode=standalone
+
+# Data files required at runtime
+# nuitka-project: --include-data-files={MAIN_DIRECTORY}/myGestureRecognizer/gesture_recognizer.task=myGestureRecognizer/gesture_recognizer.task
+## nuitka-project: --include-data-dir={MAIN_DIRECTORY}/game_generation_local_llm/model_path=game_generation_local_llm/model_path
 
 if __name__ == "__main__":
     # for game player
-    #import sys
-    #import gamePlayer
-    #import playerPage
+    import sys
+    import gamePlayer
 
-    # if len(sys.argv) > 1:
-    #     player = gamePlayer.GamePlayer()
-    #     player.play_game(sys.argv[1])
-    # else:
-    #     playerPage.run()
+    if len(sys.argv) > 1:
+        player = gamePlayer.GamePlayer()
+        player.play_game(sys.argv[1])
+    else:
+        import playerPage
+        playerPage.run()
+
+    # for video gesture recognizer
+    # import myGestureRecognizer
+    # from gesture import EnumGesture
+    #
+    # recognizer = myGestureRecognizer.VideoGestureRecogniser()
+    # recognizer.get_gesture([EnumGesture.ILoveYou_Right, EnumGesture.Victory])
 
     # for game engine
-    import kokoro
-    from gui.homePage import run
-    run()
+    # import kokoro
+    # from gui.homePage import run
+    # run()
 
     # for game loading
     # from storageManager.game_load import GameLoader
