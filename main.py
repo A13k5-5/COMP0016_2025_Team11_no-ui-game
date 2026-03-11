@@ -7,6 +7,21 @@
 # nuitka-project: --include-data-files={MAIN_DIRECTORY}/myGestureRecognizer/gesture_recognizer.task=myGestureRecognizer/gesture_recognizer.task
 # nuitka-project: --include-data-dir={MAIN_DIRECTORY}/game_generation_local_llm/model_path=game_generation_local_llm/model_path
 
+# nuitka-project: --module-parameter=torch-disable-jit=yes
+# nuitka-project: --output-filename=NOGUI_engine.exe
+# nuitka-project: --nofollow-import-to=transformers.commands
+# nuitka-project: --nofollow-import-to=transformers.generation.tf_utils
+# nuitka-project: --nofollow-import-to=transformers.generation.flax_utils
+# nuitka-project: --nofollow-import-to=transformers.pipelines
+# nuitka-project: --nofollow-import-to=transformers.tools
+# nuitka-project: --nofollow-import-to=transformers.benchmark
+# nuitka-project: --nofollow-import-to=torch._dynamo
+# nuitka-project: --nofollow-import-to=matplotlib
+# nuitka-project: --nofollow-import-to=av
+# nuitka-project: --nofollow-import-to=pyphen
+
+# nuitka-project: --spacy-language-model=en_core_web_sm
+
 if __name__ == "__main__":
     # for game player
     # import sys
@@ -27,7 +42,7 @@ if __name__ == "__main__":
     # recognizer.get_gesture([EnumGesture.ILoveYou_Right, EnumGesture.Victory])
 
     # for game engine
-    import kokoro
+    # import kokoro
     from gui.homePage import run
     run()
 
