@@ -19,7 +19,6 @@ class GamePlayer:
     """
     def __init__(self):
         self.game_loader: storageManager.game_load.GameLoader = storageManager.game_load.GameLoader()
-        self.game_saver: storageManager.game_save.GameSaver = storageManager.game_save.GameSaver()
         self.audio_player: AudioPlayer = AudioPlayer()
         self.recogniser: myGestureRecognizer.VideoGestureRecogniser = myGestureRecognizer.VideoGestureRecogniser()
 
@@ -61,7 +60,7 @@ class GamePlayer:
             return saved_node
         else:
             self.audio_player.play_audio_from_file(game_folder, "start_new.wav")
-            self.game_saver.clear_progress(zip_path)
+            #TODO: clear progress or overwrite
             return root_node
 
     def _start_game_loop(self, start_node: Node, game_folder: str, zip_path: str):
@@ -76,7 +75,7 @@ class GamePlayer:
             # Ask recognizer for a decision (expects a tuple like ("ILoveYou", "Left"))
             decision: EnumGesture = self.recogniser.get_gesture(cur_node.get_possible_gestures() + REPLAY_GESTURES)
             if decision == EnumGesture.Victory:
-                self.game_saver.save_progress(zip_path, cur_node.get_id())
+                #TODO: save progress
                 self.audio_player.play_audio_from_file(game_folder, "quit.wav")
                 break
 
