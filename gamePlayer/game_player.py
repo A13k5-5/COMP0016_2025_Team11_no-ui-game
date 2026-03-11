@@ -10,7 +10,7 @@ from gesture import EnumGesture
 import storageManager.game_load
 import storageManager.game_save
 
-ALWAYS_GESTURES = [EnumGesture.ILoveYou_Left, EnumGesture.ILoveYou_Right]
+REPLAY_GESTURES = [EnumGesture.PointingUp_Left, EnumGesture.PointingUp_Right]
 
 class GamePlayer:
     """
