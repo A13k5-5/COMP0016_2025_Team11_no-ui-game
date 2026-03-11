@@ -7,8 +7,8 @@
 # nuitka-project: --include-data-files={MAIN_DIRECTORY}/myGestureRecognizer/gesture_recognizer.task=myGestureRecognizer/gesture_recognizer.task
 # nuitka-project: --include-data-dir={MAIN_DIRECTORY}/game_generation_local_llm/model_path=game_generation_local_llm/model_path
 
-# nuitka-project: --module-parameter=torch-disable-jit=yes
 # nuitka-project: --output-filename=NOGUI_engine.exe
+# nuitka-project: --module-parameter=torch-disable-jit=yes
 # nuitka-project: --nofollow-import-to=transformers.commands
 # nuitka-project: --nofollow-import-to=transformers.generation.tf_utils
 # nuitka-project: --nofollow-import-to=transformers.generation.flax_utils
@@ -19,6 +19,10 @@
 # nuitka-project: --nofollow-import-to=matplotlib
 # nuitka-project: --nofollow-import-to=av
 # nuitka-project: --nofollow-import-to=pyphen
+# nuitka-project: --assume-yes-for-downloads
+
+# nuitka-project: --plugin-disable=transformers
+# nuitka-project: --include-distribution-metadata=transformers
 
 # nuitka-project: --spacy-language-model=en_core_web_sm
 
