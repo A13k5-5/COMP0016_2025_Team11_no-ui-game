@@ -11,6 +11,7 @@ import storageManager.game_load
 import storageManager.game_save
 
 REPLAY_GESTURES = [EnumGesture.PointingUp_Left, EnumGesture.PointingUp_Right]
+PROGRESS_GESTURES = [EnumGesture.ILoveYou_Left, EnumGesture.ILoveYou_Right]
 
 class GamePlayer:
     """
@@ -53,7 +54,7 @@ class GamePlayer:
             return root_node
 
         self.audio_player.play_audio_from_file(game_folder, "progress.wav")
-        decision = self.recogniser.get_gesture([EnumGesture.ILoveYou_Left, EnumGesture.ILoveYou_Right])
+        decision = self.recogniser.get_gesture(PROGRESS_GESTURES)
 
         if decision == EnumGesture.ILoveYou_Left:
             self.audio_player.play_audio_from_file(game_folder, "resume.wav")
@@ -73,19 +74,19 @@ class GamePlayer:
             self.audio_player.play_audio(game_folder, cur_node.get_id())
 
             # Ask recognizer for a decision (expects a tuple like ("ILoveYou", "Left"))
-            decision: EnumGesture = self.recogniser.get_gesture(cur_node.get_possible_gestures() + ALWAYS_GESTURES)
+            decision: EnumGesture = self.recogniser.get_gesture(cur_node.get_possible_gestures() + REPLAY_GESTURES)
             if decision == EnumGesture.Victory:
                 self.game_saver.save_progress(zip_path, cur_node.get_id())
                 self.audio_player.play_audio_from_file(game_folder, "quit.wav")
                 break
 
-            while decision in ALWAYS_GESTURES:
+            while decision in REPLAY_GESTURES:
                 if decision == EnumGesture.PointingUp_Left:
                     self.audio_player.play_main_audio(game_folder, cur_node.get_id())
                 elif decision == EnumGesture.PointingUp_Right:
                     self.audio_player.play_options_audio(game_folder, cur_node.get_id())
 
-                decision: EnumGesture = self.recogniser.get_gesture(cur_node.get_possible_gestures() + ALWAYS_GESTURES)
+                decision: EnumGesture = self.recogniser.get_gesture(cur_node.get_possible_gestures() + REPLAY_GESTURES)
 
 
             cur_node = cur_node.getNode(decision)
