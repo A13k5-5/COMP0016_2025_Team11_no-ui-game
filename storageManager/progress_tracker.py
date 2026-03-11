@@ -35,7 +35,6 @@ class ProgressTracker:
     def _zip_folder_to(self, folder_path: str, zip_path: str) -> None:
         """
         Writes the contents of folder_path into a new zip archive at zip_path.
-        Mirrors GameSaver._zip_folder_to.
         """
         with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zf:
             for dirpath, _, filenames in os.walk(folder_path):
@@ -44,3 +43,18 @@ class ProgressTracker:
                     # arcname = the path the file gets inside the zip
                     arcname = os.path.relpath(file_full_path, folder_path)
                     zf.write(file_full_path, arcname)
+
+    def clear_progress(self, zip_path: str) -> None:
+        """
+        Remove progress.json from the .noui zip if it exists.
+        """
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            with zipfile.ZipFile(zip_path, 'r') as zf:
+                zf.extractall(tmp_dir)
+
+            game_dir = self._get_game_dir(tmp_dir)
+            progress_path = os.path.join(game_dir, PROGRESS_FILENAME)
+            if os.path.exists(progress_path):
+                os.remove(progress_path)
+
+            self._zip_folder_to(tmp_dir, zip_path)

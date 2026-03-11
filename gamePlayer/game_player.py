@@ -93,10 +93,12 @@ class GamePlayer:
             if cur_node.is_win:
                 self.audio_player.play_audio(game_folder, cur_node.get_id())
                 self.audio_player.play_audio_from_file(game_folder, "win.wav")
+                self.progress_tracker.clear_progress(zip_path)
                 break
             if cur_node.is_losing:
                 self.audio_player.play_audio(game_folder, cur_node.get_id())
                 self.audio_player.play_audio_from_file(game_folder, "lose.wav")
+                self.progress_tracker.clear_progress(zip_path)
                 break
 
             time.sleep(2)
