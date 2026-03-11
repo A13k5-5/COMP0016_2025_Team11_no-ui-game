@@ -132,8 +132,6 @@ class GameSaver:
         self._generate_helper_audios(game_path)
 
     def _generate_helper_audios(self, game_path: str) -> None:
-        talker: Talker = Talker()
-
         # generate win/lose outcome audio
         self.talker.generate_speech("You win!", os.path.join(game_path, "audio", "win.wav"))
         self.talker.generate_speech("Game over!", os.path.join(game_path, "audio", "lose.wav"))
