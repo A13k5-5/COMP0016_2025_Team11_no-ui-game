@@ -8,7 +8,7 @@ import myGestureRecognizer
 
 from gesture import EnumGesture
 import storageManager.game_load
-import storageManager.game_save
+import storageManager.progress_tracker
 
 REPLAY_GESTURES = [EnumGesture.PointingUp_Left, EnumGesture.PointingUp_Right]
 PROGRESS_GESTURES = [EnumGesture.ILoveYou_Left, EnumGesture.ILoveYou_Right]
