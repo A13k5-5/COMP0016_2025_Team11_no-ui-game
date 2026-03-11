@@ -84,12 +84,8 @@ class GameCreationPage(QtWidgets.QWidget):
         self.title_entry = QtWidgets.QLineEdit()
         self.title_entry.setPlaceholderText("Enter game title...")
 
-        self.save_title_button = QtWidgets.QPushButton("Save Title")
-        self.save_title_button.clicked.connect(self.save_title)
-
         #save widgets
         self.layout.addWidget(self.title_entry)
-        self.layout.addWidget(self.save_title_button)
 
     def _setup_canvas(self) -> None:
         self.scene = QtWidgets.QGraphicsScene(self)
@@ -528,10 +524,6 @@ class GameCreationPage(QtWidgets.QWidget):
                 parent_node.addNode(EnumGesture.ILoveYou_Right, widget_node[right_child])
 
         return widget_node[self.root_node]
-
-    def save_title(self) -> None:
-        self.game_title = self.title_entry.text().strip()
-        print(f"Title: {self.game_title}")
 
     def save_game(self) -> None:
         root = self._build_game_graph()
