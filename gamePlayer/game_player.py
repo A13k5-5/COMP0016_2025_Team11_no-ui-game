@@ -61,7 +61,6 @@ class GamePlayer:
             return saved_node
         else:
             self.audio_player.play_audio_from_file(game_folder, "start_new.wav")
-            #TODO: clear progress or overwrite
             return root_node
 
     def _start_game_loop(self, start_node: Node, game_folder: str, zip_path: str):
