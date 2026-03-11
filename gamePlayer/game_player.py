@@ -52,14 +52,14 @@ class GamePlayer:
         if saved_node is None:
             return root_node
 
-        self.audio_player.play_audio_from_text("A saved game was found. Raise your left hand to resume, or your right to restart.")
+        self.audio_player.play_audio_from_file(game_folder, "progress.wav")
         decision = self.recogniser.get_gesture([EnumGesture.ILoveYou_Left, EnumGesture.ILoveYou_Right])
 
         if decision == EnumGesture.ILoveYou_Left:
-            self.audio_player.play_audio_from_text("Resuming your game.")
+            self.audio_player.play_audio_from_file(game_folder, "resume.wav")
             return saved_node
         else:
-            self.audio_player.play_audio_from_text("Starting a new game.")
+            self.audio_player.play_audio_from_file(game_folder, "start_new.wav")
             self.game_saver.clear_progress(zip_path)
             return root_node
 
@@ -76,7 +76,7 @@ class GamePlayer:
             decision: EnumGesture = self.recogniser.get_gesture(cur_node.get_possible_gestures() + ALWAYS_GESTURES)
             if decision == EnumGesture.Victory:
                 self.game_saver.save_progress(zip_path, cur_node.get_id())
-                self.audio_player.play_audio_from_text("Quitting game. Your progress has been saved.")
+                self.audio_player.play_audio_from_file(game_folder, "quit.wav")
                 break
 
             while decision in ALWAYS_GESTURES:
@@ -92,11 +92,11 @@ class GamePlayer:
 
             if cur_node.is_win:
                 self.audio_player.play_audio(game_folder, cur_node.get_id())
-                self.audio_player.play_win_audio(game_folder)
+                self.audio_player.play_audio_from_file(game_folder, "win.wav")
                 break
             if cur_node.is_losing:
                 self.audio_player.play_audio(game_folder, cur_node.get_id())
-                self.audio_player.play_lose_audio(game_folder)
+                self.audio_player.play_audio_from_file(game_folder, "lose.wav")
                 break
 
             time.sleep(2)

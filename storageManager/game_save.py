@@ -132,6 +132,15 @@ class GameSaver:
         talker.generate_speech("You win!", os.path.join(game_path, "audio", "win.wav"))
         talker.generate_speech("Game over!", os.path.join(game_path, "audio", "lose.wav"))
 
+        # generate progress instructions
+        talker.generate_speech(
+            "A saved game was found. Raise your left hand to resume, or your right to restart.",
+            os.path.join(game_path, "audio", "progress.wav")
+        )
+        talker.generate_speech("Resuming your game", os.path.join(game_path, "audio", "resume.wav") )
+        talker.generate_speech("Starting a new game", os.path.join(game_path, "audio", "start_new.wav"))
+        talker.generate_speech("Quitting game. Your progress has been saved.", os.path.join(game_path, "audio", "quit.wav"))
+
 
     def save_progress(self, zip_path: str, node_id: int) -> None:
         """
