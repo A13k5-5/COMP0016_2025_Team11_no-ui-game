@@ -4,7 +4,6 @@ import time
 
 from graph import Node
 
-
 class AudioPlayer:
     def _play_audio_from_path(self, file_path: str):
         """
@@ -34,3 +33,9 @@ class AudioPlayer:
         self.play_main_audio(game_path, node_id)
         time.sleep(0.5)  # small pause between main text and options
         self.play_options_audio(game_path, node_id)
+
+    def play_audio_from_file(self, game_path: str, audio_file: str):
+        """
+        Play the audio from file name
+        """
+        self._play_audio_from_path(os.path.join(game_path, "audio", audio_file))
