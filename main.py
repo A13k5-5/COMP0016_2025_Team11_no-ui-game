@@ -29,6 +29,7 @@
 # nuitka-project: --include-data-dir={MAIN_DIRECTORY}/.venv/Lib/site-packages/openvino/libs=openvino/libs
 # nuitka-project: --include-data-dir={MAIN_DIRECTORY}/.venv/Lib/site-packages/openvino_tokenizers/lib=openvino_tokenizers/lib
 
+# nuitka-project: --include-package=transformers
 # nuitka-project: --include-package=openvino
 # nuitka-project: --include-package=openvino_tokenizers
 # nuitka-project: --include-package=openvino_genai
@@ -58,8 +59,8 @@ if __name__ == "__main__":
 
     # for game engine
     # import kokoro
-    # from gui.homePage import run
-    # run()
+    from gui.homePage import run
+    run()
 
     # for game loading
     # from storageManager.game_load import GameLoader
@@ -78,8 +79,8 @@ if __name__ == "__main__":
     # saver.save_game(os.path.join(os.path.dirname(__file__), "saved_games"), "harry potter", serialized_graph)
 
     # for structured output
-    from game_generation_local_llm import structured_output
-    structured_output.main()
+    # from game_generation_local_llm import structured_output
+    # structured_output.main()
 
     # for tts
     # from text2speech import Talker
