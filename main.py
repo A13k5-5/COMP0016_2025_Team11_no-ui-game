@@ -20,9 +20,9 @@ if __name__ == "__main__":
     #     playerPage.run()
 
     # for game engine
-    import kokoro
-    from gui.homePage import run
-    run()
+    # import kokoro
+    # from gui.homePage import run
+    # run()
 
     # for game loading
     # from storageManager.game_load import GameLoader
@@ -41,6 +41,6 @@ if __name__ == "__main__":
     # saver.save_game(os.path.join(os.path.dirname(__file__), "saved_games"), "harry potter", serialized_graph)
 
     # for structured output
-    # from game_generation_local_llm import structured_output
-    # structured_output.main()
+    from game_generation_local_llm import structured_output
+    structured_output.main()
 
