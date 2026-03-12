@@ -21,7 +21,18 @@
 # nuitka-project: --nofollow-import-to=pyphen
 # nuitka-project: --assume-yes-for-downloads
 
-# nuitka-project: --plugin-disable=transformers
+## nuitka-project: --plugin-disable=transformers
+## nuitka-project: --include-package=transformers.models.albert
+## nuitka-project: --include-module=transformers.models.albert.configuration_albert
+## nuitka-project: --include-module=transformers.models.albert.modeling_albert
+
+# nuitka-project: --include-data-dir={MAIN_DIRECTORY}/.venv/Lib/site-packages/openvino/libs=openvino/libs
+# nuitka-project: --include-data-dir={MAIN_DIRECTORY}/.venv/Lib/site-packages/openvino_tokenizers/lib=openvino_tokenizers/lib
+
+# nuitka-project: --include-package=openvino
+# nuitka-project: --include-package=openvino_tokenizers
+# nuitka-project: --include-package=openvino_genai
+
 # nuitka-project: --include-distribution-metadata=transformers
 
 # nuitka-project: --spacy-language-model=en_core_web_sm
@@ -47,8 +58,8 @@ if __name__ == "__main__":
 
     # for game engine
     # import kokoro
-    from gui.homePage import run
-    run()
+    # from gui.homePage import run
+    # run()
 
     # for game loading
     # from storageManager.game_load import GameLoader
@@ -67,6 +78,10 @@ if __name__ == "__main__":
     # saver.save_game(os.path.join(os.path.dirname(__file__), "saved_games"), "harry potter", serialized_graph)
 
     # for structured output
-    # from game_generation_local_llm import structured_output
-    # structured_output.main()
+    from game_generation_local_llm import structured_output
+    structured_output.main()
 
+    # for tts
+    # from text2speech import Talker
+    # talker = Talker()
+    # talker.generate_speech("Hello world", "test_audio.wav")

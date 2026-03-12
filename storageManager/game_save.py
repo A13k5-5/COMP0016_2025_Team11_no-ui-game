@@ -6,7 +6,7 @@ from multipledispatch import dispatch
 from . import config
 from graph import Node
 from graph.serial_graph import SerialGraph
-from text2speech import Talker
+# from text2speech import Talker
 
 
 class GameSaver:
@@ -115,14 +115,15 @@ class GameSaver:
         :param serial_graph: the serialized graph containing all nodes for which audio needs to be generated
         :return:
         """
-        talker: Talker = Talker()
-
-        for node_id, serial_node in serial_graph.nodes.items():
-            # generate the main text audio
-            main_text_audio_file: str = os.path.join(game_path, "audio", Node.get_main_text_audio_filename(node_id))
-            talker.generate_speech(serial_node.text, main_text_audio_file)
-
-            # generate the options audio
-            options_audio_file: str = serial_node.get_options_text()
-            output_file = os.path.join(game_path, "audio", Node.get_options_audio_filename(node_id))
-            talker.generate_speech(options_audio_file, output_file)
+        pass
+        # talker: Talker = Talker()
+        #
+        # for node_id, serial_node in serial_graph.nodes.items():
+        #     # generate the main text audio
+        #     main_text_audio_file: str = os.path.join(game_path, "audio", Node.get_main_text_audio_filename(node_id))
+        #     talker.generate_speech(serial_node.text, main_text_audio_file)
+        #
+        #     # generate the options audio
+        #     options_audio_file: str = serial_node.get_options_text()
+        #     output_file = os.path.join(game_path, "audio", Node.get_options_audio_filename(node_id))
+        #     talker.generate_speech(options_audio_file, output_file)

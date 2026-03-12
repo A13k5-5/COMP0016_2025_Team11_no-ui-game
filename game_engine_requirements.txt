@@ -3,4 +3,6 @@ pyside6
 multipledispatch
 kokoro
 soundfile
-openvino-genai
+openvino==2026.0.0
+openvino-genai==2026.0.0
+openvino_tokenizers==2026.0.0.0

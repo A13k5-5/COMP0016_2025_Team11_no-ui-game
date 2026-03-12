@@ -4,6 +4,7 @@ import os
 
 from openvino_genai import LLMPipeline
 
+from game_generation_local_llm.game_generator import GameGenerator
 from graph.serial_graph import SerialGraph
 from game_generation_local_llm.story_generator.story_generator import StoryGenerator
 from game_generation_local_llm.graph_blueprint.blueprint import GraphBlueprint
@@ -11,14 +12,16 @@ from game_generation_local_llm.graph_blueprint.blueprint_generator import Bluepr
 
 
 def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("model_dir",
-                        help="Path to the model directory. It should contain the OpenVINO model files.")
-    args = parser.parse_args()
+    # parser = argparse.ArgumentParser()
+    # parser.add_argument("model_dir",
+    #                     help="Path to the model directory. It should contain the OpenVINO model files.")
+    # args = parser.parse_args()
 
-    pipe: LLMPipeline = LLMPipeline(args.model_dir, "CPU")
-    blueprint_generator: BlueprintGenerator = BlueprintGenerator(pipe)
-    game_generator: StoryGenerator = StoryGenerator(pipe)
+    # pipe: LLMPipeline = LLMPipeline(args.model_dir, "CPU")
+    # blueprint_generator: BlueprintGenerator = BlueprintGenerator(pipe)
+    # game_generator: StoryGenerator = StoryGenerator(pipe)
+
+    game_generator: GameGenerator = GameGenerator()
 
     print(
         "This is a smart assistant that generates an adventure game graph."
@@ -39,7 +42,8 @@ def main():
         blueprint: GraphBlueprint = GraphBlueprint.model_validate(blueprint_json)
         print(blueprint.model_dump_json(indent=2))
 
-        story: SerialGraph = game_generator.generate_game(prompt, blueprint)
+        # story: SerialGraph = game_generator.generate_game(prompt, blueprint)
+        story: SerialGraph = game_generator.generate_game(prompt)
         print(f"\nGenerated story graph: \n{story.model_dump_json(indent=2)}")
 
 
