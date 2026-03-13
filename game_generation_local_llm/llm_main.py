@@ -5,6 +5,16 @@
 # nuitka-project: --nofollow-import-to=torch._dynamo
 # nuitka-project: --nofollow-import-to=matplotlib
 
+# nuitka-project: --include-package=openvino-genai
+# nuitka-project: --include-package-data=openvino-genai
+
+# nuitka-project: --include-package=openvino
+# nuitka-project: --include-package-data=openvino
+
+# nuitka-project: --include-package=openvino-tokenizers
+# nuitka-project: --include-package-data=openvino-tokenizers
+
+
 import json
 import os
 from openvino_genai import LLMPipeline, ChatHistory, GenerationConfig, StructuredOutputConfig
@@ -25,7 +35,7 @@ if __name__ == "__main__":
     history.append({"role": "system", "content": "You are a helpful assistant."})
 
     print("Loading model...")
-    model_path: str = os.path.join(os.path.dirname(__file__), "models", "TinyLlama_1_1b_v1_ov")
+    model_path: str = os.path.join(os.path.dirname(__file__), "models", "TinyLlama-1.1B-Chat-v1.0_ov")
     pipe: LLMPipeline = LLMPipeline(model_path, "GPU")
     while True:
 
