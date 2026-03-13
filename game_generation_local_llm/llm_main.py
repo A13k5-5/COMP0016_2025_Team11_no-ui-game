@@ -1,3 +1,10 @@
+# nuitka-project: --mode=standalone
+
+# nuitka-project: --include-data-dir={MAIN_DIRECTORY}/models=models
+
+# nuitka-project: --nofollow-import-to=torch._dynamo
+# nuitka-project: --nofollow-import-to=matplotlib
+
 import json
 import os
 from openvino_genai import LLMPipeline, ChatHistory, GenerationConfig, StructuredOutputConfig
