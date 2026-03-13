@@ -11,7 +11,7 @@ from game_generation_local_llm.story_generator.story_generator import StoryGener
 class GameGenerator:
     def __init__(self):
         model_path: str = os.path.join(os.path.dirname(__file__), "model_path")
-        self.pipe: LLMPipeline = LLMPipeline(model_path, "CPU")
+        self.pipe: LLMPipeline = LLMPipeline(model_path, "GPU")
         self.blueprint_generator: BlueprintGenerator = BlueprintGenerator(self.pipe)
         self.game_generator: StoryGenerator = StoryGenerator(self.pipe)
 
