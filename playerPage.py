@@ -48,7 +48,6 @@ class PlayerPage(QtWidgets.QWidget):
     def _open_settings(self):
         dlg = SettingsPage(parent=self)
         dlg.exec()
-        self._update_mode_label()
 
     def _run(self):
         player = gamePlayer.GamePlayer()

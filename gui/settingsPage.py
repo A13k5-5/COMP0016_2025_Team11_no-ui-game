@@ -87,5 +87,12 @@ class SettingsPage(QtWidgets.QDialog):
         self.layout.addLayout(btn_row)
 
     def _save(self) -> None:
-        # TODO: wire into SettingsManager
+        selected = [gest.currentData() for gest in self._dropdowns.values()]
+        if len(selected) != len(set(selected)):
+            QtWidgets.QMessageBox.warning(
+                self,
+                "Duplicate Gesture",
+                "Each action must have a unique gesture. Please resolve the conflicts before saving."
+            )
+            return
         self.accept()
