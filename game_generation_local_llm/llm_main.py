@@ -2,8 +2,11 @@
 
 # nuitka-project: --include-data-dir={MAIN_DIRECTORY}/models=models
 
-# nuitka-project: --nofollow-import-to=torch._dynamo
-# nuitka-project: --nofollow-import-to=matplotlib
+# nuitka-project: --include-package=openvino_genai
+# nuitka-project: --include-package-data=openvino_genai
+
+# nuitka-project: --include-package=openvino_tokenizers
+# nuitka-project: --include-package-data=openvino_tokenizers
 
 import json
 import os
@@ -25,8 +28,8 @@ if __name__ == "__main__":
     history.append({"role": "system", "content": "You are a helpful assistant."})
 
     print("Loading model...")
-    model_path: str = os.path.join(os.path.dirname(__file__), "models", "TinyLlama_1_1b_v1_ov")
-    pipe: LLMPipeline = LLMPipeline(model_path, "GPU")
+    model_path: str = os.path.join(os.path.dirname(__file__), "models", "TinyLlama-1.1B-Chat-v1.0_ov")
+    pipe: LLMPipeline = LLMPipeline(model_path, "CPU")
     while True:
 
         prompt: str = input(">> ")
@@ -38,5 +41,3 @@ if __name__ == "__main__":
         print("Generating response...")
         decoded_results = pipe.generate(history, config)
         print(decoded_results.texts[0])
-
-        history.pop()
