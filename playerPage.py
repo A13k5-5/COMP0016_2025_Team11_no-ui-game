@@ -1,6 +1,7 @@
 import sys
 import os
 from PySide6 import QtWidgets
+from gui.settingsPage import SettingsPage
 
 import gamePlayer
 
@@ -25,10 +26,15 @@ class PlayerPage(QtWidgets.QWidget):
         layout.addLayout(folder_row)
 
         # Run button
+        btn_row = QtWidgets.QHBoxLayout()
         self.run_btn = QtWidgets.QPushButton("Run")
         self.run_btn.setEnabled(False)
         self.run_btn.clicked.connect(self._run)
-        layout.addWidget(self.run_btn)
+        settings_btn = QtWidgets.QPushButton("⚙ Settings")
+        settings_btn.clicked.connect(self._open_settings)
+        btn_row.addWidget(self.run_btn)
+        btn_row.addWidget(settings_btn)
+        layout.addLayout(btn_row)
 
     def _browse(self):
         path, _ = QtWidgets.QFileDialog.getOpenFileName(
@@ -38,6 +44,11 @@ class PlayerPage(QtWidgets.QWidget):
         if path:
             self.path_edit.setText(os.path.abspath(path))
             self.run_btn.setEnabled(True)
+    
+    def _open_settings(self):
+        dlg = SettingsPage(parent=self)
+        dlg.exec()
+        self._update_mode_label()
 
     def _run(self):
         player = gamePlayer.GamePlayer()
