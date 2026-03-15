@@ -33,6 +33,32 @@ A `.noui` file is a zip archive containing:
 
 Temporary extraction occurs under `storageManager/temporary/` during load.
 
+## Player Settings
+ 
+The game player has a configurable settings page accessible from `playerPage.py` via the ⚙ Settings button. Settings are persisted to `settings.json` in the project root.
+ 
+### Input Device
+Toggle between **Webcam (gesture)** and **Keyboard** input. When keyboard mode is selected, the camera is never opened.
+ 
+### Gesture Bindings
+Each game action can be mapped to any gesture via a dropdown. Available actions:
+- Option Left
+- Option Right
+- Replay Main Text
+- Replay Options Text
+- Quit / Save Progress
+ 
+### Keyboard Bindings
+Each action can be mapped to a single key (type a character in the field). Default bindings:
+ 
+| Action | Default Key |
+|---|---|
+| Option Left | A |
+| Option Right | D |
+| Replay Main Text | R |
+| Replay Options Text | F |
+| Quit / Save Progress | Q |
+
 ## Requirements
 
 - Python 3.10+ (recommended for compatibility with scientific and ML deps)
