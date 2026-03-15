@@ -30,19 +30,22 @@ class SettingsManager:
     def __init__(self):
         self._data: dict = self._load()
 
-    def _merge_with_defaults(self, candidate: dict) -> dict:
+    def _merge_with_defaults(self, candidate: dict, defaults: dict) -> dict:
         """
         Recursively merge candidate onto defaults, keeping defaults' schema.
         """
         if not isinstance(candidate, dict):
             return dict(DEFAULT_SETTINGS)
+        
+        if defaults is None:
+            defaults = DEFAULT_SETTINGS
 
         merged = {}
         for key, default_value in DEFAULT_SETTINGS.items():
             candidate_value = candidate.get(key)
 
             if isinstance(default_value, dict):
-                merged[key] = self._merge_with_defaults(default_value, candidate_value)
+                merged[key] = self._merge_with_defaults(candidate_value, default_value)
             elif candidate_value is None:
                 merged[key] = default_value
             else:
@@ -82,5 +85,8 @@ class SettingsManager:
  
     def set_gesture(self, action: str, gesture: EnumGesture) -> None:
         self._data["gestures"][action] = gesture.value
+    
+    def get_key(self, action: str) -> str:
+        return self._data["keyboard"][action]
 
     
