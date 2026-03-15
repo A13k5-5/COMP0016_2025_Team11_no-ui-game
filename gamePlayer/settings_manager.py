@@ -66,3 +66,21 @@ class SettingsManager:
         """
         with open(SETTINGS_PATH, "w") as f:
             json.dump(self._data, f, indent=4)
+    
+    def is_keyboard_mode(self) -> bool:
+        return self._data["input_device"] == "keyboard"
+    
+    def get_input_device(self) -> str:
+        return self._data["input_device"]
+ 
+    def set_input_device(self, device: str) -> None:
+        assert device in ("webcam", "keyboard")
+        self._data["input_device"] = device
+ 
+    def get_gesture(self, action: str) -> EnumGesture:
+        return EnumGesture(self._data["gestures"][action])
+ 
+    def set_gesture(self, action: str, gesture: EnumGesture) -> None:
+        self._data["gestures"][action] = gesture.value
+
+    
