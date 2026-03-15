@@ -64,6 +64,13 @@ class PlayerPage(QtWidgets.QWidget):
         player = gamePlayer.GamePlayer(recogniser)
         player.play_game(self.path_edit.text())
 
+    def keyPressEvent(self, event) -> None:
+        """
+        Forward keypresses to KeyboardInputHandler when in keyboard mode.
+        """
+        if self._settings.is_keyboard_mode() and hasattr(self, "_recogniser"):
+            self._recogniser.register_key(event.key())
+        super().keyPressEvent(event)
 
 def run():
     app = QtWidgets.QApplication.instance() or QtWidgets.QApplication(sys.argv)
