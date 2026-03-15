@@ -93,4 +93,7 @@ class SettingsManager:
     def get_key(self, action: str) -> str:
         return self._data["keyboard"][action]
 
+    def set_key(self, action: str, key: str) -> None:
+        self._data["keyboard"][action] = key
+
     
