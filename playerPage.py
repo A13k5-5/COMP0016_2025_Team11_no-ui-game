@@ -60,7 +60,7 @@ class PlayerPage(QtWidgets.QWidget):
         import threading
         if self._settings.is_keyboard_mode():
             from gamePlayer.keyboard_input_handler import KeyboardInputHandler
-            self._recogniser = KeyboardInputHandler()
+            self._recogniser = KeyboardInputHandler(self._settings)
         else:
             import myGestureRecognizer
             self._recogniser = myGestureRecognizer.VideoGestureRecogniser()
