@@ -1,17 +1,18 @@
 # nuitka-project: --mode=standalone
 
-# nuitka-project: --include-package=kokoro
-# nuitka-project: --include-package-data=kokoro
+## nuitka-project: --include-package=kokoro
+## nuitka-project: --include-package-data=kokoro
 
 # nuitka-project: --nofollow-import-to=transformers.generation.tf_utils
 # nuitka-project: --nofollow-import-to=transformers.generation.flax_utils
-# nuitka-project: --nofollow-import-to=transformers.generation.utils
+# nuitka-project: --nofollow-import-to=torch._dynamo
 # nuitka-project: --nofollow-import-to=matplotlib
 
-# nuitka-project: --nofollow-import-to=torch._dynamo
 # nuitka-project: --module-parameter=torch-disable-jit=yes
 
 # nuitka-project: --spacy-language-model=en_core_web_sm
+
+import torch_dynamo_stub
 
 from kokoro import KPipeline
 import soundfile as sf
