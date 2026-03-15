@@ -52,7 +52,16 @@ class PlayerPage(QtWidgets.QWidget):
         dlg.exec()
 
     def _run(self):
-        player = gamePlayer.GamePlayer()
+        """
+        Depending on settings configuration, call gamePlayer with keyboard or video recognizer
+        """
+        if self._settings.is_keyboard_mode():
+            from gamePlayer.keyboard_input_handler import KeyboardInputHandler
+            recogniser = KeyboardInputHandler(self._settings)
+        else:
+            import myGestureRecognizer
+            recogniser = myGestureRecognizer.VideoGestureRecogniser()
+        player = gamePlayer.GamePlayer(recogniser)
         player.play_game(self.path_edit.text())
 
 
