@@ -30,7 +30,7 @@ class SettingsManager:
     def __init__(self):
         self._data: dict = self._load()
 
-    def _merge_with_defaults(self, candidate: dict, defaults: dict) -> dict:
+    def _merge_with_defaults(self, candidate: dict, defaults: dict = None) -> dict:
         """
         Recursively merge candidate onto defaults, keeping defaults' schema.
         """
@@ -41,7 +41,7 @@ class SettingsManager:
             defaults = DEFAULT_SETTINGS
 
         merged = {}
-        for key, default_value in DEFAULT_SETTINGS.items():
+        for key, default_value in defaults.items():
             candidate_value = candidate.get(key)
 
             if isinstance(default_value, dict):
@@ -54,6 +54,8 @@ class SettingsManager:
         return merged
 
     def _load(self) -> dict:
+        print("Loading from:", SETTINGS_PATH)
+        print("File exists:", os.path.exists(SETTINGS_PATH))
         if os.path.exists(SETTINGS_PATH):
             try:
                 with open(SETTINGS_PATH, "r") as f:
@@ -67,8 +69,10 @@ class SettingsManager:
         """
         Persist current settings to settings.json.
         """
+        print("Saving to:", SETTINGS_PATH)
         with open(SETTINGS_PATH, "w") as f:
             json.dump(self._data, f, indent=4)
+        print("Saved:", self._data)
     
     def is_keyboard_mode(self) -> bool:
         return self._data["input_device"] == "keyboard"

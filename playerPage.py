@@ -2,6 +2,7 @@ import sys
 import os
 from PySide6 import QtWidgets
 from gui.settingsPage import SettingsPage
+from gamePlayer.settings_manager import SettingsManager
 
 import gamePlayer
 
@@ -9,6 +10,7 @@ import gamePlayer
 class PlayerPage(QtWidgets.QWidget):
     def __init__(self):
         super().__init__()
+        self._settings = SettingsManager()
         self.setWindowTitle("No-UI Game")
         self.resize(400, 120)
 
@@ -46,7 +48,7 @@ class PlayerPage(QtWidgets.QWidget):
             self.run_btn.setEnabled(True)
     
     def _open_settings(self):
-        dlg = SettingsPage(parent=self)
+        dlg = SettingsPage(self._settings, parent=self)
         dlg.exec()
 
     def _run(self):

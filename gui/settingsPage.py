@@ -21,11 +21,11 @@ class SettingsPage(QtWidgets.QDialog):
     Keyboard bindings are predetermined and shown read-only.
     """
 
-    def __init__(self, parent=None):
+    def __init__(self, settings: SettingsManager, parent=None):
         super().__init__(parent)
         self._dropdowns: dict[str, QtWidgets.QComboBox] = {}
 
-        self._settings: SettingsManager = SettingsManager()
+        self._settings: SettingsManager = settings
 
         self._setup_window_layout()
         self._input_selection()
