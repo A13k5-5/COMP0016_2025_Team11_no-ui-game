@@ -1,5 +1,6 @@
 from PySide6 import QtWidgets, QtCore
 from gesture import EnumGesture
+from gamePlayer.settings_manager import SettingsManager
 
 ACTIONS = [
     ("option_left",    "Option Left"),
@@ -24,6 +25,8 @@ class SettingsPage(QtWidgets.QDialog):
         super().__init__(parent)
         self._dropdowns: dict[str, QtWidgets.QComboBox] = {}
 
+        self._settings: SettingsManager = SettingsManager()
+
         self._setup_window_layout()
         self._input_selection()
         self._gesture_bindings()
@@ -46,11 +49,16 @@ class SettingsPage(QtWidgets.QDialog):
         self._keyboard_radio = QtWidgets.QRadioButton("Keyboard")
         device_layout.addWidget(self._webcam_radio)
         device_layout.addWidget(self._keyboard_radio)
-        self._webcam_radio.setChecked(True)
+        if self._settings.is_keyboard_mode():
+            self._keyboard_radio.setChecked(True)
+        else:
+            self._webcam_radio.setChecked(True)
         self.layout.addWidget(device_group)
 
     def _gesture_bindings(self) -> None:
-        """Create gesture binding dropdowns, one per action."""
+        """
+        Create gesture binding dropdowns, one per action.
+        """
         gesture_group = QtWidgets.QGroupBox("Gesture Bindings")
         gesture_layout = QtWidgets.QFormLayout(gesture_group)
         gesture_layout.setSpacing(8)
@@ -58,7 +66,9 @@ class SettingsPage(QtWidgets.QDialog):
             combo = QtWidgets.QComboBox()
             for g in GESTURE_OPTIONS:
                 combo.addItem(g.name, userData=g)
-            combo.setCurrentIndex(0)
+            current = self._settings.get_gesture(action)
+            idx = next((i for i in range(combo.count()) if combo.itemData(i) == current), 0)
+            combo.setCurrentIndex(idx)
             self._dropdowns[action] = combo
             gesture_layout.addRow(label + ":", combo)
         self.layout.addWidget(gesture_group)
@@ -69,7 +79,7 @@ class SettingsPage(QtWidgets.QDialog):
         kb_layout = QtWidgets.QFormLayout(kb_group)
         kb_layout.setSpacing(8)
         for action, label in ACTIONS:
-            key_label = QtWidgets.QLabel("—")  # TODO: populated from SettingsManager
+            key_label = QtWidgets.QLabel(self._settings.get_key(action))
             key_label.setStyleSheet("color: #555;")
             kb_layout.addRow(label + ":", key_label)
         self.layout.addWidget(kb_group)
@@ -95,4 +105,10 @@ class SettingsPage(QtWidgets.QDialog):
                 "Each action must have a unique gesture. Please resolve the conflicts before saving."
             )
             return
+        
+        device = "keyboard" if self._keyboard_radio.isChecked() else "webcam"
+        self._settings.set_input_device(device)
+        for action, combo in self._dropdowns.items():
+            self._settings.set_gesture(action, combo.currentData())
+        self._settings.save()
         self.accept()
