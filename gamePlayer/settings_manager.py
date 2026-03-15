@@ -84,7 +84,7 @@ class SettingsManager:
         return EnumGesture(self._data["gestures"][action])
  
     def set_gesture(self, action: str, gesture: EnumGesture) -> None:
-        self._data["gestures"][action] = gesture.value
+        self._data["gestures"][action] = gesture
     
     def get_key(self, action: str) -> str:
         return self._data["keyboard"][action]
