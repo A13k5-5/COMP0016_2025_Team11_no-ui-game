@@ -3,8 +3,8 @@ from gesture import EnumGesture
 
 # pre-set Qt-key codes to actions
 _KEY_TO_GESTURE: dict[int, EnumGesture] = {
-    QtCore.Qt.Key_Left:  EnumGesture.ILoveYou_Left,
-    QtCore.Qt.Key_Right: EnumGesture.ILoveYou_Right,
+    QtCore.Qt.Key_A:  EnumGesture.ILoveYou_Left,
+    QtCore.Qt.Key_D: EnumGesture.ILoveYou_Right,
     QtCore.Qt.Key_R:     EnumGesture.PointingUp_Left,
     QtCore.Qt.Key_F:     EnumGesture.PointingUp_Right,
     QtCore.Qt.Key_Q:     EnumGesture.Victory,
@@ -38,4 +38,5 @@ class KeyboardInputHandler:
         """
         Called by PlayerPage.keyPressEvent when a key is pressed.
         """
+        print("registering key:", key)
         self._last_key = key

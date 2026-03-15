@@ -54,20 +54,30 @@ class PlayerPage(QtWidgets.QWidget):
     def _run(self):
         """
         Depending on settings configuration, call gamePlayer with keyboard or video recognizer
+        Run the game loop in a background thread so the Qt main thread stays
+        free to process keypresses via keyPressEvent.
         """
+        import threading
         if self._settings.is_keyboard_mode():
             from gamePlayer.keyboard_input_handler import KeyboardInputHandler
-            recogniser = KeyboardInputHandler(self._settings)
+            self._recogniser = KeyboardInputHandler()
         else:
             import myGestureRecognizer
-            recogniser = myGestureRecognizer.VideoGestureRecogniser()
-        player = gamePlayer.GamePlayer(recogniser)
-        player.play_game(self.path_edit.text())
+            self._recogniser = myGestureRecognizer.VideoGestureRecogniser()
+        player = gamePlayer.GamePlayer(self._recogniser)
+        thread = threading.Thread(
+            target=player.play_game,
+            args=(self.path_edit.text(),),
+            daemon=True
+        )
+        # daemon thread = background thread that dies when the main program exits
+        thread.start()
 
     def keyPressEvent(self, event) -> None:
         """
         Forward keypresses to KeyboardInputHandler when in keyboard mode.
         """
+        print("key pressed:", event.key(), "has recogniser:", hasattr(self, "_recogniser"))
         if self._settings.is_keyboard_mode() and hasattr(self, "_recogniser"):
             self._recogniser.register_key(event.key())
         super().keyPressEvent(event)

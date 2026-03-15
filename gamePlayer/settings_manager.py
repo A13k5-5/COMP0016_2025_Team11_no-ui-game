@@ -14,8 +14,8 @@ DEFAULT_SETTINGS = {
         "quit":           EnumGesture.Victory.value,
     },
     "keyboard": {
-        "option_left":    "Left",
-        "option_right":   "Right",
+        "option_left":    "A",
+        "option_right":   "D",
         "replay_main":    "R",
         "replay_options": "F",
         "quit":           "Q",
