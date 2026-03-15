@@ -1,21 +1,20 @@
 from PySide6 import QtWidgets, QtCore, QtGui
 from gesture import EnumGesture
-
-# pre-set Qt-key codes to actions
-_KEY_TO_GESTURE: dict[int, EnumGesture] = {
-    QtCore.Qt.Key_A:  EnumGesture.ILoveYou_Left,
-    QtCore.Qt.Key_D: EnumGesture.ILoveYou_Right,
-    QtCore.Qt.Key_R:     EnumGesture.PointingUp_Left,
-    QtCore.Qt.Key_F:     EnumGesture.PointingUp_Right,
-    QtCore.Qt.Key_Q:     EnumGesture.Victory,
-}
+from gamePlayer.settings_manager import SettingsManager
 
 class KeyboardInputHandler:
     """
     Waits for a keypress and maps it to an EnumGesture using the configured keyboard bindings.
     """
-    def __init__(self):
+    def __init__(self, settings: SettingsManager):
         self._last_key: int | None = None
+
+        self._key_to_gesture: dict[int, EnumGesture] = {}
+        for action in ("option_left", "option_right", "replay_main", "replay_options", "quit"):
+            key_str = settings.get_key(action).upper()
+            qt_key = getattr(QtCore.Qt, f"Key_{key_str}", None)
+            if qt_key is not None:
+                self._key_to_gesture[qt_key] = settings.get_gesture(action)
 
     def get_gesture(self, gestures_to_spot: list[EnumGesture]) -> EnumGesture:
         """
@@ -28,7 +27,7 @@ class KeyboardInputHandler:
             self._last_key = None
             if key is None:
                 continue
-            gesture = _KEY_TO_GESTURE.get(key)
+            gesture = self._key_to_gesture.get(key)
             if gesture is None:
                 continue
             if gesture in gestures_to_spot or gesture == EnumGesture.Victory:

@@ -78,10 +78,19 @@ class SettingsPage(QtWidgets.QDialog):
         kb_group = QtWidgets.QGroupBox("Keyboard Bindings (fixed)")
         kb_layout = QtWidgets.QFormLayout(kb_group)
         kb_layout.setSpacing(8)
+        self._key_edits: dict[str, QtWidgets.QLineEdit] = {}
+        
         for action, label in ACTIONS:
-            key_label = QtWidgets.QLabel(self._settings.get_key(action))
-            key_label.setStyleSheet("color: #555;")
-            kb_layout.addRow(label + ":", key_label)
+            edit = QtWidgets.QLineEdit(self._settings.get_key(action))
+            edit.setMaxLength(1)
+            edit.setFixedWidth(48)
+            edit.setAlignment(QtCore.Qt.AlignCenter)
+            edit.setStyleSheet(
+                "QLineEdit { border: 1px solid #c0c0c0; border-radius: 4px; padding: 4px; font-size: 13px; }"
+            )
+            self._key_edits[action] = edit
+            kb_layout.addRow(label + ":", edit)
+
         self.layout.addWidget(kb_group)
 
     def _buttons(self) -> None:
@@ -96,6 +105,29 @@ class SettingsPage(QtWidgets.QDialog):
         btn_row.addWidget(save_btn)
         self.layout.addLayout(btn_row)
 
+    def _validate_key_bindings(self) -> dict[str, str] | None:
+        """
+        Validate key bindings and return a dict of action -> key if valid, or None if invalid.
+        """
+        FORBIDDEN = {"Escape", "Return", "Enter", "Tab", "Backspace", "Delete", "Space"}
+        keys = {}
+        for action, edit in self._key_edits.items():
+            key = edit.text().strip().upper()
+            if not key:
+                QtWidgets.QMessageBox.warning(self, "Empty Key",
+                    f"Key binding for '{dict(ACTIONS)[action]}' cannot be empty.")
+                return None
+            if key in FORBIDDEN:
+                QtWidgets.QMessageBox.warning(self, "Forbidden Key",
+                    f"'{key}' cannot be used as a key binding.")
+                return None
+            if key in keys.values():
+                QtWidgets.QMessageBox.warning(self, "Duplicate Key",
+                    f"'{key}' is already assigned to another action.")
+                return None
+            keys[action] = key
+        return keys
+
     def _save(self) -> None:
         selected = [gest.currentData() for gest in self._dropdowns.values()]
         if len(selected) != len(set(selected)):
@@ -106,9 +138,15 @@ class SettingsPage(QtWidgets.QDialog):
             )
             return
         
+        keys = self._validate_key_bindings()
+        if keys is None:
+            return
+        
         device = "keyboard" if self._keyboard_radio.isChecked() else "webcam"
         self._settings.set_input_device(device)
         for action, combo in self._dropdowns.items():
             self._settings.set_gesture(action, combo.currentData())
+        for action, key in keys.items():
+            self._settings.set_key(action, key)
         self._settings.save()
         self.accept()
