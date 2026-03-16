@@ -29,10 +29,8 @@
 # nuitka-project: --include-data-dir={MAIN_DIRECTORY}/.venv/Lib/site-packages/openvino/libs=openvino/libs
 # nuitka-project: --include-data-dir={MAIN_DIRECTORY}/.venv/Lib/site-packages/openvino_tokenizers/lib=openvino_tokenizers/lib
 
-# nuitka-project: --include-package=transformers
-# nuitka-project: --include-package=openvino
-# nuitka-project: --include-package=openvino_tokenizers
-# nuitka-project: --include-package=openvino_genai
+# nuitka-project: --include-package=kokoro
+# nuitka-project: --include-package-data=kokoro
 
 # nuitka-project: --include-distribution-metadata=transformers
 

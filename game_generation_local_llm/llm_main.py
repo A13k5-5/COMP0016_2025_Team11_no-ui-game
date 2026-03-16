@@ -2,18 +2,11 @@
 
 # nuitka-project: --include-data-dir={MAIN_DIRECTORY}/models=models
 
-# nuitka-project: --nofollow-import-to=torch._dynamo
-# nuitka-project: --nofollow-import-to=matplotlib
+# nuitka-project: --include-package=openvino_genai
+# nuitka-project: --include-package-data=openvino_genai
 
-# nuitka-project: --include-package=openvino-genai
-# nuitka-project: --include-package-data=openvino-genai
-
-# nuitka-project: --include-package=openvino
-# nuitka-project: --include-package-data=openvino
-
-# nuitka-project: --include-package=openvino-tokenizers
-# nuitka-project: --include-package-data=openvino-tokenizers
-
+# nuitka-project: --include-package=openvino_tokenizers
+# nuitka-project: --include-package-data=openvino_tokenizers
 
 import json
 import os
@@ -36,7 +29,7 @@ if __name__ == "__main__":
 
     print("Loading model...")
     model_path: str = os.path.join(os.path.dirname(__file__), "models", "TinyLlama-1.1B-Chat-v1.0_ov")
-    pipe: LLMPipeline = LLMPipeline(model_path, "GPU")
+    pipe: LLMPipeline = LLMPipeline(model_path, "CPU")
     while True:
 
         prompt: str = input(">> ")

@@ -1,3 +1,17 @@
+# nuitka-project: --mode=standalone
+
+# nuitka-project: --nofollow-import-to=transformers.generation.tf_utils
+# nuitka-project: --nofollow-import-to=transformers.generation.flax_utils
+# nuitka-project: --nofollow-import-to=torch._dynamo
+# nuitka-project: --nofollow-import-to=matplotlib
+
+# nuitka-project: --module-parameter=torch-disable-jit=yes
+
+# nuitka-project: --spacy-language-model=en_core_web_sm
+# nuitka-project: --include-distribution-metadata=phonemizer
+# nuitka-project: --include-distribution-metadata=phonemizer-fork
+# nuitka-project: --include-distribution-metadata=spacy
+
 from kokoro import KPipeline
 import soundfile as sf
 
