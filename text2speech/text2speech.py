@@ -1,8 +1,5 @@
 # nuitka-project: --mode=standalone
 
-## nuitka-project: --include-package=kokoro
-## nuitka-project: --include-package-data=kokoro
-
 # nuitka-project: --nofollow-import-to=transformers.generation.tf_utils
 # nuitka-project: --nofollow-import-to=transformers.generation.flax_utils
 # nuitka-project: --nofollow-import-to=torch._dynamo
