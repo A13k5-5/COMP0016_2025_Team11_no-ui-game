@@ -1,6 +1,6 @@
 .idea/
 **/__pycache__/
-**/.venv/
+**/.venv*/
 .vscode
 *.exe
 ./storageManager/temporary/
