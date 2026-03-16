@@ -10,6 +10,10 @@ class KeyboardInputHandler:
         self._last_key: int | None = None
 
         self._key_to_gesture: dict[int, EnumGesture] = {}
+        # for every game action:
+        # 1) get the configured key string from settings
+        # 2) convert key string to Qt code ("A" -> QtCore.Qt.Key_A)
+        # 3) map it to the corresponding EnumGesture
         for action in ("option_left", "option_right", "replay_main", "replay_options", "quit"):
             key_str = settings.get_key(action).upper()
             qt_key = getattr(QtCore.Qt, f"Key_{key_str}", None)
