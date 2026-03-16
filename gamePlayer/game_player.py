@@ -4,7 +4,6 @@ import time
 
 from gamePlayer.audio_player import AudioPlayer
 from graph import Node
-import myGestureRecognizer
 
 from gesture import EnumGesture
 import storageManager.game_load
@@ -17,11 +16,11 @@ class GamePlayer:
     """
     Class to play the interactive story game.
     """
-    def __init__(self):
+    def __init__(self, recogniser):
         self.game_loader: storageManager.game_load.GameLoader = storageManager.game_load.GameLoader()
         self.progress_tracker: storageManager.progress_tracker.ProgressTracker = storageManager.progress_tracker.ProgressTracker()
         self.audio_player: AudioPlayer = AudioPlayer()
-        self.recogniser: myGestureRecognizer.VideoGestureRecogniser = myGestureRecognizer.VideoGestureRecogniser()
+        self.recogniser = recogniser
 
     def play_game(self, game_path: str):
         try:
