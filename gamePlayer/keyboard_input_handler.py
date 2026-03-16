@@ -37,5 +37,4 @@ class KeyboardInputHandler:
         """
         Called by PlayerPage.keyPressEvent when a key is pressed.
         """
-        print("registering key:", key)
         self._last_key = key
