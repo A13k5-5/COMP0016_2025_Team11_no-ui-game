@@ -1,0 +1,137 @@
+{
+  "nodes": {
+    "0": {
+      "id": 0,
+      "text": "In a cozy little room bathed in the soft glow of a crescent moon, you find yourself in a magical land of dreams. The room is filled with whispers of stories waiting to unfold. A gentle breeze carries,",
+      "left_option": "Explore the Closet",
+      "right_option": "Climb into Bed",
+      "adjacency_list": {
+        "0": 1,
+        "1": 4
+      },
+      "is_win": false,
+      "is_losing": false
+    },
+    "1": {
+      "id": 1,
+      "text": "The room is filled with gentle warmth, as the magical night invites you to explore its wonders. A tiny door, no bigger than your hand, catches your eye tucked under the bed. Curiosity sparkling in the",
+      "left_option": "Open the Tiny Door",
+      "right_option": "Stay Put",
+      "adjacency_list": {
+        "0": 2,
+        "1": 2
+      },
+      "is_win": false,
+      "is_losing": false
+    },
+    "2": {
+      "id": 2,
+      "text": "You find yourself in a whimsical garden where the flowers hum lullabies, and the leaves rustle soothingly under a velvet sky. Stars twinkle like glittering lanterns leading the way. A shimmering brook",
+      "left_option": "Follow the Brook",
+      "right_option": "Sip from the Stream",
+      "adjacency_list": {
+        "0": 3,
+        "1": 8
+      },
+      "is_win": false,
+      "is_losing": false
+    },
+    "3": {
+      "id": 3,
+      "text": "You stand at the edge of a mystical meadow, where the grass shimmers with dew like scattered diamonds. In the distance, you can see colorful butterflies fluttering about, guiding you to a hidden part.",
+      "left_option": "Follow the Butterflies",
+      "right_option": "Stay in the Meadow",
+      "adjacency_list": {
+        "0": 7,
+        "1": 7
+      },
+      "is_win": false,
+      "is_losing": false
+    },
+    "4": {
+      "id": 4,
+      "text": "You find yourself in a quaint little library, where the walls are lined with books that whisper secrets and tales of adventure. The air is filled with the scent of old parchment and the soft glow of a",
+      "left_option": "Read an Enchanted Book",
+      "right_option": "Look at the Paintings",
+      "adjacency_list": {
+        "0": 5,
+        "1": 5
+      },
+      "is_win": false,
+      "is_losing": false
+    },
+    "5": {
+      "id": 5,
+      "text": "You enter a serene library, its vast shelves stretching out like endless mountains of stories. The air is filled with the sweet scent of vanilla and leather, as if every book is alive with its own sym",
+      "left_option": "Explore the Bookshelf",
+      "right_option": "Sit Down with the Storyteller",
+      "adjacency_list": {
+        "0": 6,
+        "1": 9
+      },
+      "is_win": false,
+      "is_losing": false
+    },
+    "6": {
+      "id": 6,
+      "text": "You find yourself in an enchanted forest where the trees gently sway and whisper secrets in the breeze. The air is filled with a melody of crickets and the scent of blooming wildflowers. Sunlight dapp",
+      "left_option": "Follow the Whispers",
+      "right_option": "Sit Down",
+      "adjacency_list": {
+        "0": 7,
+        "1": 7
+      },
+      "is_win": false,
+      "is_losing": false
+    },
+    "7": {
+      "id": 7,
+      "text": "You find yourself in a tranquil glade where the sunlight filters through the canopy, casting golden patterns on the soft mossy ground. The rustling leaves above sing a harmonious melody, and the air,\u00a0",
+      "left_option": "Walk Towards the Light",
+      "right_option": "Rest Among the Flowers",
+      "adjacency_list": {
+        "0": 10,
+        "1": 10
+      },
+      "is_win": false,
+      "is_losing": false
+    },
+    "8": {
+      "id": 8,
+      "text": "You find yourself in a mystical riverbank where the water sparkles under the moonlight. The gentle murmur of the stream, accompanied by the gentle hoot of an owl, creates a soothing symphony. A bridge",
+      "left_option": "Cross the Enchanted Bridge",
+      "right_option": "Dip Your Toes in the Water",
+      "adjacency_list": {
+        "0": 10,
+        "1": 9
+      },
+      "is_win": false,
+      "is_losing": false
+    },
+    "9": {
+      "id": 9,
+      "text": "You have wandered into the heart of an ancient forest, where the trees seem to lean in with soft, rustling whispers. The air is dense with the scent of pine and earth, and a gentle mist weaves through",
+      "left_option": "",
+      "right_option": "",
+      "adjacency_list": {
+        "0": 10,
+        "1": 10
+      },
+      "is_win": false,
+      "is_losing": true
+    },
+    "10": {
+      "id": 10,
+      "text": "You find yourself in a dreamlike glen where the moonflowers open to reveal a path paved with twinkling starlight. The air is filled with the harmonious song of nightingales, and a gentle breeze dances",
+      "left_option": "",
+      "right_option": "",
+      "adjacency_list": {
+        "0": 10,
+        "1": 10
+      },
+      "is_win": true,
+      "is_losing": false
+    }
+  }
+}
+

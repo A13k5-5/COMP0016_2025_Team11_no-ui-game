@@ -33,5 +33,6 @@ class BlueprintGenerator:
         self._build_history(user_prompt)
 
         decoded_results = self.llm.generate(self.history, self.config)
+        print(decoded_results.texts[0])
         generated_blueprint: GraphBlueprint = GraphBlueprint.model_validate_json(decoded_results.texts[0])
         return generated_blueprint

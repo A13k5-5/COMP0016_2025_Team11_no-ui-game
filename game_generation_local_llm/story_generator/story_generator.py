@@ -21,15 +21,7 @@ class StoryGenerator:
         )
         return config
 
-    def _build_node_history(
-        self,
-        node_id: int,
-        adjacency: dict[int, int],
-        is_win: bool,
-        is_losing: bool,
-        theme: str,
-        generated_nodes: dict[int, SerialNode],
-    ) -> ChatHistory:
+    def _build_node_history(self, node_id: int, adjacency: dict[int, int], is_win: bool, is_losing: bool, theme: str, generated_nodes: dict[int, SerialNode]) -> ChatHistory:
         context: str = (
             "\n".join(node.model_dump_json() for node in generated_nodes.values())
             if generated_nodes

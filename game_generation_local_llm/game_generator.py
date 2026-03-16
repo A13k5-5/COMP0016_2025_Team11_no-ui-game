@@ -10,7 +10,7 @@ from game_generation_local_llm.story_generator.story_generator import StoryGener
 
 class GameGenerator:
     def __init__(self):
-        model_path: str = os.path.join(os.path.dirname(__file__), "models", "TinyLlama-1.1B-Chat-v1.0_ov")
+        model_path: str = os.path.join(os.path.dirname(__file__), "models", "model_path")
         self.pipe: LLMPipeline = LLMPipeline(model_path, "GPU")
         self.blueprint_generator: BlueprintGenerator = BlueprintGenerator(self.pipe)
         self.game_generator: StoryGenerator = StoryGenerator(self.pipe)
@@ -25,7 +25,9 @@ class GameGenerator:
         """
         # sanitise blueprint
         if blueprint is None:
+            print("generating blueprint")
             blueprint: GraphBlueprint = self.blueprint_generator.generate_blueprint(prompt)
 
+        print("generating game")
         story: SerialGraph = self.game_generator.generate_game(prompt, blueprint)
         return story

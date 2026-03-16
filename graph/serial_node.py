@@ -1,6 +1,6 @@
 from typing import Self
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from gesture import EnumGesture
 from graph import Node
@@ -8,7 +8,7 @@ from graph import Node
 
 class SerialNode(BaseModel):
     id: int
-    text: str
+    text: str = Field(max_length=200)
     left_option: str = ""
     right_option: str = ""
     adjacency_list: dict[EnumGesture, int]

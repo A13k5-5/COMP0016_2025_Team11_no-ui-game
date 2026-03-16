@@ -9,15 +9,15 @@
 
 if __name__ == "__main__":
     # for game player
-    #import sys
-    #import gamePlayer
-    #import playerPage
+    import sys
+    import gamePlayer
+    import playerPage
 
-    # if len(sys.argv) > 1:
-    #     player = gamePlayer.GamePlayer()
-    #     player.play_game(sys.argv[1])
-    # else:
-    #     playerPage.run()
+    if len(sys.argv) > 1:
+        player = gamePlayer.GamePlayer()
+        player.play_game(sys.argv[1])
+    else:
+        playerPage.run()
 
     # for game engine
     # import kokoro
@@ -34,13 +34,13 @@ if __name__ == "__main__":
     # import os
     # from storageManager.game_save import GameSaver
     # from graph.serial_graph import SerialGraph
-
-    # with open(os.path.join(os.path.dirname(__file__), "game_generation_local_llm\\generated_games", "harry_potter1.json"), 'r') as file:
+    #
+    # with open(os.path.join(os.path.dirname(__file__), "game_generation_local_llm\\generated_games", "bed_story_serial.json"), 'r') as file:
     #     serialized_graph: SerialGraph = SerialGraph.model_validate_json(file.read().strip())
     # saver = GameSaver()
-    # saver.save_game(os.path.join(os.path.dirname(__file__), "saved_games"), "harry potter", serialized_graph)
+    # saver.save_game(os.path.join(os.path.dirname(__file__), "saved_games"), "Bed story", serialized_graph)
 
     # for structured output
-    from game_generation_local_llm import structured_output
-    structured_output.main()
+    # from game_generation_local_llm import structured_output
+    # structured_output.main()
 
