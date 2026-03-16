@@ -11,8 +11,9 @@
 # nuitka-project: --module-parameter=torch-disable-jit=yes
 
 # nuitka-project: --spacy-language-model=en_core_web_sm
-
-import torch_dynamo_stub
+# nuitka-project: --include-distribution-metadata=phonemizer
+# nuitka-project: --include-distribution-metadata=phonemizer-fork
+# nuitka-project: --include-distribution-metadata=spacy
 
 from kokoro import KPipeline
 import soundfile as sf
