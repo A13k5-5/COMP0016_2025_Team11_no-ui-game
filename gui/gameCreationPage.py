@@ -36,10 +36,6 @@ class GameCreationPage(QtWidgets.QWidget):
         self.game_loader: GameLoader = GameLoader()
         self.game_saver: GameSaver = GameSaver()
 
-        # AI
-        from game_generation_local_llm.game_generator import GameGenerator
-        self._game_generator: GameGenerator = GameGenerator()
-
         # Ordered list of all node widgets
         self.nodes: list[NodeWidget] = []
         self.root_node: Optional[NodeWidget] = None
@@ -145,8 +141,7 @@ class GameCreationPage(QtWidgets.QWidget):
 
         self._ai_prompt = QtWidgets.QTextEdit()
         self._ai_prompt.setPlaceholderText("e.g. A horror story set in an abandoned hospital...")
-        self._ai_prompt.setFixedHeight(120)
-        self._ai_prompt.setLineWrapMode(QtWidgets.QTextEdit.WidgetWidth)
+        self._ai_prompt.setFixedHeight(80)
         self._ai_prompt.setStyleSheet(
             "QTextEdit {"
             "  border: 1px solid #c0c0c0;"
@@ -181,19 +176,20 @@ class GameCreationPage(QtWidgets.QWidget):
         """
         Send prompt to GameGenerator and load generated graph from json.
         """ 
+        from game_generation_local_llm.game_generator import GameGenerator
+        self._game_generator: GameGenerator = GameGenerator()
+
         prompt = self._ai_prompt.toPlainText().strip()
         if not prompt:
             self._ai_status.setText("Please enter a prompt first.")
             return
         
-        self._ai_status.setText("Generating…")
         QtWidgets.QApplication.processEvents()
 
         try:
             serial_graph = self.generate_game(prompt)
             self._clear_canvas()
             self._populate_graph_from_serial(serial_graph)
-            self._ai_status.setText(f"Done — {len(serial_graph.nodes)} nodes generated.")
         except Exception as e:
             self._ai_status.setText(f"Error: {e}")
 
@@ -311,7 +307,7 @@ class GameCreationPage(QtWidgets.QWidget):
         self._draw_line(source, side, target)
 
         self._cancel_link_mode()
-        self._update_delete_buttons()
+        self._update_buttons()
 
 
     def _create_node_at(self, x: float, y: float) -> NodeWidget:
@@ -338,38 +334,102 @@ class GameCreationPage(QtWidgets.QWidget):
     
     def _create_child_node(self, parent: NodeWidget, side: OptionSide) -> None:
         """
-        Create a brand-new child node in the tree and connect it.
+        Create a brand-new child node in the tree, connect it, then
+        re-layout the whole tree so nothing overlaps.
         """
         if not self.node_coords_dict.get(parent):
             return
 
-        parent_depth, parent_pos = self.node_depth_pos.get(parent, (0, 0))
-        child_depth = parent_depth + 1
-        child_pos = parent_pos * 2 if side == OptionSide.LEFT else parent_pos * 2 + 1
-
-        new_x, new_y = self._get_node_position(child_depth, child_pos)
-        child = self._create_node_at(new_x, new_y)
-        self.node_depth_pos[child] = (child_depth, child_pos)
-
-        # Remove any previous connection on this side before adding the new one
         self._remove_connection(parent, side)
+
+        child = self._create_node_at(0, 0)
 
         if parent not in self.node_children:
             self.node_children[parent] = {}
         self.node_children[parent][side] = child
 
-        self._draw_line(parent, side, child)
-        self._update_delete_buttons()
+        self._relayout_tree()
+        self._update_buttons()
 
-    def _update_delete_buttons(self) -> None:
+    def _relayout_tree(self) -> None:
         """
-        Update the delete buttons on nodes as tree grows.
+        Recompute positions for all nodes using the subtree-width algorithm
+        and move their proxies. Redraws all lines.
+        """
+        if self.root_node is None:
+            return
+
+        H_GAP = 60
+        slot = max(
+            config.NODE_WIDTH + H_GAP,
+            config.GAME_TREE_WIDTH / max(1, self._widget_subtree_width(self.root_node, set()))
+        )
+
+        positions: dict[NodeWidget, tuple[float, float]] = {}
+        self._assign_widget_x(self.root_node, 0.0, slot, 0, set(), positions)
+
+        for nw, (x, y) in positions.items():
+            self.node_coords_dict[nw] = (x, y)
+            nw._proxy.setPos(x, y)
+
+        for key in list(self._lines):
+            self.scene.removeItem(self._lines.pop(key))
+        for par, children in self.node_children.items():
+            for s, child in children.items():
+                self._draw_line(par, s, child)
+
+    def _widget_subtree_width(self, node: NodeWidget, visited: set) -> int:
+        """
+        Number of leaves in this widget subtree (minimum 1).
+        """
+        if id(node) in visited:
+            return 1
+        visited.add(id(node))
+        children = list(self.node_children.get(node, {}).values())
+        if not children:
+            return 1
+        return sum(self._widget_subtree_width(c, visited) for c in children)
+
+    def _assign_widget_x(self, node: NodeWidget, x_start: float, slot: float,
+                         depth: int, visited: set,
+                         positions: dict) -> None:
+        """
+        Recursively assign x positions based on subtree leaf counts.
+        """
+        if id(node) in visited:
+            return
+        visited.add(id(node))
+
+        children = self.node_children.get(node, {})
+        ordered = [(s, c) for s, c in [
+            (OptionSide.LEFT,  children.get(OptionSide.LEFT)),
+            (OptionSide.RIGHT, children.get(OptionSide.RIGHT)),
+        ] if c is not None]
+
+        if not ordered:
+            x = x_start + slot / 2
+        else:
+            widths = [self._widget_subtree_width(c, set()) for _, c in ordered]
+            x = x_start + sum(widths) * slot / 2
+            cursor = x_start
+            for (_, child), w in zip(ordered, widths):
+                self._assign_widget_x(child, cursor, slot, depth + 1, visited, positions)
+                cursor += w * slot
+
+        y = depth * config.CHILD_NODE_Y_OFFSET + config.TREE_Y_OFFSET
+        positions[node] = (x, y)
+
+    def _update_buttons(self) -> None:
+        """
+        Update the buttons on nodes as tree grows.
         So that only leaf nodes can be deleted (not root).
+        And only leaf nodes can be set as losing nodes.
         """
         for node in self.nodes:
             is_leaf: bool = len(self.node_children.get(node, {})) == 0
             is_root: bool = (node == self.root_node)
             node.set_delete_visible(is_leaf and not is_root)
+            node.set_lose_visible(is_leaf and not is_root)
 
     def delete_leaf_node(self, node: NodeWidget) -> None:
         """
@@ -393,17 +453,20 @@ class GameCreationPage(QtWidgets.QWidget):
             proxy.deleteLater()
         node.deleteLater()
 
-        self._update_delete_buttons()
+        self._update_buttons()
 
     def _node_centre_bottom(self, node: NodeWidget) -> QtCore.QPointF:
         """Scene coordinates of the bottom-centre of a node's proxy."""
         x, y = self.node_coords_dict[node]
-        return QtCore.QPointF(x + config.NODE_WIDTH / 2, y + config.NODE_HEIGHT)
+        w = node.width()
+        h = node.height()
+        return QtCore.QPointF(x + w / 2, y + h)
 
     def _node_centre_top(self, node: NodeWidget) -> QtCore.QPointF:
         """Scene coordinates of the top-centre of a node's proxy."""
         x, y = self.node_coords_dict[node]
-        return QtCore.QPointF(x + config.NODE_WIDTH / 2, y)
+        w = node.width()
+        return QtCore.QPointF(x + w / 2, y)
 
     def _draw_line(self, parent: NodeWidget, side: OptionSide, child: NodeWidget) -> None:
         """Draw (or redraw) the connector line for this parent-side pair."""
@@ -448,6 +511,7 @@ class GameCreationPage(QtWidgets.QWidget):
                 nw.right_option.text().strip(),
             )
             n.is_win = nw.win_button.isChecked()
+            n.is_losing = nw.lose_button.isChecked()
             widget_node[nw] = n
 
         for parent_widget, children in self.node_children.items():
@@ -494,7 +558,7 @@ class GameCreationPage(QtWidgets.QWidget):
         Load an existing game onto the creation page and populate the graph nodes.
         """
         try:
-            root_node, game_folder = self.game_loader.load_graph(game_path)
+            root_node, game_folder, _ = self.game_loader.load_graph(game_path)
             game_name = os.path.basename(game_folder)
             self.game_title = game_name
             self.title_entry.setText(game_name)
@@ -514,11 +578,17 @@ class GameCreationPage(QtWidgets.QWidget):
     def _populate_graph(self, root_node: Node) -> None:
         """
         BFS over the loaded backend graph, creating NodeWidgets.
-        Tree edges are placed with tree layout; back-edges (links to already-visited
-        nodes) are drawn as connector lines to their existing widgets.
+
+        At shallow depths nodes are placed using the standard binary tree slot
+        formula. Once slot_width < NODE_WIDTH + gap, nodes at that depth are
+        assigned x positions using a sequential counter so they never overlap,
+        regardless of how many nodes share a depth level.
         """
-        # backend Node -> NodeWidget
+        H_GAP = 60
+        MIN_SLOT = config.NODE_WIDTH + H_GAP
+
         backend_to_widget: dict[int, NodeWidget] = {}
+        depth_counter: dict[int, int] = {}  # tracks how many nodes placed per depth
 
         queue: list[tuple[Node, int, int, Optional[NodeWidget], Optional[OptionSide]]] = [
             (root_node, 0, 0, None, None)
@@ -531,7 +601,6 @@ class GameCreationPage(QtWidgets.QWidget):
             node_id = node.get_id()
 
             if node_id in visited:
-                # This node already has a widget — just draw the link line
                 if parent_widget is not None and side is not None:
                     target_widget = backend_to_widget[node_id]
                     if parent_widget not in self.node_children:
@@ -542,7 +611,16 @@ class GameCreationPage(QtWidgets.QWidget):
 
             visited.add(node_id)
 
-            x, y = self._get_node_position(depth, pos)
+            slot_width = config.GAME_TREE_WIDTH / (2 ** depth)
+            if slot_width >= MIN_SLOT:
+                x = slot_width * pos + slot_width / 2
+            else:
+                idx = depth_counter.get(depth, 0)
+                depth_counter[depth] = idx + 1
+                x = idx * MIN_SLOT + MIN_SLOT / 2
+
+            y = depth * config.CHILD_NODE_Y_OFFSET + config.TREE_Y_OFFSET
+
             nw = self._create_node_at(x, y)
             self._populate_widget_from_node(nw, node)
             self.node_depth_pos[nw] = (depth, pos)
@@ -563,7 +641,7 @@ class GameCreationPage(QtWidgets.QWidget):
                 elif gesture == EnumGesture.ILoveYou_Right:
                     queue.append((child_node, depth + 1, pos * 2 + 1, nw, OptionSide.RIGHT))
 
-        self._update_delete_buttons()
+        self._update_buttons()
 
     def _populate_widget_from_node(self, nw: NodeWidget, node: Node) -> None:
         nw.text.setPlainText(node.getText())
@@ -571,6 +649,8 @@ class GameCreationPage(QtWidgets.QWidget):
         nw.right_option.setText(node.right_option)
         nw.win_button.setChecked(node.is_win)
         nw.win_button.setStyleSheet("background-color: #f0c040;" if node.is_win else "")
+        nw.lose_button.setChecked(node.is_losing)
+        nw.lose_button.setStyleSheet("background-color: #fc3d3d;" if node.is_losing else "")
 
 
 def run():
