@@ -1,4 +1,5 @@
 import json
+from typing import Any, Callable
 
 from openvino_genai import GenerationConfig, LLMPipeline, StructuredOutputConfig, ChatHistory
 
@@ -11,6 +12,11 @@ from game_generation_local_llm.graph_blueprint.blueprint import GraphBlueprint
 class StoryGenerator:
     def __init__(self, llm: LLMPipeline):
         self.llm: LLMPipeline = llm
+
+    @staticmethod
+    def _emit_progress(progress_cb: Callable[[dict[str, Any]], None] | None, **payload: Any) -> None:
+        if progress_cb is not None:
+            progress_cb(payload)
 
     def _build_node_config(self) -> GenerationConfig:
         config: GenerationConfig = GenerationConfig()
@@ -40,13 +46,29 @@ class StoryGenerator:
         history.append({"role": "user", "content": user_message})
         return history
 
-    def generate_game(self, user_prompt: str, game_blueprint: GraphBlueprint) -> SerialGraph:
+    def generate_game(
+        self,
+        user_prompt: str,
+        game_blueprint: GraphBlueprint,
+        progress_cb: Callable[[dict[str, Any]], None] | None = None,
+    ) -> SerialGraph:
         config: GenerationConfig = self._build_node_config()
         generated_nodes: dict[int, SerialNode] = {}
+        nodes_total = len(game_blueprint.adjacency)
 
-        for node_id, adjacency in game_blueprint.adjacency.items():
+        # generate each node one-by-one
+        for index, (node_id, adjacency) in enumerate(game_blueprint.adjacency.items(), start=1):
             is_win: bool = node_id in game_blueprint.win_nodes
             is_losing: bool = node_id in game_blueprint.lose_nodes
+
+            self._emit_progress(
+                progress_cb,
+                stage="node_started",
+                message=f"Generating node {node_id}",
+                node_id=node_id,
+                nodes_done=index - 1,
+                nodes_total=nodes_total,
+            )
 
             history: ChatHistory = self._build_node_history(
                 node_id=node_id,
@@ -71,5 +93,15 @@ class StoryGenerator:
 
             generated_nodes[node_id] = serial_node
             print(serial_node.model_dump_json(indent=2))
+
+            self._emit_progress(
+                progress_cb,
+                stage="node_ready",
+                message=f"Generated node {node_id}",
+                node_id=node_id,
+                nodes_done=index,
+                nodes_total=nodes_total,
+                node=serial_node.model_dump(mode="json"),
+            )
 
         return SerialGraph(nodes=generated_nodes)

@@ -9,20 +9,20 @@
 
 if __name__ == "__main__":
     # for game player
-    import sys
-    import gamePlayer
-    import playerPage
-
-    if len(sys.argv) > 1:
-        player = gamePlayer.GamePlayer()
-        player.play_game(sys.argv[1])
-    else:
-        playerPage.run()
+    # import sys
+    # import gamePlayer
+    # import playerPage
+    #
+    # if len(sys.argv) > 1:
+    #     player = gamePlayer.GamePlayer()
+    #     player.play_game(sys.argv[1])
+    # else:
+    #     playerPage.run()
 
     # for game engine
     # import kokoro
-    # from gui.homePage import run
-    # run()
+    from gui.homePage import run
+    run()
 
     # for game loading
     # from storageManager.game_load import GameLoader

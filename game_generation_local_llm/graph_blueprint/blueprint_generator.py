@@ -1,9 +1,11 @@
 import json
+from typing import Any, Callable
 
 from openvino_genai import GenerationConfig, LLMPipeline, StructuredOutputConfig, ChatHistory
 
 from .blueprint import GraphBlueprint
 from .prompts import BLUEPRINT_MESSAGE
+
 
 class BlueprintGenerator:
     """
@@ -28,11 +30,29 @@ class BlueprintGenerator:
         self.history.append({"role": "system", "content": BLUEPRINT_MESSAGE})
         self.history.append({"role": "user", "content": user_prompt})
 
-    def generate_blueprint(self, user_prompt: str) -> GraphBlueprint:
+    @staticmethod
+    def _emit_progress(progress_cb: Callable[[dict[str, Any]], None] | None, **payload: Any) -> None:
+        if progress_cb is not None:
+            progress_cb(payload)
+
+    def generate_blueprint(
+        self,
+        user_prompt: str,
+        progress_cb: Callable[[dict[str, Any]], None] | None = None,
+    ) -> GraphBlueprint:
         self._build_config()
         self._build_history(user_prompt)
+        self._emit_progress(progress_cb, stage="blueprint_started", message="Generating blueprint structure")
 
         decoded_results = self.llm.generate(self.history, self.config)
         print(decoded_results.texts[0])
         generated_blueprint: GraphBlueprint = GraphBlueprint.model_validate_json(decoded_results.texts[0])
+
+        self._emit_progress(
+            progress_cb,
+            stage="blueprint_ready",
+            message="Blueprint generated",
+            nodes_total=len(generated_blueprint.adjacency),
+            blueprint=generated_blueprint.model_dump(mode="json"),
+        )
         return generated_blueprint

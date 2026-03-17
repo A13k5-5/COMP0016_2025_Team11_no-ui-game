@@ -1,12 +1,13 @@
 import os.path
 import sys
-from typing import Optional
+from typing import Any, Optional
 
 from PySide6 import QtWidgets, QtCore, QtGui
 
 from gesture import EnumGesture
 from graph import Node
 from graph.serial_graph import SerialGraph
+from graph.serial_node import SerialNode
 from storageManager import GameLoader, GameSaver
 from . import config
 from .zoomableGraphicsView import ZoomableGraphicsView
@@ -17,6 +18,34 @@ from .optionSide import OptionSide
 # Colours for the connector lines
 LINE_COLOR_LEFT  = QtGui.QColor("#2a7ae2") # left opt = blue
 LINE_COLOR_RIGHT = QtGui.QColor("#e22d2a") # right opt = red
+
+
+class _GameGenerationWorker(QtCore.QObject):
+    """Background worker that keeps heavy LLM generation off the GUI thread."""
+    progress = QtCore.Signal(dict)
+    finished = QtCore.Signal(object)
+    failed = QtCore.Signal(str)
+    done = QtCore.Signal()
+
+    def __init__(self, prompt: str) -> None:
+        super().__init__()
+        self.prompt = prompt
+
+    @QtCore.Slot()
+    def run(self) -> None:
+        from game_generation_local_llm.game_generator import GameGenerator
+
+        try:
+            generator = GameGenerator()
+            serial_graph = generator.generate_game(self.prompt, progress_cb=self._emit_progress)
+            self.finished.emit(serial_graph)
+        except Exception as exc:
+            self.failed.emit(str(exc))
+        finally:
+            self.done.emit()
+
+    def _emit_progress(self, payload: dict[str, Any]) -> None:
+        self.progress.emit(payload)
 
 
 class GameCreationPage(QtWidgets.QWidget):
@@ -51,6 +80,12 @@ class GameCreationPage(QtWidgets.QWidget):
 
         # Link-mode state: None when inactive
         self._link_source: Optional[tuple[NodeWidget, OptionSide]] = None
+
+        # AI generation state
+        self._generation_thread: Optional[QtCore.QThread] = None
+        self._generation_worker: Optional[_GameGenerationWorker] = None
+        self._stream_blueprint: Optional[dict[str, Any]] = None
+        self._stream_nodes: dict[int, dict[str, Any]] = {}
 
         self._setup_window_layout("No-UI-Game Creator")
         self._title_entry()
@@ -165,6 +200,12 @@ class GameCreationPage(QtWidgets.QWidget):
         self._ai_generate_btn.clicked.connect(self._on_AIgenerate_clicked)
         layout.addWidget(self._ai_generate_btn)
 
+        self._ai_progress = QtWidgets.QProgressBar()
+        self._ai_progress.setVisible(False)
+        self._ai_progress.setRange(0, 1)
+        self._ai_progress.setValue(0)
+        layout.addWidget(self._ai_progress)
+
         self._ai_status = QtWidgets.QLabel("")
         self._ai_status.setWordWrap(True)
         self._ai_status.setStyleSheet("font-size: 11px; background: transparent;")
@@ -174,45 +215,143 @@ class GameCreationPage(QtWidgets.QWidget):
 
     def _on_AIgenerate_clicked(self) -> None:
         """
-        Send prompt to GameGenerator and load generated graph from json.
-        """ 
-        from game_generation_local_llm.game_generator import GameGenerator
-        self._game_generator: GameGenerator = GameGenerator()
+        Start generation on a worker thread and stream progress into the UI.
+        """
+        if self._generation_thread is not None and self._generation_thread.isRunning():
+            self._ai_status.setText("Generation is already in progress.")
+            return
 
         prompt = self._ai_prompt.toPlainText().strip()
         if not prompt:
             self._ai_status.setText("Please enter a prompt first.")
             return
-        
-        QtWidgets.QApplication.processEvents()
 
-        try:
-            serial_graph = self.generate_game(prompt)
-            self._clear_canvas()
-            self._populate_graph_from_serial(serial_graph)
-        except Exception as e:
-            self._ai_status.setText(f"Error: {e}")
+        self._stream_blueprint = None
+        self._stream_nodes.clear()
+        self._set_generation_running(True)
+        self._ai_status.setText("Starting game generation...")
 
-    def generate_game(self, prompt: str) -> SerialGraph:
-        return self._game_generator.generate_game(prompt)
-    
-    def _clear_canvas(self) -> None:
-        """
-        Remove all nodes, lines, and reset tracking state.
-        """
-        self.scene.clear()
-        self.nodes.clear()
-        self.node_coords_dict.clear()
-        self.node_children.clear()
-        self.node_depth_pos.clear()
-        self._lines.clear()
-        self.root_node = None
+        thread = QtCore.QThread(self)
+        worker = _GameGenerationWorker(prompt)
+        worker.moveToThread(thread)
 
-    def _populate_graph_from_serial(self, serial: SerialGraph) -> None:
-        root, nodes = self.game_loader._load_nodes(serial)
-        self.game_loader._establish_connections(serial, nodes)
-        self._populate_graph(root)
-    
+        thread.started.connect(worker.run)
+        worker.progress.connect(self._on_generation_progress)
+        worker.finished.connect(self._on_generation_finished)
+        worker.failed.connect(self._on_generation_failed)
+        worker.done.connect(self._on_generation_done)
+        worker.done.connect(thread.quit)
+        thread.finished.connect(worker.deleteLater)
+        thread.finished.connect(self._on_generation_thread_finished)
+        thread.finished.connect(thread.deleteLater)
+
+        self._generation_thread = thread
+        self._generation_worker = worker
+        thread.start()
+
+    @QtCore.Slot(dict)
+    def _on_generation_progress(self, payload: dict[str, Any]) -> None:
+        stage = payload.get("stage", "")
+        message = payload.get("message", "")
+
+        if stage == "blueprint_ready":
+            self._stream_blueprint = payload.get("blueprint")
+            total = int(payload.get("nodes_total", 0) or 0)
+            self._ai_progress.setRange(0, max(1, total))
+            self._ai_progress.setValue(0)
+            self._render_streaming_preview()
+
+        if stage == "story_started":
+            total = int(payload.get("nodes_total", 0) or 0)
+            self._ai_progress.setRange(0, max(1, total))
+
+        if stage in {"node_started", "node_ready"}:
+            done = int(payload.get("nodes_done", 0) or 0)
+            total = int(payload.get("nodes_total", 0) or 0)
+            if total > 0:
+                self._ai_progress.setRange(0, total)
+                self._ai_progress.setValue(min(done, total))
+
+        if stage == "node_ready":
+            node_id = payload.get("node_id")
+            node_payload = payload.get("node")
+            if node_id is not None and isinstance(node_payload, dict):
+                self._stream_nodes[int(node_id)] = node_payload
+                self._render_streaming_preview()
+
+        if message:
+            self._ai_status.setText(message)
+
+    @QtCore.Slot(object)
+    def _on_generation_finished(self, serial_graph: SerialGraph) -> None:
+        self._clear_canvas()
+        self._populate_graph_from_serial(serial_graph)
+        self._ai_status.setText("Generation complete.")
+        if self._ai_progress.maximum() > 0:
+            self._ai_progress.setValue(self._ai_progress.maximum())
+
+    @QtCore.Slot(str)
+    def _on_generation_failed(self, error_message: str) -> None:
+        self._ai_status.setText(f"Error: {error_message}")
+
+    @QtCore.Slot()
+    def _on_generation_done(self) -> None:
+        self._set_generation_running(False)
+
+    @QtCore.Slot()
+    def _on_generation_thread_finished(self) -> None:
+        self._generation_thread = None
+        self._generation_worker = None
+
+    def _set_generation_running(self, running: bool) -> None:
+        self._ai_generate_btn.setEnabled(not running)
+        self._ai_prompt.setEnabled(not running)
+        self._ai_progress.setVisible(running)
+        if not running:
+            self._ai_progress.setRange(0, 1)
+            self._ai_progress.setValue(0)
+
+    def _render_streaming_preview(self) -> None:
+        """Render the current blueprint with generated/placeholder node text while generation runs."""
+        blueprint = self._stream_blueprint
+        if not blueprint:
+            return
+
+        adjacency = blueprint.get("adjacency")
+        if not isinstance(adjacency, dict) or not adjacency:
+            return
+
+        win_nodes = {int(node_id) for node_id in blueprint.get("win_nodes", [])}
+        lose_nodes = {int(node_id) for node_id in blueprint.get("lose_nodes", [])}
+        serial_nodes: dict[int, SerialNode] = {}
+
+        for raw_node_id, raw_adjacency in adjacency.items():
+            node_id = int(raw_node_id)
+            is_win = node_id in win_nodes
+            is_losing = node_id in lose_nodes
+            payload = self._stream_nodes.get(node_id)
+
+            if payload is None:
+                payload = {
+                    "id": node_id,
+                    "text": f"[Generating node {node_id}...]",
+                    "left_option": "" if (is_win or is_losing) else "Working...",
+                    "right_option": "" if (is_win or is_losing) else "Working...",
+                    "adjacency_list": raw_adjacency,
+                    "is_win": is_win,
+                    "is_losing": is_losing,
+                }
+            else:
+                payload = dict(payload)
+                payload["id"] = node_id
+                payload["adjacency_list"] = raw_adjacency
+                payload["is_win"] = is_win
+                payload["is_losing"] = is_losing
+
+            serial_nodes[node_id] = SerialNode.model_validate(payload)
+
+        self._clear_canvas()
+        self._populate_graph_from_serial(SerialGraph(nodes=serial_nodes))
 
     def keyPressEvent(self, event: QtGui.QKeyEvent) -> None:
         if event.key() == QtCore.Qt.Key_Escape:
