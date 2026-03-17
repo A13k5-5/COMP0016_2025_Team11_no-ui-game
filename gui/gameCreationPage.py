@@ -311,6 +311,16 @@ class GameCreationPage(QtWidgets.QWidget):
             self._ai_progress.setRange(0, 1)
             self._ai_progress.setValue(0)
 
+    def _clear_canvas(self) -> None:
+        """Remove all nodes, lines, and graph tracking state from the canvas."""
+        self.scene.clear()
+        self.nodes.clear()
+        self.node_coords_dict.clear()
+        self.node_children.clear()
+        self.node_depth_pos.clear()
+        self._lines.clear()
+        self.root_node = None
+
     def _render_streaming_preview(self) -> None:
         """Render the current blueprint with generated/placeholder node text while generation runs."""
         blueprint = self._stream_blueprint
@@ -782,6 +792,12 @@ class GameCreationPage(QtWidgets.QWidget):
 
         self._update_buttons()
 
+    def _populate_graph_from_serial(self, serial: SerialGraph) -> None:
+        """Rebuild widget graph from a serialized graph payload."""
+        root, nodes = self.game_loader._load_nodes(serial)
+        self.game_loader._establish_connections(serial, nodes)
+        self._populate_graph(root)
+
     def _populate_widget_from_node(self, nw: NodeWidget, node: Node) -> None:
         nw.text.setPlainText(node.getText())
         nw.left_option.setText(node.left_option)
@@ -804,3 +820,4 @@ def run():
 
 if __name__ == "__main__":
     run()
+
