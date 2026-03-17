@@ -101,7 +101,7 @@ class StoryGenerator:
                 node_id=node_id,
                 nodes_done=index,
                 nodes_total=nodes_total,
-                node=serial_node.model_dump(mode="json"),
+                node=serial_node,
             )
 
         return SerialGraph(nodes=generated_nodes)

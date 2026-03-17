@@ -86,7 +86,7 @@ class GameCreationPage(QtWidgets.QWidget):
         self._generation_thread: Optional[QtCore.QThread] = None
         self._generation_worker: Optional[_GameGenerationWorker] = None
         self._stream_blueprint: Optional[GraphBlueprint] = None
-        self._stream_nodes: dict[int, dict[str, Any]] = {}
+        self._stream_nodes: dict[int, SerialNode] = {}
 
         self._setup_window_layout("No-UI-Game Creator")
         self._title_entry()
@@ -275,10 +275,9 @@ class GameCreationPage(QtWidgets.QWidget):
 
         if stage == "node_ready":
             node_id = payload.get("node_id")
-            node_payload = payload.get("node")
-            if node_id is not None and isinstance(node_payload, dict):
-                self._stream_nodes[int(node_id)] = node_payload
-                self._render_streaming_preview()
+            node_payload: SerialNode = payload.get("node")
+            self._stream_nodes[int(node_id)] = node_payload
+            self._render_streaming_preview()
 
         # for blueprint_ready only this is triggered
         if message:
@@ -329,39 +328,39 @@ class GameCreationPage(QtWidgets.QWidget):
         if not blueprint:
             return
 
-        adjacency = blueprint.adjacency
-
         win_nodes = {int(node_id) for node_id in blueprint.win_nodes}
         lose_nodes = {int(node_id) for node_id in blueprint.lose_nodes}
-        serial_nodes: dict[int, SerialNode] = {}
+        serial_graph: SerialGraph = SerialGraph(nodes={})
 
-        for raw_node_id, raw_adjacency in adjacency.items():
+        for raw_node_id, raw_adjacency in blueprint.adjacency.items():
             node_id = int(raw_node_id)
             is_win = node_id in win_nodes
             is_losing = node_id in lose_nodes
-            payload = self._stream_nodes.get(node_id)
 
+            # get the generated node, or create a placeholder if not yet generated
+            payload: Optional[SerialNode] = self._stream_nodes.get(node_id)
+
+            # if node not yet generated, create a placeholder
             if payload is None:
-                payload = {
-                    "id": node_id,
-                    "text": f"[Generating node {node_id}...]",
-                    "left_option": "" if (is_win or is_losing) else "Working...",
-                    "right_option": "" if (is_win or is_losing) else "Working...",
-                    "adjacency_list": raw_adjacency,
-                    "is_win": is_win,
-                    "is_losing": is_losing,
-                }
+                payload = SerialNode (
+                    id=node_id,
+                    text=f"[Generating node {node_id}...]",
+                    left_option="" if (is_win or is_losing) else "Working...",
+                    right_option="" if (is_win or is_losing) else "Working...",
+                    adjacency_list=raw_adjacency,
+                    is_win=is_win,
+                    is_losing=is_losing,
+                )
+            # when node already generated, enforce blueprint adjacency and win/lose flags in case of any mismatch
             else:
-                payload = dict(payload)
-                payload["id"] = node_id
-                payload["adjacency_list"] = raw_adjacency
-                payload["is_win"] = is_win
-                payload["is_losing"] = is_losing
+                payload.adjacency_list = raw_adjacency
+                payload.is_win = is_win
+                payload.is_losing = is_losing
 
-            serial_nodes[node_id] = SerialNode.model_validate(payload)
+            serial_graph.nodes[node_id] = payload
 
         self._clear_canvas()
-        self._populate_graph_from_serial(SerialGraph(nodes=serial_nodes))
+        self._populate_graph_from_serial(serial_graph)
 
     def keyPressEvent(self, event: QtGui.QKeyEvent) -> None:
         if event.key() == QtCore.Qt.Key_Escape:
