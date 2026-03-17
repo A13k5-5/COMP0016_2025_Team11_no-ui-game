@@ -571,19 +571,22 @@ class GameCreationPage(QtWidgets.QWidget):
             return
 
         title = self.title_entry.text().strip() or "untitled"
-        if self.game_par_dir is None:
-            self.game_par_dir = os.path.join(os.path.dirname(__file__), os.pardir, "saved_games")
+        save_dir = QtWidgets.QFileDialog.getExistingDirectory(
+            self, "Choose where to save your game"
+        )
+        if not save_dir:
+            return
 
         progress = self._show_saving_popup()
         try:
             voice = self.voice_selector.currentData()
-            self.game_saver.save_game(self.game_par_dir, title, root, voice)
+            self.game_saver.save_game(save_dir, title, root, voice)
         except Exception as e:
             progress.close()
             QtWidgets.QMessageBox.critical(self, "Save failed", str(e))
             return
         progress.close()
-        QtWidgets.QMessageBox.information(self, "Success", f"Game saved to {self.game_par_dir}/{title}")
+        QtWidgets.QMessageBox.information(self, "Success", f"Game saved to {save_dir}/{title}")
 
     def _show_saving_popup(self) -> QtWidgets.QProgressDialog:
         progress = QtWidgets.QProgressDialog("Saving game...", None, 0, 0, self)
