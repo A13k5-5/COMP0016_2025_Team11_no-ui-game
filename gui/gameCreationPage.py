@@ -54,7 +54,7 @@ class GameCreationPage(QtWidgets.QWidget):
         self._link_source: Optional[tuple[NodeWidget, OptionSide]] = None
 
         self._setup_window_layout("No-UI-Game Creator")
-        self._title_entry()
+        self._title_row()
 
         self._setup_canvas()
 
@@ -80,13 +80,29 @@ class GameCreationPage(QtWidgets.QWidget):
 
         h_layout.addWidget(self._build_ai_panel())
 
-    def _title_entry(self) -> None:
-        # create title entry bar and save button
+    def _title_row(self) -> None:
+        # create title entry bar and voice selector
+        title_row = QtWidgets.QHBoxLayout()
         self.title_entry = QtWidgets.QLineEdit()
         self.title_entry.setPlaceholderText("Enter game title...")
-
-        #save widgets
-        self.layout.addWidget(self.title_entry)
+        title_row.addWidget(self.title_entry)
+        self.voice_selector = QtWidgets.QComboBox()
+        VOICES = [
+            ("bf_alice",    "Alice (F)"),
+            ("bf_emma",     "Emma (F)"),
+            ("bf_isabella", "Isabella (F)"),
+            ("bf_lily",     "Lily (F)"),
+            ("bm_daniel",   "Daniel (M)"),
+            ("bm_fable",    "Fable (M)"),
+            ("bm_george",   "George (M)"),
+            ("bm_lewis",    "Lewis (M)"),
+        ]
+        for voice_id, voice_label in VOICES:
+            self.voice_selector.addItem(voice_label, userData=voice_id)
+        self.voice_selector.setCurrentIndex(1)  # default to bf_emma
+        self.voice_selector.setFixedWidth(120)
+        title_row.addWidget(self.voice_selector)
+        self.layout.addLayout(title_row)
 
     def _setup_canvas(self) -> None:
         self.scene = QtWidgets.QGraphicsScene(self)
@@ -537,7 +553,8 @@ class GameCreationPage(QtWidgets.QWidget):
 
         progress = self._show_saving_popup()
         try:
-            self.game_saver.save_game(self.game_par_dir, title, root)
+            voice = self.voice_selector.currentData()
+            self.game_saver.save_game(self.game_par_dir, title, root, voice)
         except Exception as e:
             progress.close()
             QtWidgets.QMessageBox.critical(self, "Save failed", str(e))
