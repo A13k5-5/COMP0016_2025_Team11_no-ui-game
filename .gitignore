@@ -3,4 +3,4 @@
 **/.venv/
 .vscode
 *.exe
-./storageManager/temporary/
+storageManager/temporary/

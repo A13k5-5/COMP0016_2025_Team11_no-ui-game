@@ -8,7 +8,7 @@ from graph import Node
 from graph.serial_graph import SerialGraph
 from text2speech import Talker
 
-VOICE: str = "bm-lewis"
+VOICE: str = "bf_emma"
 
 class GameSaver:
     """
