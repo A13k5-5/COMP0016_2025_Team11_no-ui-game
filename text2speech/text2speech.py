@@ -18,8 +18,8 @@ class Talker:
         # 'b' - for British English
         self.pipeline: KPipeline = KPipeline(lang_code='b', repo_id="hexgrad/Kokoro-82M")
 
-    def generate_speech(self, text: str, output_file="output.wav"):
-        generator = self.pipeline(text, voice='bm_lewis')
+    def generate_speech(self, text: str, output_file: str, voice: str):
+        generator = self.pipeline(text, voice=voice)
 
         audio_chunks = []
         for gs, ps, audio in generator:
@@ -34,4 +34,4 @@ class Talker:
 if __name__ == "__main__":
     talker = Talker()
     prompt = "Once upon a time in a land far away"
-    talker.generate_speech(prompt, "story.wav")
+    talker.generate_speech(prompt, "story.wav", "bf_emma")

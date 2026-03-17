@@ -3,7 +3,9 @@ import sys
 from typing import Any, Optional
 
 from PySide6 import QtWidgets, QtCore, QtGui
+from pathlib import Path
 
+from gamePlayer.audio_player import AudioPlayer
 from game_generation_local_llm.graph_blueprint.blueprint import GraphBlueprint
 from graph.enum_LR import EnumLR
 from graph import Node
@@ -15,6 +17,7 @@ from .zoomableGraphicsView import ZoomableGraphicsView
 from .nodeWidget import NodeWidget
 from .optionSide import OptionSide
 
+import threading
 
 # Colours for the connector lines
 LINE_COLOR_LEFT  = QtGui.QColor("#2a7ae2") # left opt = blue
@@ -65,6 +68,9 @@ class GameCreationPage(QtWidgets.QWidget):
         self.game_title: str = ""
         self.game_loader: GameLoader = GameLoader()
         self.game_saver: GameSaver = GameSaver()
+        self.game_par_dir: Optional[str] = os.path.dirname(game_path) if game_path else None
+        # self._voice_samples_dir = os.path.join(os.path.dirname(__file__), os.pardir, "voiceSamples")
+        self._voice_samples_dir = Path(__file__).parent.parent / "voiceSamples"
 
         # Ordered list of all node widgets
         self.nodes: list[NodeWidget] = []
@@ -89,7 +95,7 @@ class GameCreationPage(QtWidgets.QWidget):
         self._stream_nodes: dict[int, SerialNode] = {}
 
         self._setup_window_layout("No-UI-Game Creator")
-        self._title_entry()
+        self._title_row()
 
         self._setup_canvas()
 
@@ -115,13 +121,47 @@ class GameCreationPage(QtWidgets.QWidget):
 
         h_layout.addWidget(self._build_ai_panel())
 
-    def _title_entry(self) -> None:
-        # create title entry bar and save button
+    def _title_row(self) -> None:
+        # create title entry bar and voice selector
+        title_row = QtWidgets.QHBoxLayout()
         self.title_entry = QtWidgets.QLineEdit()
         self.title_entry.setPlaceholderText("Enter game title...")
+        title_row.addWidget(self.title_entry)
 
-        #save widgets
-        self.layout.addWidget(self.title_entry)
+        self.voice_selector = QtWidgets.QComboBox()
+        VOICES = [
+            ("bf_alice",    "Alice (F)"),
+            ("bf_emma",     "Emma (F)"),
+            ("bf_isabella", "Isabella (F)"),
+            ("bf_lily",     "Lily (F)"),
+            ("bm_daniel",   "Daniel (M)"),
+            ("bm_fable",    "Fable (M)"),
+            ("bm_george",   "George (M)"),
+            ("bm_lewis",    "Lewis (M)"),
+        ]
+        for voice_id, voice_label in VOICES:
+            self.voice_selector.addItem(voice_label, userData=voice_id)
+        self.voice_selector.setCurrentIndex(1)  # default to bf_emma
+        self.voice_selector.setFixedWidth(120)
+        title_row.addWidget(self.voice_selector)
+
+        self.preview_voice_button = QtWidgets.QPushButton("▶ Preview")
+        self.preview_voice_button.setFixedWidth(120)
+        self.preview_voice_button.clicked.connect(self._preview_selected_voice)
+        title_row.addWidget(self.preview_voice_button)
+
+        self.layout.addLayout(title_row)
+
+    def _preview_selected_voice(self) -> None:
+        """
+        Play the pre-generated sample for the currently selected voice.
+        """
+        voice_id = self.voice_selector.currentData()
+        sample_path: Path = self._voice_samples_dir / f"{voice_id}.wav"
+        if not os.path.exists(sample_path):
+            return
+
+        threading.Thread(target=AudioPlayer.play_audio_from_path, args=[sample_path]).start()
 
     def _setup_canvas(self) -> None:
         self.scene = QtWidgets.QGraphicsScene(self)
@@ -679,17 +719,22 @@ class GameCreationPage(QtWidgets.QWidget):
             return
 
         title = self.title_entry.text().strip() or "untitled"
-        game_path = os.path.join(os.path.dirname(__file__), os.pardir, "saved_games")
+        save_dir = QtWidgets.QFileDialog.getExistingDirectory(
+            self, "Choose where to save your game"
+        )
+        if not save_dir:
+            return
 
         progress = self._show_saving_popup()
         try:
-            self.game_saver.save_game(game_path, title, root)
+            voice = self.voice_selector.currentData()
+            self.game_saver.save_game(save_dir, title, root, voice)
         except Exception as e:
             progress.close()
             QtWidgets.QMessageBox.critical(self, "Save failed", str(e))
             return
         progress.close()
-        QtWidgets.QMessageBox.information(self, "Success", f"Game saved to {game_path}/{title}")
+        QtWidgets.QMessageBox.information(self, "Success", f"Game saved to {save_dir}/{title}")
 
     def _show_saving_popup(self) -> QtWidgets.QProgressDialog:
         progress = QtWidgets.QProgressDialog("Saving game...", None, 0, 0, self)
