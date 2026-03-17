@@ -1,5 +1,6 @@
 import os.path
 import sys
+import threading
 from typing import Optional
 
 from PySide6 import QtWidgets, QtCore, QtGui
@@ -36,6 +37,7 @@ class GameCreationPage(QtWidgets.QWidget):
         self.game_loader: GameLoader = GameLoader()
         self.game_saver: GameSaver = GameSaver()
         self.game_par_dir: Optional[str] = os.path.dirname(game_path) if game_path else None
+        self._voice_samples_dir = os.path.join(os.path.dirname(__file__), "..", "voiceSamples")
 
         # Ordered list of all node widgets
         self.nodes: list[NodeWidget] = []
@@ -86,6 +88,7 @@ class GameCreationPage(QtWidgets.QWidget):
         self.title_entry = QtWidgets.QLineEdit()
         self.title_entry.setPlaceholderText("Enter game title...")
         title_row.addWidget(self.title_entry)
+        
         self.voice_selector = QtWidgets.QComboBox()
         VOICES = [
             ("bf_alice",    "Alice (F)"),
@@ -102,7 +105,26 @@ class GameCreationPage(QtWidgets.QWidget):
         self.voice_selector.setCurrentIndex(1)  # default to bf_emma
         self.voice_selector.setFixedWidth(120)
         title_row.addWidget(self.voice_selector)
+
+        self.preview_voice_button = QtWidgets.QPushButton("▶ Preview")
+        self.preview_voice_button.setFixedWidth(120)
+        self.preview_voice_button.clicked.connect(self._preview_selected_voice)
+        title_row.addWidget(self.preview_voice_button)
+
         self.layout.addLayout(title_row)
+    
+    def _preview_selected_voice(self) -> None:
+        """
+        Play the pre-generated sample for the currently selected voice.
+        """
+        voice_id = self.voice_selector.currentData()
+        sample_path = os.path.join(self._voice_samples_dir, f"{voice_id}.wav")
+        if not os.path.exists(sample_path):
+            return
+        def _play():
+            from playsound3 import playsound
+            playsound(sample_path)
+        threading.Thread(target=_play, daemon=True).start()
 
     def _setup_canvas(self) -> None:
         self.scene = QtWidgets.QGraphicsScene(self)
