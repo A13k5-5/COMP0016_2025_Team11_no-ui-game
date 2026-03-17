@@ -6,6 +6,7 @@ from gamePlayer.audio_player import AudioPlayer
 from graph import Node
 
 from gesture import EnumGesture
+from graph.enum_LR import EnumLR
 import storageManager.game_load
 import storageManager.progress_tracker
 from gamePlayer.settings_manager import SettingsManager
@@ -20,6 +21,9 @@ class GamePlayer:
         self.audio_player: AudioPlayer = AudioPlayer()
         self.recogniser = recogniser
         self.settings = settings
+
+    def _quit_gesture(self) -> EnumGesture:
+        return self.settings.get_gesture("quit")
 
     def _replay_gestures(self) -> list[EnumGesture]:
         return [self.settings.get_gesture("replay_main"), self.settings.get_gesture("replay_options")]
@@ -36,6 +40,22 @@ class GamePlayer:
 
         start_node = self._start_from(root_node, game_folder, zip_path)
         self._start_game_loop(start_node, game_folder, zip_path)
+
+    def _gesture_to_side(self, gesture: EnumGesture) -> EnumLR | None:
+        if gesture == self.settings.get_gesture("option_left"):
+            return EnumLR.LEFT
+        if gesture == self.settings.get_gesture("option_right"):
+            return EnumLR.RIGHT
+        return None
+
+    def _side_to_gesture(self, side: EnumLR) -> EnumGesture:
+        if side == EnumLR.LEFT:
+            return self.settings.get_gesture("option_left")
+        return self.settings.get_gesture("option_right")
+    
+    def _allowed_gestures_for_node(self, node: Node) -> list[EnumGesture]:
+        option_gestures = [self._side_to_gesture(side) for side in node.get_possible_sides()]
+        return option_gestures + self._replay_gestures() + [self._quit_gesture()]
 
     def _start_from(self, root_node: Node, game_folder: str, zip_path: str) -> Node:
         """
@@ -58,9 +78,9 @@ class GamePlayer:
             return root_node
 
         self.audio_player.play_audio_from_file(game_folder, "progress.wav")
-        decision = self.recogniser.get_gesture(self._progress_gestures())
+        decision = self.recogniser.get_gesture(self._progress_gestures() + [self._quit_gesture()])
 
-        if decision == EnumGesture.ILoveYou_Left:
+        if decision == self.settings.get_gesture("option_left"):
             self.audio_player.play_audio_from_file(game_folder, "resume.wav")
             return saved_node
         else:
@@ -77,22 +97,24 @@ class GamePlayer:
             self.audio_player.play_audio(game_folder, cur_node.get_id())
 
             # Ask recognizer for a decision (expects a tuple like ("ILoveYou", "Left"))
-            decision: EnumGesture = self.recogniser.get_gesture(cur_node.get_possible_gestures() + self._replay_gestures())
-            if decision == EnumGesture.Victory:
+            decision: EnumGesture = self.recogniser.get_gesture(self._allowed_gestures_for_node(cur_node))
+            if decision == self._quit_gesture():
                 self.progress_tracker.save_progress(zip_path, cur_node.get_id())
                 self.audio_player.play_audio_from_file(game_folder, "quit.wav")
                 break
 
             while decision in self._replay_gestures():
-                if decision == EnumGesture.PointingUp_Left:
+                if decision == self.settings.get_gesture("replay_main"):
                     self.audio_player.play_main_audio(game_folder, cur_node.get_id())
-                elif decision == EnumGesture.PointingUp_Right:
+                elif decision == self.settings.get_gesture("replay_options"):
                     self.audio_player.play_options_audio(game_folder, cur_node.get_id())
 
-                decision: EnumGesture = self.recogniser.get_gesture(cur_node.get_possible_gestures() + self._replay_gestures())
+                decision: EnumGesture = self.recogniser.get_gesture(self._allowed_gestures_for_node(cur_node))
 
-
-            cur_node = cur_node.getNode(decision)
+            chosen_side = self._gesture_to_side(decision)
+            if chosen_side is None:
+                continue
+            cur_node = cur_node.getNode(chosen_side)
 
             if cur_node.is_win:
                 self.audio_player.play_audio(game_folder, cur_node.get_id())
