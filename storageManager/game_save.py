@@ -8,8 +8,6 @@ from graph import Node
 from graph.serial_graph import SerialGraph
 from text2speech import Talker
 
-VOICE: str = "bf_emma"
-
 class GameSaver:
     """
     Class responsible for saving the game into a zipped game folder (containing the graph and corresponding audio files).
@@ -17,12 +15,12 @@ class GameSaver:
     def __init__(self):
         self._talker: Talker = Talker()
 
-    @dispatch(str, str, Node)
+    @dispatch(str, str, Node, str)
     def save_game(self, path_to_save: str, game_name: str, root: Node, voice: str):
         serialized_graph: SerialGraph = SerialGraph.serialize_graph(root)
         self.save_game(path_to_save, game_name, serialized_graph, voice)
 
-    @dispatch(str, str, SerialGraph)
+    @dispatch(str, str, SerialGraph, str)
     def save_game(self, path_to_save: str, game_name: str, serialized_graph: SerialGraph, voice: str):
         """
         Saves the game to the given path as a zip archive. Only the zip file is written to path_to_save;
