@@ -4,6 +4,7 @@ from typing import Any, Optional
 
 from PySide6 import QtWidgets, QtCore, QtGui
 
+from game_generation_local_llm.graph_blueprint.blueprint import GraphBlueprint
 from graph.enum_LR import EnumLR
 from graph import Node
 from graph.serial_graph import SerialGraph
@@ -84,7 +85,7 @@ class GameCreationPage(QtWidgets.QWidget):
         # AI generation state
         self._generation_thread: Optional[QtCore.QThread] = None
         self._generation_worker: Optional[_GameGenerationWorker] = None
-        self._stream_blueprint: Optional[dict[str, Any]] = None
+        self._stream_blueprint: Optional[GraphBlueprint] = None
         self._stream_nodes: dict[int, dict[str, Any]] = {}
 
         self._setup_window_layout("No-UI-Game Creator")
@@ -279,6 +280,7 @@ class GameCreationPage(QtWidgets.QWidget):
                 self._stream_nodes[int(node_id)] = node_payload
                 self._render_streaming_preview()
 
+        # for blueprint_ready only this is triggered
         if message:
             self._ai_status.setText(message)
 
@@ -323,16 +325,14 @@ class GameCreationPage(QtWidgets.QWidget):
 
     def _render_streaming_preview(self) -> None:
         """Render the current blueprint with generated/placeholder node text while generation runs."""
-        blueprint = self._stream_blueprint
+        blueprint: GraphBlueprint = self._stream_blueprint
         if not blueprint:
             return
 
-        adjacency = blueprint.get("adjacency")
-        if not isinstance(adjacency, dict) or not adjacency:
-            return
+        adjacency = blueprint.adjacency
 
-        win_nodes = {int(node_id) for node_id in blueprint.get("win_nodes", [])}
-        lose_nodes = {int(node_id) for node_id in blueprint.get("lose_nodes", [])}
+        win_nodes = {int(node_id) for node_id in blueprint.win_nodes}
+        lose_nodes = {int(node_id) for node_id in blueprint.lose_nodes}
         serial_nodes: dict[int, SerialNode] = {}
 
         for raw_node_id, raw_adjacency in adjacency.items():

@@ -1,6 +1,8 @@
 from pydantic import BaseModel
 
 from graph import EnumLR
+from graph.serial_graph import SerialGraph
+from graph.serial_node import SerialNode
 
 
 class GraphBlueprint(BaseModel):
@@ -13,3 +15,10 @@ class GraphBlueprint(BaseModel):
     adjacency: dict[int, dict[EnumLR, int]]
     win_nodes: list[int]
     lose_nodes: list[int]
+
+    def convert_to_serial_graph(self) -> SerialGraph:
+        """
+        Placeholder serial graph.
+        :return:
+        """
+        pass
