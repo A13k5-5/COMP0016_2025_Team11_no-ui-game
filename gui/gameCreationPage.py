@@ -635,7 +635,7 @@ class GameCreationPage(QtWidgets.QWidget):
                 self.node_children[parent_widget][side] = nw
                 self._draw_line(parent_widget, side, nw)
 
-            for gesture, child_node in node.adjacencyList.items():
+            for side, child_node in node.adjacencyList.items():
                 if side == EnumLR.LEFT:
                     queue.append((child_node, depth + 1, pos * 2,     nw, OptionSide.LEFT))
                 elif side == EnumLR.RIGHT:
