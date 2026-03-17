@@ -79,6 +79,6 @@ class GameLoader:
         """
         for node_id, serial_node in serial_graph.nodes.items():
             node = nodes[int(node_id)]
-            for gesture, adjacent_node_id in serial_node.adjacency_list.items():
+            for side, adjacent_node_id in serial_node.adjacency_list.items():
                 adjacent_node = nodes[int(adjacent_node_id)]
-                node.addNode(gesture, adjacent_node)
+                node.addNode(side, adjacent_node)
