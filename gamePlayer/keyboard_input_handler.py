@@ -34,7 +34,7 @@ class KeyboardInputHandler:
             gesture = self._key_to_gesture.get(key)
             if gesture is None:
                 continue
-            if gesture in gestures_to_spot or gesture == EnumGesture.Victory:
+            if gesture in gestures_to_spot:
                 return gesture
     
     def register_key(self, key: int) -> None:
