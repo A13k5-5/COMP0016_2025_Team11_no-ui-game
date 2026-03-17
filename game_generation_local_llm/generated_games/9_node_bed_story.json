@@ -1,0 +1,124 @@
+{
+  "nodes": {
+    "0": {
+      "id": 0,
+      "text": "In a meadow bathed in the soft glow of twilight, nestled among whispering grasses, is a cozy little burrow. This is where you find yourself, curious and wide-eyed, on a journey through a magical meow.",
+      "left_option": "Explore the burrow",
+      "right_option": "Watch the sunset",
+      "adjacency_list": {
+        "0": 1,
+        "1": 3
+      },
+      "is_win": false,
+      "is_losing": false
+    },
+    "1": {
+      "id": 1,
+      "text": "You step into a cozy forest glade, where the trees form a natural canopy, casting dappled light onto the soft forest floor. The air is fresh with the scent of pine and earth, and in the distance, the,",
+      "left_option": "Follow the river",
+      "right_option": "Climb the tree",
+      "adjacency_list": {
+        "0": 2,
+        "1": 2
+      },
+      "is_win": false,
+      "is_losing": false
+    },
+    "2": {
+      "id": 2,
+      "text": "You find yourself in a shimmering glade, where the air is filled with a gentle, enchanting melody. The trees around you sway as if dancing, their leaves whispering secrets only the forest knows. At a ",
+      "left_option": "Follow the melody",
+      "right_option": "Sit and listen",
+      "adjacency_list": {
+        "0": 9,
+        "1": 9
+      },
+      "is_win": false,
+      "is_losing": false
+    },
+    "3": {
+      "id": 3,
+      "text": "As you wander deeper into the magical meadow, the grass beneath your feet sparkles with a thousand tiny rainbows. In the soft twilight, a charming little fairy ring catches your eye. It's a circle of ",
+      "left_option": "Enter the ring",
+      "right_option": "Keep walking",
+      "adjacency_list": {
+        "0": 4,
+        "1": 6
+      },
+      "is_win": false,
+      "is_losing": false
+    },
+    "4": {
+      "id": 4,
+      "text": "You step into the fairy ring, feeling an immediate warmth wash over you. The air here is different, filled with a gentle, twinkling magic. Tiny fireflies dance around you, their light flickering like星",
+      "left_option": "Join the fireflies",
+      "right_option": "Explore deeper",
+      "adjacency_list": {
+        "0": 5,
+        "1": 5
+      },
+      "is_win": false,
+      "is_losing": false
+    },
+    "5": {
+      "id": 5,
+      "text": "Within the heart of the fairy ring, you find yourself in a hidden grove, where the air shimmers with gentle magic. Lush moss blankets the ground, and vibrant flowers bloom in a riot of colors. A soft,",
+      "left_option": "Follow the butterflies",
+      "right_option": "Sit and dream",
+      "adjacency_list": {
+        "0": 9,
+        "1": 9
+      },
+      "is_win": false,
+      "is_losing": false
+    },
+    "6": {
+      "id": 6,
+      "text": "You find yourself at the edge of a serene forest clearing, where the moonlight paints everything in a silvery hue. The gentle breeze carries the scent of wildflowers and the distant call of nightingw.",
+      "left_option": "Follow the stream",
+      "right_option": "Explore the shadows",
+      "adjacency_list": {
+        "0": 7,
+        "1": 8
+      },
+      "is_win": false,
+      "is_losing": false
+    },
+    "7": {
+      "id": 7,
+      "text": "You stand at the edge of a sparkling brook, its gentle flow creating a soothing melody. The moonlight reflects off the water, casting a silvery sheen that dances across the rocks and pebbles. A gentle",
+      "left_option": "Follow the brook",
+      "right_option": "Find a spot to rest",
+      "adjacency_list": {
+        "0": 9,
+        "1": 9
+      },
+      "is_win": false,
+      "is_losing": false
+    },
+    "8": {
+      "id": 8,
+      "text": "You arrive at a peaceful grove bathed in moonlight, where the night air is cool and crisp. The ground is carpeted with soft, silver moss that glows faintly under the starry sky. In the center, a moon-",
+      "left_option": "Approach the moonlit pond",
+      "right_option": "Gaze at the stars",
+      "adjacency_list": {
+        "0": 9,
+        "1": 9
+      },
+      "is_win": false,
+      "is_losing": false
+    },
+    "9": {
+      "id": 9,
+      "text": "As you stand in the heart of the enchanted meadow, you feel a warm, gentle breeze rustling the grass around you. The moon is high in the sky, casting a soft silver glow that makes you feel safe and at",
+      "left_option": "",
+      "right_option": "",
+      "adjacency_list": {
+        "0": 9,
+        "1": 9
+      },
+      "is_win": true,
+      "is_losing": false
+    }
+  }
+}
