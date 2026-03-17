@@ -18,12 +18,12 @@ class GameSaver:
         self._talker: Talker = Talker()
 
     @dispatch(str, str, Node)
-    def save_game(self, path_to_save: str, game_name: str, root: Node):
+    def save_game(self, path_to_save: str, game_name: str, root: Node, voice: str):
         serialized_graph: SerialGraph = SerialGraph.serialize_graph(root)
-        self.save_game(path_to_save, game_name, serialized_graph)
+        self.save_game(path_to_save, game_name, serialized_graph, voice)
 
     @dispatch(str, str, SerialGraph)
-    def save_game(self, path_to_save: str, game_name: str, serialized_graph: SerialGraph):
+    def save_game(self, path_to_save: str, game_name: str, serialized_graph: SerialGraph, voice: str):
         """
         Saves the game to the given path as a zip archive. Only the zip file is written to path_to_save;
         a temporary directory is used for staging and is removed afterwards.
@@ -41,7 +41,7 @@ class GameSaver:
             os.makedirs(os.path.join(stage_path, "audio"))
 
             self.save_graph(stage_path, serialized_graph)
-            self._generate_audio(serialized_graph, stage_path)
+            self._generate_audio(serialized_graph, stage_path, voice)
 
             self._zip_folder_to(stage_path, zip_path)
 
@@ -111,7 +111,7 @@ class GameSaver:
         """
         return f"node_{node_id}.wav"
 
-    def _generate_audio(self, serial_graph: SerialGraph, game_path: str):
+    def _generate_audio(self, serial_graph: SerialGraph, game_path: str, voice: str):
         """
         Generates audio files for each node in the graph using the Talker class. The audio files are saved in the specified
         audio directory with filenames corresponding to their node IDs.
@@ -122,27 +122,27 @@ class GameSaver:
         for node_id, serial_node in serial_graph.nodes.items():
             # generate the main text audio
             main_text_audio_file: str = os.path.join(game_path, "audio", Node.get_main_text_audio_filename(node_id))
-            self._talker.generate_speech(serial_node.text, main_text_audio_file, VOICE)
+            self._talker.generate_speech(serial_node.text, main_text_audio_file, voice)
 
             # generate the options audio
             options_audio_file: str = serial_node.get_options_text()
             output_file = os.path.join(game_path, "audio", Node.get_options_audio_filename(node_id))
-            self._talker.generate_speech(options_audio_file, output_file, VOICE)
+            self._talker.generate_speech(options_audio_file, output_file, voice)
 
-        self._generate_helper_audios(game_path)
+        self._generate_helper_audios(game_path, voice)
 
-    def _generate_helper_audios(self, game_path: str) -> None:
+    def _generate_helper_audios(self, game_path: str, voice: str) -> None:
         # generate win/lose outcome audio
-        self._talker.generate_speech("You win!", os.path.join(game_path, "audio", "win.wav"), VOICE)
-        self._talker.generate_speech("Game over!", os.path.join(game_path, "audio", "lose.wav"), VOICE)
+        self._talker.generate_speech("You win!", os.path.join(game_path, "audio", "win.wav"), voice)
+        self._talker.generate_speech("Game over!", os.path.join(game_path, "audio", "lose.wav"), voice)
 
         # generate progress instructions
         self._talker.generate_speech(
             "A saved game was found. Raise your left hand to resume, or your right to restart.",
             os.path.join(game_path, "audio", "progress.wav"),
-            VOICE
+            voice
         )
-        self._talker.generate_speech("Resuming your game", os.path.join(game_path, "audio", "resume.wav"), VOICE)
-        self._talker.generate_speech("Starting a new game", os.path.join(game_path, "audio", "start_new.wav"), VOICE)
-        self._talker.generate_speech("Quitting game. Your progress has been saved.", os.path.join(game_path, "audio", "quit.wav"), VOICE)
+        self._talker.generate_speech("Resuming your game", os.path.join(game_path, "audio", "resume.wav"), voice)
+        self._talker.generate_speech("Starting a new game", os.path.join(game_path, "audio", "start_new.wav"), voice)
+        self._talker.generate_speech("Quitting game. Your progress has been saved.", os.path.join(game_path, "audio", "quit.wav"), voice)
 
