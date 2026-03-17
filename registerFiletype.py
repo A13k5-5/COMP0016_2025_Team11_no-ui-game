@@ -70,3 +70,6 @@ def register_noui_filetype(
     SHCNE_ASSOCCHANGED = 0x08000000
     SHCNF_IDLIST = 0x0000
     ctypes.windll.shell32.SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, None, None)
+
+if __name__ == "__main__":
+    register_noui_filetype("C:\\Users\\pison\\OneDrive\\Počítač\\game_player_build\\main.dist\\main.exe", DEFAULT_ICON)
