@@ -1,5 +1,5 @@
 from typing import Self
-from gesture import EnumGesture
+from graph.enum_LR import EnumLR
 
 
 class Node:
@@ -13,7 +13,7 @@ class Node:
         self._text = text
         self.left_option = left_option
         self.right_option = right_option
-        self.adjacencyList: dict[EnumGesture, Node] = {}
+        self.adjacencyList: dict[EnumLR, Node] = {}
         self.is_win: bool = False
         self.is_losing: bool = False
 
@@ -31,14 +31,14 @@ class Node:
     def get_id(self) -> int:
         return self.id
 
-    def addNode(self, gesture: EnumGesture, newNode: Self):
-        self.adjacencyList[gesture] = newNode
+    def addNode(self, side: EnumLR, newNode: Self):
+        self.adjacencyList[side] = newNode
 
-    def getNode(self, gesture: EnumGesture):
-        return self.adjacencyList.get(gesture)
+    def getNode(self, side: EnumLR):
+        return self.adjacencyList.get(side)
 
-    def get_possible_gestures(self) -> list[EnumGesture]:
-        return [gesture for gesture, node in self.adjacencyList.items() if node is not None]
+    def get_possible_sides(self) -> list[EnumLR]:
+        return [side for side, node in self.adjacencyList.items() if node is not None]
 
     def __str__(self):
         return f"{self._text}, adjacent to {[node._text for node in self.adjacencyList.values()]}"
