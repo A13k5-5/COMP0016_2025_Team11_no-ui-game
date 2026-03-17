@@ -794,8 +794,7 @@ class GameCreationPage(QtWidgets.QWidget):
 
     def _populate_graph_from_serial(self, serial: SerialGraph) -> None:
         """Rebuild widget graph from a serialized graph payload."""
-        root, nodes = self.game_loader._load_nodes(serial)
-        self.game_loader._establish_connections(serial, nodes)
+        root = SerialGraph.deserialize_graph(serial)
         self._populate_graph(root)
 
     def _populate_widget_from_node(self, nw: NodeWidget, node: Node) -> None:
@@ -820,4 +819,3 @@ def run():
 
 if __name__ == "__main__":
     run()
-

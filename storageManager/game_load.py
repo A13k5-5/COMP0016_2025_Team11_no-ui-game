@@ -4,7 +4,6 @@ import zipfile
 
 from graph import Node
 from graph.serial_graph import SerialGraph
-from graph.serial_node import SerialNode
 
 TEMP_FOLDER = os.path.join(os.path.dirname(__file__), "temporary")
 
@@ -48,37 +47,6 @@ class GameLoader:
             serial_graph: SerialGraph = SerialGraph.model_validate_json(file.read().strip())
 
         # reconstruct the graph structure from the serial graph
-        root, nodes = self._load_nodes(serial_graph)
-        self._establish_connections(serial_graph, nodes)
+        root: Node = SerialGraph.deserialize_graph(serial_graph)
 
         return root, game_folder, game_zip
-
-    def _load_nodes(self, serial_graph: SerialGraph) -> tuple[Node, dict[int, Node]]:
-        """
-        Load nodes without connections. Gives back the root node and a dictionary of all nodes.
-        :param serial_graph:
-        :return:
-        """
-        root: Node | None = None
-        nodes: dict[int, Node] = {}
-        for node_id, serial_node in serial_graph.nodes.items():
-            node: Node = SerialNode.deserialize_node(serial_node)
-
-            nodes[node.id] = node
-            if root is None:
-                root = node
-        return root, nodes
-
-
-    def _establish_connections(self, serial_graph: SerialGraph, nodes: dict[int, Node]) -> None:
-        """
-        Establish connections between nodes based on adjacency lists. Makes sure that all the nodes have their adjacency
-        lists properly filled in, so that the game can be played.
-        :param serial_graph:
-        :param nodes:
-        """
-        for node_id, serial_node in serial_graph.nodes.items():
-            node = nodes[int(node_id)]
-            for side, adjacent_node_id in serial_node.adjacency_list.items():
-                adjacent_node = nodes[int(adjacent_node_id)]
-                node.addNode(side, adjacent_node)
