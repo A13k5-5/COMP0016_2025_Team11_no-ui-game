@@ -64,7 +64,7 @@ class PlayerPage(QtWidgets.QWidget):
         else:
             import myGestureRecognizer
             self._recogniser = myGestureRecognizer.VideoGestureRecogniser()
-        player = gamePlayer.GamePlayer(self._recogniser)
+        player = gamePlayer.GamePlayer(self._recogniser, self._settings)
         thread = threading.Thread(
             target=player.play_game,
             args=(self.path_edit.text(),),

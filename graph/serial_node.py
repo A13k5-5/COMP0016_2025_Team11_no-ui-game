@@ -27,8 +27,8 @@ class SerialNode(BaseModel):
             text=node.getText(),
             left_option=node.left_option,
             right_option=node.right_option,
-            adjacency_list={gesture: adjacent_node.get_id() for
-                            gesture, adjacent_node in
+            adjacency_list={side: adjacent_node.get_id() for
+                            side, adjacent_node in
                             node.adjacencyList.items()},
             is_win=node.is_win,
             is_losing=node.is_losing

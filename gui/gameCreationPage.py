@@ -4,7 +4,7 @@ from typing import Any, Optional
 
 from PySide6 import QtWidgets, QtCore, QtGui
 
-from gesture import EnumGesture
+from graph.enum_LR import EnumLR
 from graph import Node
 from graph.serial_graph import SerialGraph
 from graph.serial_node import SerialNode
@@ -668,9 +668,9 @@ class GameCreationPage(QtWidgets.QWidget):
             left_child  = children.get(OptionSide.LEFT)
             right_child = children.get(OptionSide.RIGHT)
             if left_child:
-                parent_node.addNode(EnumGesture.ILoveYou_Left,  widget_node[left_child])
+                parent_node.addNode(EnumLR.LEFT,  widget_node[left_child])
             if right_child:
-                parent_node.addNode(EnumGesture.ILoveYou_Right, widget_node[right_child])
+                parent_node.addNode(EnumLR.RIGHT, widget_node[right_child])
 
         return widget_node[self.root_node]
 
@@ -784,10 +784,10 @@ class GameCreationPage(QtWidgets.QWidget):
                 self.node_children[parent_widget][side] = nw
                 self._draw_line(parent_widget, side, nw)
 
-            for gesture, child_node in node.adjacencyList.items():
-                if gesture == EnumGesture.ILoveYou_Left:
+            for side, child_node in node.adjacencyList.items():
+                if side == EnumLR.LEFT:
                     queue.append((child_node, depth + 1, pos * 2,     nw, OptionSide.LEFT))
-                elif gesture == EnumGesture.ILoveYou_Right:
+                elif side == EnumLR.RIGHT:
                     queue.append((child_node, depth + 1, pos * 2 + 1, nw, OptionSide.RIGHT))
 
         self._update_buttons()
