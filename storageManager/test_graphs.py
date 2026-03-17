@@ -1,4 +1,4 @@
-from gesture import EnumGesture
+from graph.enum_LR import EnumLR
 from graph import Node
 
 
@@ -49,23 +49,23 @@ def build_default_story_graph() -> Node:
     survived.is_win = True
 
     # Connections
-    start.addNode(EnumGesture.ILoveYou_Left, riddle)
-    start.addNode(EnumGesture.ILoveYou_Right, freed)
+    start.addNode(EnumLR.LEFT, riddle)
+    start.addNode(EnumLR.RIGHT, freed)
 
-    riddle.addNode(EnumGesture.ILoveYou_Left, freed)
-    riddle.addNode(EnumGesture.ILoveYou_Right, freed)
+    riddle.addNode(EnumLR.LEFT, freed)
+    riddle.addNode(EnumLR.RIGHT, freed)
 
-    freed.addNode(EnumGesture.ILoveYou_Left, chamber_of_mazarbul)
-    freed.addNode(EnumGesture.ILoveYou_Right, chamber_of_mazarbul)
+    freed.addNode(EnumLR.LEFT, chamber_of_mazarbul)
+    freed.addNode(EnumLR.RIGHT, chamber_of_mazarbul)
 
-    chamber_of_mazarbul.addNode(EnumGesture.ILoveYou_Left, balrog_bridge)
-    chamber_of_mazarbul.addNode(EnumGesture.ILoveYou_Right, balrog_bridge)
+    chamber_of_mazarbul.addNode(EnumLR.LEFT, balrog_bridge)
+    chamber_of_mazarbul.addNode(EnumLR.RIGHT, balrog_bridge)
 
-    balrog_bridge.addNode(EnumGesture.ILoveYou_Left, gandalf_falls)
-    balrog_bridge.addNode(EnumGesture.ILoveYou_Right, gandalf_falls)
+    balrog_bridge.addNode(EnumLR.LEFT, gandalf_falls)
+    balrog_bridge.addNode(EnumLR.RIGHT, gandalf_falls)
 
-    gandalf_falls.addNode(EnumGesture.ILoveYou_Left, survived)
-    gandalf_falls.addNode(EnumGesture.ILoveYou_Right, survived)
+    gandalf_falls.addNode(EnumLR.LEFT, survived)
+    gandalf_falls.addNode(EnumLR.RIGHT, survived)
 
     return start
 
@@ -74,7 +74,7 @@ def test_game() -> Node:
     root: Node = Node("Hi Bilbo. May I come in?")
     nodeA: Node = Node("Sure come on in.")
     nodeB: Node = Node("No, I'm busy right now. Come tomorrow.")
-    root.addNode(EnumGesture.ILoveYou_Left, nodeA)
-    root.addNode(EnumGesture.ILoveYou_Right, nodeB)
+    root.addNode(EnumLR.LEFT, nodeA)
+    root.addNode(EnumLR.RIGHT, nodeB)
 
     return root
