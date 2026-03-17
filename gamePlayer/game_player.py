@@ -22,10 +22,10 @@ class GamePlayer:
         self.settings = settings
 
     def _replay_gestures(self) -> list[EnumGesture]:
-        return [self._settings.get_gesture("replay_main"), self._settings.get_gesture("replay_options")]
+        return [self.settings.get_gesture("replay_main"), self.settings.get_gesture("replay_options")]
  
     def _progress_gestures(self) -> list[EnumGesture]:
-        return [self._settings.get_gesture("option_left"), self._settings.get_gesture("option_right")]
+        return [self.settings.get_gesture("option_left"), self.settings.get_gesture("option_right")]
 
     def play_game(self, game_path: str):
         try:
@@ -58,7 +58,7 @@ class GamePlayer:
             return root_node
 
         self.audio_player.play_audio_from_file(game_folder, "progress.wav")
-        decision = self.recogniser.get_gesture(self._progress_gestures)
+        decision = self.recogniser.get_gesture(self._progress_gestures())
 
         if decision == EnumGesture.ILoveYou_Left:
             self.audio_player.play_audio_from_file(game_folder, "resume.wav")
@@ -77,19 +77,19 @@ class GamePlayer:
             self.audio_player.play_audio(game_folder, cur_node.get_id())
 
             # Ask recognizer for a decision (expects a tuple like ("ILoveYou", "Left"))
-            decision: EnumGesture = self.recogniser.get_gesture(cur_node.get_possible_gestures() + self._replay_gestures)
+            decision: EnumGesture = self.recogniser.get_gesture(cur_node.get_possible_gestures() + self._replay_gestures())
             if decision == EnumGesture.Victory:
                 self.progress_tracker.save_progress(zip_path, cur_node.get_id())
                 self.audio_player.play_audio_from_file(game_folder, "quit.wav")
                 break
 
-            while decision in self._replay_gestures:
+            while decision in self._replay_gestures():
                 if decision == EnumGesture.PointingUp_Left:
                     self.audio_player.play_main_audio(game_folder, cur_node.get_id())
                 elif decision == EnumGesture.PointingUp_Right:
                     self.audio_player.play_options_audio(game_folder, cur_node.get_id())
 
-                decision: EnumGesture = self.recogniser.get_gesture(cur_node.get_possible_gestures() + self._replay_gestures)
+                decision: EnumGesture = self.recogniser.get_gesture(cur_node.get_possible_gestures() + self._replay_gestures())
 
 
             cur_node = cur_node.getNode(decision)
