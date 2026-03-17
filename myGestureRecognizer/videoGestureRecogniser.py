@@ -68,7 +68,7 @@ class VideoGestureRecogniser:
         self._last_handedness = result.handedness[0][0].category_name
 
         # victory set as a special case for stopping the loop
-        if self._get_last_gesture() in self._gestures_to_spot or self._get_last_gesture() == EnumGesture.Victory:
+        if self._get_last_gesture() in self._gestures_to_spot:
             self._stop()
 
     def timeout_stop(self, start_time: float, timeout_duration: float):
