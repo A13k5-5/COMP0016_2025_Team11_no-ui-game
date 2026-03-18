@@ -1,0 +1,88 @@
+{
+  "nodes": {
+    "0": {
+      "id": 0,
+      "text": "In a whimsical forest, the gentle rustle of leaves and the soft chirping of crickets fill the air as dusk settles. You find yourself at the crossroads of an enchanted path, where the moonlight dances,",
+      "left_option": "follow the glowing fireflies",
+      "right_option": "listen to the hooting owl",
+      "adjacency_list": {
+        "0": 1,
+        "1": 3
+      },
+      "is_win": false,
+      "is_losing": false
+    },
+    "1": {
+      "id": 1,
+      "text": "In the heart of the moonlit glade, you stumble upon a serene pond, its surface mirroring the starlit sky above. The air is filled with the soothing scent of night-blooming flowers. From the shadows, a",
+      "left_option": "approach the wise old turtle",
+      "right_option": "admire the shimmering fireflies",
+      "adjacency_list": {
+        "0": 2,
+        "1": 4
+      },
+      "is_win": false,
+      "is_losing": false
+    },
+    "2": {
+      "id": 2,
+      "text": "In a hidden grove, you come across a mysterious old tree with sprawling roots and a trunk wrapped in glowing moss. Its ancient branches stretch wide, whispering secrets of bygone ages. A gentle breeze",
+      "left_option": "embrace the tree's warmth",
+      "right_option": "trace the glowing roots",
+      "adjacency_list": {
+        "0": 5,
+        "1": 5
+      },
+      "is_win": false,
+      "is_losing": false
+    },
+    "3": {
+      "id": 3,
+      "text": "As you meander deeper into the forest, a quaint little cabin appears, nestled among the ancient trees. Smoke lazily drifts from its chimney, hinting at a warm hearth inside. The door creaks open, and,",
+      "left_option": "enter the cabin",
+      "right_option": "continue on the path",
+      "adjacency_list": {
+        "0": 4,
+        "1": 6
+      },
+      "is_win": false,
+      "is_losing": false
+    },
+    "4": {
+      "id": 4,
+      "text": "You find yourself in a dreamlike meadow, where the moon casts a silvery glow over a field of whispering daisies. The air is filled with the gentle hum of nocturnal creatures. In the distance, you can.",
+      "left_option": "follow the twinkling stars",
+      "right_option": "watch the fireflies dance",
+      "adjacency_list": {
+        "0": 5,
+        "1": 6
+      },
+      "is_win": false,
+      "is_losing": false
+    },
+    "5": {
+      "id": 5,
+      "text": "You find yourself in a tranquil clearing, where the air is filled with the soft melody of nightingales. Moonbeams spill through the treetops, creating a serene tapestry of light and shadow. In the eye",
+      "left_option": "",
+      "right_option": "",
+      "adjacency_list": {
+        "0": 5,
+        "1": 5
+      },
+      "is_win": true,
+      "is_losing": false
+    },
+    "6": {
+      "id": 6,
+      "text": "Lost in a shadowy thicket, you hear eerie whispers and see shadows flit between the trees. The familiar path is nowhere in sight. The forest seems alive with a strange energy, and unease settles over.",
+      "left_option": "",
+      "right_option": "",
+      "adjacency_list": {
+        "0": 6,
+        "1": 6
+      },
+      "is_win": false,
+      "is_losing": true
+    }
+  }
+}

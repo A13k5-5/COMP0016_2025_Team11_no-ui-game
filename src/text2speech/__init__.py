@@ -1,0 +1,1 @@
+from src.text2speech.text2speech import Talker
