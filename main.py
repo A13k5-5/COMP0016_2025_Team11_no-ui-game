@@ -21,7 +21,7 @@ if __name__ == "__main__":
 
     # for game engine
     # import kokoro
-    from gui.homePage import run
+    from src.gui.homePage import run
     run()
 
     # for game loading

@@ -1,5 +1,5 @@
 from typing import Self
-from graph.enum_LR import EnumLR
+from src.graph.enum_LR import EnumLR
 
 
 class Node:

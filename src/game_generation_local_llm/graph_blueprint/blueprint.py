@@ -1,8 +1,8 @@
 from pydantic import BaseModel
 
-from graph import EnumLR
-from graph.serial_graph import SerialGraph
-from graph.serial_node import SerialNode
+from src.graph import EnumLR
+from src.graph.serial_graph import SerialGraph
+from src.graph.serial_node import SerialNode
 
 
 class GraphBlueprint(BaseModel):

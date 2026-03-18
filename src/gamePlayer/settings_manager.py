@@ -1,6 +1,6 @@
 import os
 import json
-from gesture import EnumGesture
+from src.gesture import EnumGesture
 
 SETTINGS_PATH = os.path.join(os.path.dirname(__file__), "..", "settings.json")
 

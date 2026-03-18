@@ -2,8 +2,7 @@ from typing import Self
 
 from pydantic import BaseModel, Field
 
-from gesture import EnumGesture
-from graph import Node
+from src.graph import Node, EnumLR
 
 
 class SerialNode(BaseModel):
@@ -11,7 +10,7 @@ class SerialNode(BaseModel):
     text: str = Field(max_length=200)
     left_option: str = ""
     right_option: str = ""
-    adjacency_list: dict[EnumGesture, int]
+    adjacency_list: dict[EnumLR, int]
     is_win: bool = False
     is_losing: bool = False
 

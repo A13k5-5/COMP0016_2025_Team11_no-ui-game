@@ -2,22 +2,22 @@ import os
 import json
 import time
 
-from gamePlayer.audio_player import AudioPlayer
-from graph import Node
+from src.gamePlayer.audio_player import AudioPlayer
+from src.graph import Node
 
-from gesture import EnumGesture
-from graph.enum_LR import EnumLR
-import storageManager.game_load
-import storageManager.progress_tracker
-from gamePlayer.settings_manager import SettingsManager
+from src.gesture import EnumGesture
+from src.graph.enum_LR import EnumLR
+from src.storageManager import game_load
+from src.storageManager import progress_tracker
+from src.gamePlayer.settings_manager import SettingsManager
 
 class GamePlayer:
     """
     Class to play the interactive story game.
     """
     def __init__(self, recogniser, settings: SettingsManager):
-        self.game_loader: storageManager.game_load.GameLoader = storageManager.game_load.GameLoader()
-        self.progress_tracker: storageManager.progress_tracker.ProgressTracker = storageManager.progress_tracker.ProgressTracker()
+        self.game_loader: game_load.GameLoader = game_load.GameLoader()
+        self.progress_tracker: progress_tracker.ProgressTracker = progress_tracker.ProgressTracker()
         self.audio_player: AudioPlayer = AudioPlayer()
         self.recogniser = recogniser
         self.settings = settings
