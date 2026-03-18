@@ -37,7 +37,7 @@ class _GameGenerationWorker(QtCore.QObject):
 
     @QtCore.Slot()
     def run(self) -> None:
-        from game_generation_local_llm.game_generator import GameGenerator
+        from src.game_generation_local_llm.game_generator import GameGenerator
 
         try:
             generator = GameGenerator()

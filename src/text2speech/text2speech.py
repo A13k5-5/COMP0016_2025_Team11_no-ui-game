@@ -16,10 +16,15 @@ warnings.filterwarnings('ignore')  # Suppress all warnings
 class Talker:
     def __init__(self):
         # 'b' - for British English
-        self.pipeline: KPipeline = KPipeline(lang_code='b', repo_id="hexgrad/Kokoro-82M")
+        self.pipeline: KPipeline | None = None
+
+    def _get_pipeline(self) -> KPipeline:
+        if self.pipeline is None:
+            self.pipeline = KPipeline(lang_code='b', repo_id="hexgrad/Kokoro-82M")
+        return self.pipeline
 
     def generate_speech(self, text: str, output_file: str, voice: str):
-        generator = self.pipeline(text, voice=voice)
+        generator = self._get_pipeline()(text, voice=voice)
 
         audio_chunks = []
         for gs, ps, audio in generator:
