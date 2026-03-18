@@ -1,8 +1,9 @@
 import os
 import json
 from src.gesture import EnumGesture
+from pathlib import Path
 
-SETTINGS_PATH = os.path.join(os.path.dirname(__file__), "..", "settings.json")
+SETTINGS_PATH = Path(__file__).parent.parent / "settings.json"
 
 DEFAULT_SETTINGS = {
     "input_device": "webcam",  # "webcam" or "keyboard"
@@ -54,8 +55,6 @@ class SettingsManager:
         return merged
 
     def _load(self) -> dict:
-        print("Loading from:", SETTINGS_PATH)
-        print("File exists:", os.path.exists(SETTINGS_PATH))
         if os.path.exists(SETTINGS_PATH):
             try:
                 with open(SETTINGS_PATH, "r") as f:
@@ -69,11 +68,9 @@ class SettingsManager:
         """
         Persist current settings to settings.json.
         """
-        print("Saving to:", SETTINGS_PATH)
         with open(SETTINGS_PATH, "w") as f:
             json.dump(self._data, f, indent=4)
-        print("Saved:", self._data)
-    
+
     def is_keyboard_mode(self) -> bool:
         return self._data["input_device"] == "keyboard"
     
