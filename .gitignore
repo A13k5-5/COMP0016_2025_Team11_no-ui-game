@@ -3,5 +3,5 @@
 **/.venv*/
 .vscode
 *.exe
-storageManager/temporary/
+**temporary/
 *.dist/

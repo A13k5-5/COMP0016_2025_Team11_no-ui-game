@@ -1,22 +1,12 @@
 import sys
 import os
 from PySide6 import QtWidgets
-from PySide6.QtCore import QThread
 
-from gui.settingsPage import SettingsPage
-from gamePlayer.settings_manager import SettingsManager
+from src.gui.settingsPage import SettingsPage
+from src.gamePlayer.settings_manager import SettingsManager
 
-import gamePlayer
+from src import gamePlayer
 
-
-class GameThread(QThread):
-    def __init__(self, game_path):
-        super().__init__()
-        self.game_path = game_path
-
-    def run(self):
-        player = gamePlayer.GamePlayer()
-        player.play_game(self.game_path)
 
 class PlayerPage(QtWidgets.QWidget):
     def __init__(self):
@@ -43,6 +33,7 @@ class PlayerPage(QtWidgets.QWidget):
         self.run_btn = QtWidgets.QPushButton("Run")
         self.run_btn.setEnabled(False)
         self.run_btn.clicked.connect(self._run)
+
         settings_btn = QtWidgets.QPushButton("⚙ Settings")
         settings_btn.clicked.connect(self._open_settings)
         btn_row.addWidget(self.run_btn)
@@ -70,11 +61,12 @@ class PlayerPage(QtWidgets.QWidget):
         """
         import threading
         if self._settings.is_keyboard_mode():
-            from gamePlayer.keyboard_input_handler import KeyboardInputHandler
+            from src.gamePlayer.keyboard_input_handler import KeyboardInputHandler
             self._recogniser = KeyboardInputHandler(self._settings)
         else:
-            import myGestureRecognizer
+            from src import myGestureRecognizer
             self._recogniser = myGestureRecognizer.VideoGestureRecogniser()
+
         player = gamePlayer.GamePlayer(self._recogniser, self._settings)
         thread = threading.Thread(
             target=player.play_game,
@@ -93,9 +85,14 @@ class PlayerPage(QtWidgets.QWidget):
             self._recogniser.register_key(event.key())
         super().keyPressEvent(event)
 
-def run():
+def run(path: str = None):
     app = QtWidgets.QApplication.instance() or QtWidgets.QApplication(sys.argv)
     window = PlayerPage()
 
     window.show()
+    if path is not None:
+        window.path_edit.setText(os.path.abspath(path))
+        window.run_btn.setEnabled(True)
+        window._run()
+
     sys.exit(app.exec())
