@@ -3,7 +3,7 @@ from playsound3 import playsound
 from pathlib import Path
 import time
 
-from graph import Node
+from src.graph import Node
 
 class AudioPlayer:
     @staticmethod

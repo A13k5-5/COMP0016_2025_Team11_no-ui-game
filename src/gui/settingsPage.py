@@ -1,6 +1,6 @@
 from PySide6 import QtWidgets, QtCore
-from gesture import EnumGesture
-from gamePlayer.settings_manager import SettingsManager
+from src.gesture import EnumGesture
+from src.gamePlayer.settings_manager import SettingsManager
 
 ACTIONS = [
     ("option_left",    "Option Left"),

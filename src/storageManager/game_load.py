@@ -2,8 +2,8 @@ import os
 import shutil
 import zipfile
 
-from graph import Node
-from graph.serial_graph import SerialGraph
+from src.graph import Node
+from src.graph.serial_graph import SerialGraph
 
 TEMP_FOLDER = os.path.join(os.path.dirname(__file__), "temporary")
 

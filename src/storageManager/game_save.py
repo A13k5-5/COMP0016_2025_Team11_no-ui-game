@@ -4,9 +4,9 @@ import zipfile
 
 from multipledispatch import dispatch
 from . import config
-from graph import Node
-from graph.serial_graph import SerialGraph
-from text2speech import Talker
+from src.graph import Node
+from src.graph.serial_graph import SerialGraph
+from src.text2speech import Talker
 
 class GameSaver:
     """

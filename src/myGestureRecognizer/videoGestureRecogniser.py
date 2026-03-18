@@ -7,7 +7,7 @@ from mediapipe.tasks.python import BaseOptions
 from mediapipe.tasks.python.vision import GestureRecognizer, RunningMode, GestureRecognizerOptions, \
     GestureRecognizerResult
 
-from gesture import EnumGesture
+from src.gesture import EnumGesture
 from .videoCaptureManager import video_capture_manager
 
 WINDOW_NAME = "Hand Detection"

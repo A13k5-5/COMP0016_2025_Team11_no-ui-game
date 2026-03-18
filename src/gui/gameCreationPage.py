@@ -5,13 +5,13 @@ from typing import Any, Optional
 from PySide6 import QtWidgets, QtCore, QtGui
 from pathlib import Path
 
-from gamePlayer.audio_player import AudioPlayer
-from game_generation_local_llm.graph_blueprint.blueprint import GraphBlueprint
-from graph.enum_LR import EnumLR
-from graph import Node
-from graph.serial_graph import SerialGraph
-from graph.serial_node import SerialNode
-from storageManager import GameLoader, GameSaver
+from src.gamePlayer.audio_player import AudioPlayer
+from src.game_generation_local_llm.graph_blueprint.blueprint import GraphBlueprint
+from src.graph.enum_LR import EnumLR
+from src.graph import Node
+from src.graph.serial_graph import SerialGraph
+from src.graph.serial_node import SerialNode
+from src.storageManager import GameLoader, GameSaver
 from . import config
 from .zoomableGraphicsView import ZoomableGraphicsView
 from .nodeWidget import NodeWidget
@@ -37,7 +37,7 @@ class _GameGenerationWorker(QtCore.QObject):
 
     @QtCore.Slot()
     def run(self) -> None:
-        from game_generation_local_llm.game_generator import GameGenerator
+        from src.game_generation_local_llm.game_generator import GameGenerator
 
         try:
             generator = GameGenerator()

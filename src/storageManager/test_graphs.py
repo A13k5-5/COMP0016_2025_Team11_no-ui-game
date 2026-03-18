@@ -1,5 +1,5 @@
-from graph.enum_LR import EnumLR
-from graph import Node
+from src.graph.enum_LR import EnumLR
+from src.graph import Node
 
 
 def build_default_story_graph() -> Node:

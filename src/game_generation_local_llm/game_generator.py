@@ -3,10 +3,10 @@ from typing import Any, Callable
 
 from openvino_genai import LLMPipeline
 
-from graph.serial_graph import SerialGraph
-from game_generation_local_llm.graph_blueprint.blueprint import GraphBlueprint
-from game_generation_local_llm.graph_blueprint.blueprint_generator import BlueprintGenerator
-from game_generation_local_llm.story_generator.story_generator import StoryGenerator
+from src.graph.serial_graph import SerialGraph
+from src.game_generation_local_llm.graph_blueprint.blueprint import GraphBlueprint
+from src.game_generation_local_llm.graph_blueprint.blueprint_generator import BlueprintGenerator
+from src.game_generation_local_llm.story_generator.story_generator import StoryGenerator
 
 
 class GameGenerator:

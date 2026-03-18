@@ -1,8 +1,8 @@
 from pydantic import BaseModel
 from typing import Self
 
-from graph import Node
-from graph.serial_node import SerialNode
+from src.graph import Node
+from src.graph.serial_node import SerialNode
 
 
 class SerialGraph(BaseModel):

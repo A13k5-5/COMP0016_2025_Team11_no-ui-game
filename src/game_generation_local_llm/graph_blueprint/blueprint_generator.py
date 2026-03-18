@@ -1,5 +1,4 @@
 import json
-import os
 from typing import Any, Callable
 
 from openvino_genai import GenerationConfig, LLMPipeline, StructuredOutputConfig, ChatHistory
