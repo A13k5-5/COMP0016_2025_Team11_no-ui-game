@@ -1,15 +1,15 @@
 {
     "input_device": "webcam",
     "gestures": {
-        "option_left": "1",
-        "option_right": "0",
-        "replay_main": "4",
-        "replay_options": "3",
+        "option_left": "4",
+        "option_right": "3",
+        "replay_main": "1",
+        "replay_options": "0",
         "quit": "2"
     },
     "keyboard": {
-        "option_left": "Left",
-        "option_right": "Right",
+        "option_left": "J",
+        "option_right": "K",
         "replay_main": "R",
         "replay_options": "F",
         "quit": "Q"

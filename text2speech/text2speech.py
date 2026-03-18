@@ -1,3 +1,12 @@
+# nuitka-project: --standalone
+
+# nuitka-project: --include-package=transformers
+# nuitka-project: --nofollow-import-to=matplotlib
+
+# nuitka-project: --spacy-language-model=en_core_web_sm
+
+
+
 from kokoro import KPipeline
 import soundfile as sf
 
