@@ -11,11 +11,11 @@ class AudioPlayer:
         """
         Play the audio file at the given path.
         """
-        print(file_path)
         try:
             playsound(file_path)
         except Exception as e:
-            print(f"Error playing audio file {file_path}: {e}")
+            # should be a better handling probably - a popup window maybe? or an audio file?
+            pass
 
     def play_main_audio(self, game_path: str, node_id: int):
         """
