@@ -290,6 +290,7 @@ class GameCreationPage(QtWidgets.QWidget):
         self._generation_worker = worker
         thread.start()
 
+    # payload is sent from the backend, this method is like a rest controller
     @QtCore.Slot(dict)
     def _on_generation_progress(self, payload: dict[str, Any]) -> None:
         stage = payload.get("stage", "")
@@ -372,6 +373,7 @@ class GameCreationPage(QtWidgets.QWidget):
         lose_nodes = {int(node_id) for node_id in blueprint.lose_nodes}
         serial_graph: SerialGraph = SerialGraph(nodes={})
 
+        # for each node, get the generated payload if available, or create a placeholder with blueprint adjacency and win/lose flags
         for raw_node_id, raw_adjacency in blueprint.adjacency.items():
             node_id = int(raw_node_id)
             is_win = node_id in win_nodes
