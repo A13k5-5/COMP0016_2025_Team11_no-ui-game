@@ -123,7 +123,6 @@ class SettingsPage(QtWidgets.QDialog):
         timeout_row = QtWidgets.QHBoxLayout()
         timeout_row.addWidget(self._timeout_min_spin)
         timeout_row.addWidget(QtWidgets.QLabel("m"))
-        timeout_row.addWidget(QtWidgets.QLabel(":"))
         timeout_row.addWidget(self._timeout_sec_spin)
         timeout_row.addWidget(QtWidgets.QLabel("s"))
         timeout_row.addStretch()
