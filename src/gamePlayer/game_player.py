@@ -31,10 +31,16 @@ class GamePlayer:
 
         # before starting the game loop, show the menu
         progress_node: Node = self.progress_tracker.get_progress_node(game_folder, root_node)
-        self.audio_player.play_main_menu_audio(game_folder, progress_node is not None)
-        start_node = self._start_from(root_node, progress_node, game_folder)
+        while True:
+            self.audio_player.play_main_menu_audio(game_folder, progress_node is not None)
+            start_node = self._start_from(root_node, progress_node, game_folder)
 
-        self._start_game_loop(start_node, game_folder, zip_path)
+            if start_node is None:
+                # player chose to quit from the menu
+                self.audio_player.play_quit_audio(game_folder)
+                break
+
+            self._start_game_loop(start_node, game_folder, zip_path)
 
     def _gesture_to_side(self, gesture: EnumGesture) -> EnumLR | None:
         if gesture == self.settings.get_left_gesture():
@@ -52,7 +58,7 @@ class GamePlayer:
         option_gestures = [self._side_to_gesture(side) for side in node.get_possible_sides()]
         return option_gestures + self.settings.get_replay_gestures() + [self.settings.get_quit_gesture()]
 
-    def _start_from(self, root_node: Node, saved_node: Node, game_folder: str) -> Node:
+    def _start_from(self, root_node: Node, saved_node: Node, game_folder: str) -> Node | None:
         """
         If a progress.json exists for this game, ask the player whether to
         resume or restart via a Left/Right gesture.
@@ -64,11 +70,13 @@ class GamePlayer:
         decision = self.recogniser.get_gesture(available_gestures + [self.settings.get_quit_gesture()])
 
         if decision == self.settings.get_left_gesture():
-            self.audio_player.play_audio_from_file(game_folder, "resume.wav")
+            self.audio_player.play_resume_audio(game_folder)
             return saved_node
-        else:
-            self.audio_player.play_audio_from_file(game_folder, "start_new.wav")
+        elif decision == self.settings.get_right_gesture():
+            self.audio_player.play_start_new_audio(game_folder)
             return root_node
+        # for quitting gesture
+        return None
 
     def _start_game_loop(self, start_node: Node, game_folder: str, zip_path: str):
         """
@@ -83,14 +91,14 @@ class GamePlayer:
             decision: EnumGesture = self.recogniser.get_gesture(self._allowed_gestures_for_node(cur_node))
 
             if decision == self.settings.get_quit_gesture():
-                self._handle_quit(cur_node, game_folder, zip_path)
+                self._handle_quit_from_game(cur_node, game_folder, zip_path)
                 break
 
             decision = self._handle_replay(decision, cur_node, game_folder)
 
             # handle quit again in case the player decided to quit while replaying
             if decision == self.settings.get_quit_gesture():
-                self._handle_quit(cur_node, game_folder, zip_path)
+                self._handle_quit_from_game(cur_node, game_folder, zip_path)
                 break
 
             chosen_side = self._gesture_to_side(decision)
@@ -118,16 +126,16 @@ class GamePlayer:
 
         return decision
 
-    def _handle_quit(self, cur_node: Node, game_folder: str, zip_path: str):
+    def _handle_quit_from_game(self, cur_node: Node, game_folder: str, zip_path: str):
         self.progress_tracker.save_progress(zip_path, cur_node.get_id())
-        self.audio_player.play_audio_from_file(game_folder, "quit.wav")
+        self.audio_player.play_quit_audio(game_folder)
 
     def _handle_win(self, cur_node: Node, game_folder: str, zip_path: str):
         self.audio_player.play_audio(game_folder, cur_node.get_id())
-        self.audio_player.play_audio_from_file(game_folder, "win.wav")
+        self.audio_player.play_win_audio(game_folder)
         self.progress_tracker.clear_progress(zip_path)
 
     def _handle_lose(self, cur_node: Node, game_folder: str, zip_path: str):
         self.audio_player.play_audio(game_folder, cur_node.get_id())
-        self.audio_player.play_audio_from_file(game_folder, "lose.wav")
+        self.audio_player.play_lose_audio(game_folder)
         self.progress_tracker.clear_progress(zip_path)

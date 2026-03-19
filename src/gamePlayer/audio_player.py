@@ -38,6 +38,36 @@ class AudioPlayer:
         if progress_exists:
             self.play_audio_from_path(os.path.join(game_folder, "audio", "main_menu_progress.wav"))
 
+    def play_quit_audio(self, game_folder: str):
+        """
+        Play the quit audio file.
+        """
+        self.play_audio_from_path(os.path.join(game_folder, "audio", "quit.wav"))
+
+    def play_win_audio(self, game_folder: str):
+        """
+        Play the win audio file.
+        """
+        self.play_audio_from_path(os.path.join(game_folder, "audio", "win.wav"))
+
+    def play_lose_audio(self, game_folder: str):
+        """
+        Play the lose audio file.
+        """
+        self.play_audio_from_path(os.path.join(game_folder, "audio", "lose.wav"))
+
+    def play_resume_audio(self, game_folder: str):
+        """
+        Play the resume audio file.
+        """
+        self.play_audio_from_path(os.path.join(game_folder, "audio", "resume.wav"))
+
+    def play_start_new_audio(self, game_folder: str):
+        """
+        Play the start new game audio file.
+        """
+        self.play_audio_from_path(os.path.join(game_folder, "audio", "start_new.wav"))
+
     def play_audio(self, game_folder: str, node_id: int):
         """
         Play the main audio followed by the options audio for the current node.
