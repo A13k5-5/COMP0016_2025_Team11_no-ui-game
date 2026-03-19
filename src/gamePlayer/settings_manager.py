@@ -89,7 +89,22 @@ class SettingsManager:
 
     def get_right_gesture(self):
         return self.get_gesture("option_right")
- 
+
+    def get_quit_gesture(self) -> EnumGesture:
+        return self.get_gesture("quit")
+
+    def get_replay_gestures(self) -> list[EnumGesture]:
+        return [self.get_gesture("replay_main"), self.get_gesture("replay_options")]
+
+    def get_progress_gestures(self) -> list[EnumGesture]:
+        return [self.get_gesture("option_left"), self.get_gesture("option_right")]
+
+    def get_replay_main_gesture(self):
+        return self.get_gesture("replay_main")
+
+    def get_replay_options_gesture(self):
+        return self.get_gesture("replay_options")
+
     def get_gesture(self, action: str) -> EnumGesture:
         return EnumGesture(self._data["gestures"][action])
  
