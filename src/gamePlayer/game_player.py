@@ -81,11 +81,17 @@ class GamePlayer:
 
             # Ask recognizer for a decision (expects a tuple like ("ILoveYou", "Left"))
             decision: EnumGesture = self.recogniser.get_gesture(self._allowed_gestures_for_node(cur_node))
+
             if decision == self.settings.get_quit_gesture():
                 self._handle_quit(cur_node, game_folder, zip_path)
                 break
 
             decision = self._handle_replay(decision, cur_node, game_folder)
+
+            # handle quit again in case the player decided to quit while replaying
+            if decision == self.settings.get_quit_gesture():
+                self._handle_quit(cur_node, game_folder, zip_path)
+                break
 
             chosen_side = self._gesture_to_side(decision)
             if chosen_side is None:
