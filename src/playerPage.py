@@ -77,7 +77,6 @@ class PlayerPage(QtWidgets.QWidget):
         """
         Forward keypresses to KeyboardInputHandler when in keyboard mode.
         """
-        print("key pressed:", event.key(), "has recogniser:", hasattr(self, "_recogniser"))
         if self._settings.is_keyboard_mode() and hasattr(self, "_recogniser"):
             self._recogniser.register_key(event.key())
         super().keyPressEvent(event)

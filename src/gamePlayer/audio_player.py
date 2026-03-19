@@ -88,5 +88,11 @@ class AudioPlayer:
         """
         self.play_audio_from_path(os.path.join(game_folder, "audio", audio_file))
 
+    def play_inactivity_audio(self, game_folder: str):
+        """
+        Play the inactivity audio file.
+        """
+        self.play_audio_from_path(os.path.join(game_folder, "audio", "inactivity.wav"))
+
 if __name__ == "__main__":
     AudioPlayer.play_audio_from_path(Path(__file__).parent.parent / "voiceSamples" / "bf_emma.wav")

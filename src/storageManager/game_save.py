@@ -161,3 +161,7 @@ class GameSaver:
         self._talker.generate_speech("Quitting game. See you next time!", os.path.join(game_path, "audio", "quit.wav"), voice)
         self._talker.generate_speech("Quitting to main menu. Your progress has been saved.", os.path.join(game_path, "audio", "progress_saved.wav"), voice)
 
+        # inactivity audio
+        self._talker.generate_speech("Quitting due to inactivity.", os.path.join(game_path, "audio", "inactivity.wav"), voice)
+
+
