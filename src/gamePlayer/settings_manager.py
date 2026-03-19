@@ -84,10 +84,10 @@ class SettingsManager:
         assert device in ("webcam", "keyboard")
         self._data["input_device"] = device
 
-    def get_left_gesture(self):
+    def get_left_gesture(self) -> EnumGesture:
         return self.get_gesture("option_left")
 
-    def get_right_gesture(self):
+    def get_right_gesture(self) -> EnumGesture:
         return self.get_gesture("option_right")
 
     def get_quit_gesture(self) -> EnumGesture:
@@ -99,10 +99,10 @@ class SettingsManager:
     def get_progress_gestures(self) -> list[EnumGesture]:
         return [self.get_gesture("option_left"), self.get_gesture("option_right")]
 
-    def get_replay_main_gesture(self):
+    def get_replay_main_gesture(self) -> EnumGesture:
         return self.get_gesture("replay_main")
 
-    def get_replay_options_gesture(self):
+    def get_replay_options_gesture(self) -> EnumGesture:
         return self.get_gesture("replay_options")
 
     def get_gesture(self, action: str) -> EnumGesture:

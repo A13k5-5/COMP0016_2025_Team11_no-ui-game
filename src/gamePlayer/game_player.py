@@ -29,16 +29,22 @@ class GamePlayer:
             print(f"Failed to load graph from file: {e}")
             return
 
-        # before starting the game loop, show the menu
-        progress_node: Node = self.progress_tracker.get_progress_node(game_folder, root_node)
         while True:
+            # main menu
+            progress_node: Node = self.progress_tracker.get_progress_node(game_folder, root_node)
             self.audio_player.play_main_menu_audio(game_folder, progress_node is not None)
-            start_node = self._start_from(root_node, progress_node, game_folder)
 
-            if start_node is None:
-                # player chose to quit from the menu
+            decision: EnumGesture = self._get_main_menu_decision(progress_node)
+
+            # quit
+            if decision == self.settings.get_quit_gesture():
                 self.audio_player.play_quit_audio(game_folder)
                 break
+
+            if decision in self.settings.get_replay_gestures():
+                continue
+
+            start_node = self._start_from(root_node, progress_node, game_folder, decision)
 
             self._start_game_loop(start_node, game_folder, zip_path)
 
@@ -58,17 +64,11 @@ class GamePlayer:
         option_gestures = [self._side_to_gesture(side) for side in node.get_possible_sides()]
         return option_gestures + self.settings.get_replay_gestures() + [self.settings.get_quit_gesture()]
 
-    def _start_from(self, root_node: Node, saved_node: Node, game_folder: str) -> Node | None:
+    def _start_from(self, root_node: Node, saved_node: Node, game_folder: str, decision: EnumGesture) -> Node | None:
         """
         If a progress.json exists for this game, ask the player whether to
         resume or restart via a Left/Right gesture.
         """
-        available_gestures = [self.settings.get_right_gesture()]
-        if saved_node is not None:
-            available_gestures.append(self.settings.get_left_gesture())
-
-        decision = self.recogniser.get_gesture(available_gestures + [self.settings.get_quit_gesture()])
-
         if decision == self.settings.get_left_gesture():
             self.audio_player.play_resume_audio(game_folder)
             return saved_node
@@ -77,6 +77,19 @@ class GamePlayer:
             return root_node
         # for quitting gesture
         return None
+
+    def _get_main_menu_decision(self, progress_node: Node) -> EnumGesture:
+        available_gestures: list[EnumGesture] = self.settings.get_replay_gestures() + [self.settings.get_quit_gesture()]
+
+        # right gesture always there to start the game
+        available_gestures.append(self.settings.get_right_gesture())
+
+        if progress_node is not None:
+            # if progress exists, left gesture to resume the game
+            available_gestures.append(self.settings.get_left_gesture())
+
+        decision = self.recogniser.get_gesture(available_gestures)
+        return decision
 
     def _start_game_loop(self, start_node: Node, game_folder: str, zip_path: str):
         """
@@ -87,13 +100,14 @@ class GamePlayer:
             # Play current scene audio
             self.audio_player.play_audio(game_folder, cur_node.get_id())
 
-            # Ask recognizer for a decision (expects a tuple like ("ILoveYou", "Left"))
+            # Ask recognizer for a decision
             decision: EnumGesture = self.recogniser.get_gesture(self._allowed_gestures_for_node(cur_node))
 
             if decision == self.settings.get_quit_gesture():
                 self._handle_quit_from_game(cur_node, game_folder, zip_path)
                 break
 
+            # handle replays
             decision = self._handle_replay(decision, cur_node, game_folder)
 
             # handle quit again in case the player decided to quit while replaying
@@ -101,7 +115,7 @@ class GamePlayer:
                 self._handle_quit_from_game(cur_node, game_folder, zip_path)
                 break
 
-            chosen_side = self._gesture_to_side(decision)
+            chosen_side: EnumLR | None = self._gesture_to_side(decision)
             if chosen_side is None:
                 continue
             cur_node = cur_node.getNode(chosen_side)
@@ -128,12 +142,11 @@ class GamePlayer:
 
     def _handle_quit_from_game(self, cur_node: Node, game_folder: str, zip_path: str):
         self.progress_tracker.save_progress(zip_path, cur_node.get_id())
-        self.audio_player.play_quit_audio(game_folder)
+        self.audio_player.play_quitting_to_main_menu(game_folder)
 
     def _handle_win(self, cur_node: Node, game_folder: str, zip_path: str):
         self.audio_player.play_audio(game_folder, cur_node.get_id())
         self.audio_player.play_win_audio(game_folder)
-        self.progress_tracker.clear_progress(zip_path)
 
     def _handle_lose(self, cur_node: Node, game_folder: str, zip_path: str):
         self.audio_player.play_audio(game_folder, cur_node.get_id())

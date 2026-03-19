@@ -44,6 +44,12 @@ class AudioPlayer:
         """
         self.play_audio_from_path(os.path.join(game_folder, "audio", "quit.wav"))
 
+    def play_quitting_to_main_menu(self, game_folder: str):
+        """
+        Play the progress saved audio file.
+        """
+        self.play_audio_from_path(os.path.join(game_folder, "audio", "progress_saved.wav"))
+
     def play_win_audio(self, game_folder: str):
         """
         Play the win audio file.
