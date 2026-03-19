@@ -82,17 +82,10 @@ class GamePlayer:
             # Ask recognizer for a decision (expects a tuple like ("ILoveYou", "Left"))
             decision: EnumGesture = self.recogniser.get_gesture(self._allowed_gestures_for_node(cur_node))
             if decision == self.settings.get_quit_gesture():
-                self.progress_tracker.save_progress(zip_path, cur_node.get_id())
-                self.audio_player.play_audio_from_file(game_folder, "quit.wav")
+                self._handle_quit(cur_node, game_folder, zip_path)
                 break
 
-            while decision in self.settings.get_replay_gestures():
-                if decision == self.settings.get_replay_main_gesture():
-                    self.audio_player.play_main_audio(game_folder, cur_node.get_id())
-                elif decision == self.settings.get_replay_options_gesture():
-                    self.audio_player.play_options_audio(game_folder, cur_node.get_id())
-
-                decision: EnumGesture = self.recogniser.get_gesture(self._allowed_gestures_for_node(cur_node))
+            decision = self._handle_replay(decision, cur_node, game_folder)
 
             chosen_side = self._gesture_to_side(decision)
             if chosen_side is None:
@@ -100,14 +93,35 @@ class GamePlayer:
             cur_node = cur_node.getNode(chosen_side)
 
             if cur_node.is_win:
-                self.audio_player.play_audio(game_folder, cur_node.get_id())
-                self.audio_player.play_audio_from_file(game_folder, "win.wav")
-                self.progress_tracker.clear_progress(zip_path)
+                self._handle_win(cur_node, game_folder, zip_path)
                 break
             if cur_node.is_losing:
-                self.audio_player.play_audio(game_folder, cur_node.get_id())
-                self.audio_player.play_audio_from_file(game_folder, "lose.wav")
-                self.progress_tracker.clear_progress(zip_path)
+                self._handle_lose(cur_node, game_folder, zip_path)
                 break
 
             time.sleep(1)
+
+    def _handle_replay(self, decision: EnumGesture, cur_node: Node, game_folder: str) -> EnumGesture:
+        while decision in self.settings.get_replay_gestures():
+            if decision == self.settings.get_replay_main_gesture():
+                self.audio_player.play_main_audio(game_folder, cur_node.get_id())
+            elif decision == self.settings.get_replay_options_gesture():
+                self.audio_player.play_options_audio(game_folder, cur_node.get_id())
+
+            decision: EnumGesture = self.recogniser.get_gesture(self._allowed_gestures_for_node(cur_node))
+
+        return decision
+
+    def _handle_quit(self, cur_node: Node, game_folder: str, zip_path: str):
+        self.progress_tracker.save_progress(zip_path, cur_node.get_id())
+        self.audio_player.play_audio_from_file(game_folder, "quit.wav")
+
+    def _handle_win(self, cur_node: Node, game_folder: str, zip_path: str):
+        self.audio_player.play_audio(game_folder, cur_node.get_id())
+        self.audio_player.play_audio_from_file(game_folder, "win.wav")
+        self.progress_tracker.clear_progress(zip_path)
+
+    def _handle_lose(self, cur_node: Node, game_folder: str, zip_path: str):
+        self.audio_player.play_audio(game_folder, cur_node.get_id())
+        self.audio_player.play_audio_from_file(game_folder, "lose.wav")
+        self.progress_tracker.clear_progress(zip_path)
