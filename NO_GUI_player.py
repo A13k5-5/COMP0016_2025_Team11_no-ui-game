@@ -7,6 +7,7 @@
 
 # recognizer file
 # nuitka-project: --include-data-files={MAIN_DIRECTORY}/src/myGestureRecognizer/gesture_recognizer.task=src/myGestureRecognizer/gesture_recognizer.task
+
 if __name__ == "__main__":
     import sys
 
