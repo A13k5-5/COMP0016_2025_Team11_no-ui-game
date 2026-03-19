@@ -818,10 +818,12 @@ class GameCreationPage(QtWidgets.QWidget):
             if node_id in visited:
                 if parent_widget is not None and side is not None:
                     target_widget = backend_to_widget[node_id]
-                    if parent_widget not in self.node_children:
-                        self.node_children[parent_widget] = {}
-                    self.node_children[parent_widget][side] = target_widget
-                    self._draw_line(parent_widget, side, target_widget)
+                    # skip self-loops (terminal win/lose nodes point to themselves)
+                    if target_widget is not parent_widget:
+                        if parent_widget not in self.node_children:
+                            self.node_children[parent_widget] = {}
+                        self.node_children[parent_widget][side] = target_widget
+                        self._draw_line(parent_widget, side, target_widget)
                 continue
 
             visited.add(node_id)
