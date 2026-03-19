@@ -96,20 +96,50 @@ class SettingsPage(QtWidgets.QDialog):
 
     def _timeout_setting(self) -> None:
         """
-        Add a spin box to configure the gesture recogniser timeout in seconds.
+        Add a spin box and unit selector to configure the gesture recogniser timeout.
+        The user can toggle between seconds and minutes — the value is converted automatically.
+        Stored internally as seconds.
         """
         timeout_group = QtWidgets.QGroupBox("Gesture Recognizer")
         timeout_layout = QtWidgets.QFormLayout(timeout_group)
         timeout_layout.setSpacing(8)
+ 
         self._timeout_spin = QtWidgets.QDoubleSpinBox()
-        self._timeout_spin.setRange(1.0, 60.0)
-        self._timeout_spin.setSingleStep(0.5)
         self._timeout_spin.setDecimals(1)
-        self._timeout_spin.setSuffix(" s")
-        self._timeout_spin.setValue(self._settings.get_recogniser_timeout())
+        self._timeout_spin.setSingleStep(1.0)
         self._timeout_spin.setFixedWidth(80)
-        timeout_layout.addRow("Timeout:", self._timeout_spin)
+ 
+        self._timeout_unit = QtWidgets.QComboBox()
+        self._timeout_unit.addItem("sec", userData="sec")
+        self._timeout_unit.addItem("min", userData="min")
+        self._timeout_unit.setFixedWidth(60)
+        self._timeout_unit.currentIndexChanged.connect(self._on_timeout_unit_changed)
+
+        self._timeout_spin.setRange(1.0, 3600.0)
+        self._timeout_spin.setValue(self._settings.get_recogniser_timeout())
+ 
+        timeout_row = QtWidgets.QHBoxLayout()
+        timeout_row.addWidget(self._timeout_spin)
+        timeout_row.addWidget(self._timeout_unit)
+        timeout_row.addStretch()
+ 
+        timeout_layout.addRow("Timeout:", timeout_row)
         self.layout.addWidget(timeout_group)
+
+    def _on_timeout_unit_changed(self, index: int) -> None:
+        """
+        Convert the displayed value when the user switches between seconds and minutes.
+        """
+        unit = self._timeout_unit.currentData()
+        current = self._timeout_spin.value()
+        if unit == "min":
+            self._timeout_spin.setRange(0.1, 60.0)
+            self._timeout_spin.setSingleStep(0.5)
+            self._timeout_spin.setValue(round(current / 60.0, 1))
+        else:
+            self._timeout_spin.setRange(1.0, 3600.0)
+            self._timeout_spin.setSingleStep(1.0)
+            self._timeout_spin.setValue(round(current * 60.0, 1))
 
     def _buttons(self) -> None:
         """Add Save and Cancel buttons."""
@@ -166,7 +196,9 @@ class SettingsPage(QtWidgets.QDialog):
             self._settings.set_gesture(action, combo.currentData())
         for action, key in keys.items():
             self._settings.set_key(action, key)
-        # save timeout value
-        self._settings.set_recogniser_timeout(self._timeout_spin.value())
+        # save timeout value - convert to sec
+        unit = self._timeout_unit.currentData()
+        timeout_seconds = self._timeout_spin.value() * 60.0 if unit == "min" else self._timeout_spin.value()
+        self._settings.set_recogniser_timeout(timeout_seconds)
         self._settings.save()
         self.accept()
