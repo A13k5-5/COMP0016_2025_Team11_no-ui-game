@@ -30,7 +30,7 @@ class GamePlayer:
             return
 
         # before starting the game loop, show the menu
-        progress_node: Node = self._get_progress_node(game_folder, root_node)
+        progress_node: Node = self.progress_tracker.get_progress_node(game_folder, root_node)
         self.audio_player.play_main_menu_audio(game_folder, progress_node is not None)
         start_node = self._start_from(root_node, progress_node, game_folder)
 
@@ -51,33 +51,6 @@ class GamePlayer:
     def _allowed_gestures_for_node(self, node: Node) -> list[EnumGesture]:
         option_gestures = [self._side_to_gesture(side) for side in node.get_possible_sides()]
         return option_gestures + self.settings.get_replay_gestures() + [self.settings.get_quit_gesture()]
-
-    def _get_progress_node(self, game_folder: str, root_node: Node) -> Node | None:
-        """
-        Gives the progress node if a progress.json file exists and is valid, otherwise returns None.
-        :param game_folder:
-        :param root_node:
-        :return:
-        """
-        progress_path = os.path.join(game_folder, "progress.json")
-
-        # if doesn't exist, return None
-        if not os.path.exists(progress_path):
-            return None
-
-        try:
-            # if error, return None
-            with open(progress_path, "r") as f:
-                data = json.load(f)
-            saved_id = data.get("node_id")
-            saved_node = self._find_node_by_id(root_node, saved_id)
-        except Exception:
-            return None
-
-        if saved_node is None:
-            return None
-
-        return saved_node
 
     def _start_from(self, root_node: Node, saved_node: Node, game_folder: str) -> Node:
         """
@@ -138,21 +111,3 @@ class GamePlayer:
                 break
 
             time.sleep(1)
-
-    
-    def _find_node_by_id(self, root: Node, target_id: int) -> Node | None:
-        """
-        BFS from root to find the node with the given ID
-        """
-        visited: set[int] = set()
-        queue: list[Node] = [root]
-        while queue:
-            node = queue.pop(0)
-            node_id = node.get_id()
-            if node_id in visited:
-                continue
-            visited.add(node_id)
-            if node_id == target_id:
-                return node
-            queue.extend(node.adjacencyList.values())
-        return None
