@@ -3,11 +3,12 @@ from src.gesture import EnumGesture
 from src.gamePlayer.settings_manager import SettingsManager
 
 ACTIONS = [
-    ("option_left",    "Option Left"),
-    ("option_right",   "Option Right"),
-    ("replay_main",    "Replay Main Text"),
-    ("replay_options", "Replay Options Text"),
-    ("quit",           "Quit / Save Progress"),
+    ("option_left",        "Option Left"),
+    ("option_right",       "Option Right"),
+    ("replay_main",        "Replay Main Text"),
+    ("replay_options",     "Replay Options Text"),
+    ("quit",               "Quit / Save Progress"),
+    ("recogniser_timeout", "Gesture Recognizer Timeout (s)"),
 ]
 
 GESTURE_OPTIONS = [g for g in EnumGesture if g != EnumGesture.INVALID]
@@ -79,7 +80,7 @@ class SettingsPage(QtWidgets.QDialog):
         kb_layout = QtWidgets.QFormLayout(kb_group)
         kb_layout.setSpacing(8)
         self._key_edits: dict[str, QtWidgets.QLineEdit] = {}
-        
+
         for action, label in ACTIONS:
             edit = QtWidgets.QLineEdit(self._settings.get_key(action))
             edit.setMaxLength(1)
@@ -137,11 +138,11 @@ class SettingsPage(QtWidgets.QDialog):
                 "Each action must have a unique gesture. Please resolve the conflicts before saving."
             )
             return
-        
+
         keys = self._validate_key_bindings()
         if keys is None:
             return
-        
+
         device = "keyboard" if self._keyboard_radio.isChecked() else "webcam"
         self._settings.set_input_device(device)
         for action, combo in self._dropdowns.items():

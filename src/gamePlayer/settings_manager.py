@@ -1,10 +1,11 @@
 import os
 import json
 from src.gesture import EnumGesture
+from pathlib import Path
 
-SETTINGS_PATH = os.path.join(os.path.dirname(__file__), "..", "settings.json")
+SETTINGS_PATH: Path = Path(__file__).parent.parent / "settings.json"
 
-DEFAULT_SETTINGS = {
+DEFAULT_SETTINGS: dict = {
     "input_device": "webcam",  # "webcam" or "keyboard"
     "gestures": {
         "option_left":    EnumGesture.ILoveYou_Left.value,
@@ -19,7 +20,8 @@ DEFAULT_SETTINGS = {
         "replay_main":    "R",
         "replay_options": "F",
         "quit":           "Q",
-    }
+    },
+    "recogniser_timeout": 5.0 # seconds to wait for gesture recognizer before timeout
 }
  
 
@@ -117,4 +119,8 @@ class SettingsManager:
     def set_key(self, action: str, key: str) -> None:
         self._data["keyboard"][action] = key
 
-    
+    def get_recogniser_timeout(self) -> float:
+        return self._data["recogniser_timeout"]
+
+    def set_recogniser_timeout(self, timeout: float) -> None:
+        self._data["recogniser_timeout"] = timeout
