@@ -111,13 +111,13 @@ class SettingsPage(QtWidgets.QDialog):
         self._timeout_min_spin = QtWidgets.QSpinBox()
         self._timeout_min_spin.setRange(0, 59)
         self._timeout_min_spin.setValue(initial_min)
-        self._timeout_min_spin.setFixedWidth(50)
+        self._timeout_min_spin.setFixedWidth(80)
         self._timeout_min_spin.setFixedHeight(26)
  
         self._timeout_sec_spin = QtWidgets.QSpinBox()
         self._timeout_sec_spin.setRange(0, 59)
         self._timeout_sec_spin.setValue(initial_sec)
-        self._timeout_sec_spin.setFixedWidth(50)
+        self._timeout_sec_spin.setFixedWidth(80)
         self._timeout_sec_spin.setFixedHeight(26)
  
         timeout_row = QtWidgets.QHBoxLayout()
