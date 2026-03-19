@@ -13,5 +13,5 @@ if __name__ == "__main__":
     from src import playerPage
     if len(sys.argv) > 1:
         playerPage.run(sys.argv[1])
-    playerPage.run()
-
+    else:
+        playerPage.run()
