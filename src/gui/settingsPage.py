@@ -31,6 +31,7 @@ class SettingsPage(QtWidgets.QDialog):
         self._input_selection()
         self._gesture_bindings()
         self._keyboard_bindings()
+        self._timeout_setting()
         self._buttons()
 
     def _setup_window_layout(self) -> None:
@@ -93,6 +94,23 @@ class SettingsPage(QtWidgets.QDialog):
 
         self.layout.addWidget(kb_group)
 
+    def _timeout_setting(self) -> None:
+        """
+        Add a spin box to configure the gesture recogniser timeout in seconds.
+        """
+        timeout_group = QtWidgets.QGroupBox("Gesture Recognizer")
+        timeout_layout = QtWidgets.QFormLayout(timeout_group)
+        timeout_layout.setSpacing(8)
+        self._timeout_spin = QtWidgets.QDoubleSpinBox()
+        self._timeout_spin.setRange(1.0, 60.0)
+        self._timeout_spin.setSingleStep(0.5)
+        self._timeout_spin.setDecimals(1)
+        self._timeout_spin.setSuffix(" s")
+        self._timeout_spin.setValue(self._settings.get_recogniser_timeout())
+        self._timeout_spin.setFixedWidth(80)
+        timeout_layout.addRow("Timeout:", self._timeout_spin)
+        self.layout.addWidget(timeout_group)
+
     def _buttons(self) -> None:
         """Add Save and Cancel buttons."""
         btn_row = QtWidgets.QHBoxLayout()
@@ -148,5 +166,7 @@ class SettingsPage(QtWidgets.QDialog):
             self._settings.set_gesture(action, combo.currentData())
         for action, key in keys.items():
             self._settings.set_key(action, key)
+        # save timeout value
+        self._settings.set_recogniser_timeout(self._timeout_spin.value())
         self._settings.save()
         self.accept()
