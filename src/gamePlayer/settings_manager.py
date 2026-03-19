@@ -83,6 +83,12 @@ class SettingsManager:
     def set_input_device(self, device: str) -> None:
         assert device in ("webcam", "keyboard")
         self._data["input_device"] = device
+
+    def get_left_gesture(self):
+        return self.get_gesture("option_left")
+
+    def get_right_gesture(self):
+        return self.get_gesture("option_right")
  
     def get_gesture(self, action: str) -> EnumGesture:
         return EnumGesture(self._data["gestures"][action])

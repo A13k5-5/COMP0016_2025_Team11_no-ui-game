@@ -38,13 +38,17 @@ class GamePlayer:
             print(f"Failed to load graph from file: {e}")
             return
 
-        start_node = self._start_from(root_node, game_folder, zip_path)
+        # before starting the game loop, show the menu
+        progress_node: Node = self._get_progress_node(game_folder, root_node)
+        self.audio_player.play_main_menu_audio(game_folder, progress_node is not None)
+        start_node = self._start_from(root_node, progress_node, game_folder)
+
         self._start_game_loop(start_node, game_folder, zip_path)
 
     def _gesture_to_side(self, gesture: EnumGesture) -> EnumLR | None:
-        if gesture == self.settings.get_gesture("option_left"):
+        if gesture == self.settings.get_left_gesture():
             return EnumLR.LEFT
-        if gesture == self.settings.get_gesture("option_right"):
+        if gesture == self.settings.get_right_gesture():
             return EnumLR.RIGHT
         return None
 
@@ -57,28 +61,43 @@ class GamePlayer:
         option_gestures = [self._side_to_gesture(side) for side in node.get_possible_sides()]
         return option_gestures + self._replay_gestures() + [self._quit_gesture()]
 
-    def _start_from(self, root_node: Node, game_folder: str, zip_path: str) -> Node:
+    def _get_progress_node(self, game_folder: str, root_node: Node) -> Node | None:
         """
-        If a progress.json exists for this game, ask the player whether to
-        resume or restart via a Left/Right gesture.
+        Gives the progress node if a progress.json file exists and is valid, otherwise returns None.
+        :param game_folder:
+        :param root_node:
+        :return:
         """
         progress_path = os.path.join(game_folder, "progress.json")
+
+        # if doesn't exist, return None
         if not os.path.exists(progress_path):
-            return root_node
+            return None
 
         try:
+            # if error, return None
             with open(progress_path, "r") as f:
                 data = json.load(f)
             saved_id = data.get("node_id")
             saved_node = self._find_node_by_id(root_node, saved_id)
         except Exception:
-            return root_node
+            return None
 
         if saved_node is None:
-            return root_node
+            return None
 
-        self.audio_player.play_audio_from_file(game_folder, "progress.wav")
-        decision = self.recogniser.get_gesture(self._progress_gestures() + [self._quit_gesture()])
+        return saved_node
+
+    def _start_from(self, root_node: Node, saved_node: Node, game_folder: str) -> Node:
+        """
+        If a progress.json exists for this game, ask the player whether to
+        resume or restart via a Left/Right gesture.
+        """
+        available_gestures = [self.settings.get_right_gesture()]
+        if saved_node is not None:
+            available_gestures.append(self.settings.get_left_gesture())
+
+        decision = self.recogniser.get_gesture(available_gestures + [self._quit_gesture()])
 
         if decision == self.settings.get_gesture("option_left"):
             self.audio_player.play_audio_from_file(game_folder, "resume.wav")
@@ -127,7 +146,7 @@ class GamePlayer:
                 self.progress_tracker.clear_progress(zip_path)
                 break
 
-            time.sleep(2)
+            time.sleep(1)
 
     
     def _find_node_by_id(self, root: Node, target_id: int) -> Node | None:
