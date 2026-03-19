@@ -3,11 +3,11 @@ from src.gesture import EnumGesture
 from src.gamePlayer.settings_manager import SettingsManager
 
 ACTIONS = [
-    ("option_left",    "Option Left"),
-    ("option_right",   "Option Right"),
-    ("replay_main",    "Replay Main Text"),
-    ("replay_options", "Replay Options Text"),
-    ("quit",           "Quit / Save Progress"),
+    ("option_left",        "Option Left"),
+    ("option_right",       "Option Right"),
+    ("replay_main",        "Replay Main Text"),
+    ("replay_options",     "Replay Options Text"),
+    ("quit",               "Quit / Save Progress")
 ]
 
 GESTURE_OPTIONS = [g for g in EnumGesture if g != EnumGesture.INVALID]
@@ -31,6 +31,7 @@ class SettingsPage(QtWidgets.QDialog):
         self._input_selection()
         self._gesture_bindings()
         self._keyboard_bindings()
+        self._timeout_setting()
         self._buttons()
 
     def _setup_window_layout(self) -> None:
@@ -79,7 +80,7 @@ class SettingsPage(QtWidgets.QDialog):
         kb_layout = QtWidgets.QFormLayout(kb_group)
         kb_layout.setSpacing(8)
         self._key_edits: dict[str, QtWidgets.QLineEdit] = {}
-        
+
         for action, label in ACTIONS:
             edit = QtWidgets.QLineEdit(self._settings.get_key(action))
             edit.setMaxLength(1)
@@ -92,6 +93,42 @@ class SettingsPage(QtWidgets.QDialog):
             kb_layout.addRow(label + ":", edit)
 
         self.layout.addWidget(kb_group)
+
+    def _timeout_setting(self) -> None:
+        """
+        Add two integer spin boxes (minutes : seconds) to configure the gesture
+        recogniser timeout. 
+        Stored internally as seconds.
+        """
+        timeout_group = QtWidgets.QGroupBox("Gesture Recognizer")
+        timeout_layout = QtWidgets.QFormLayout(timeout_group)
+        timeout_layout.setSpacing(8)
+ 
+        total_seconds = int(self._settings.get_recogniser_timeout())
+        initial_min = total_seconds // 60
+        initial_sec = total_seconds % 60
+ 
+        self._timeout_min_spin = QtWidgets.QSpinBox()
+        self._timeout_min_spin.setRange(0, 59)
+        self._timeout_min_spin.setValue(initial_min)
+        self._timeout_min_spin.setFixedWidth(80)
+        self._timeout_min_spin.setFixedHeight(26)
+ 
+        self._timeout_sec_spin = QtWidgets.QSpinBox()
+        self._timeout_sec_spin.setRange(0, 59)
+        self._timeout_sec_spin.setValue(initial_sec)
+        self._timeout_sec_spin.setFixedWidth(80)
+        self._timeout_sec_spin.setFixedHeight(26)
+ 
+        timeout_row = QtWidgets.QHBoxLayout()
+        timeout_row.addWidget(self._timeout_min_spin)
+        timeout_row.addWidget(QtWidgets.QLabel("m"))
+        timeout_row.addWidget(self._timeout_sec_spin)
+        timeout_row.addWidget(QtWidgets.QLabel("s"))
+        timeout_row.addStretch()
+ 
+        timeout_layout.addRow("Timeout:", timeout_row)
+        self.layout.addWidget(timeout_group)
 
     def _buttons(self) -> None:
         """Add Save and Cancel buttons."""
@@ -137,16 +174,19 @@ class SettingsPage(QtWidgets.QDialog):
                 "Each action must have a unique gesture. Please resolve the conflicts before saving."
             )
             return
-        
+
         keys = self._validate_key_bindings()
         if keys is None:
             return
-        
+
         device = "keyboard" if self._keyboard_radio.isChecked() else "webcam"
         self._settings.set_input_device(device)
         for action, combo in self._dropdowns.items():
             self._settings.set_gesture(action, combo.currentData())
         for action, key in keys.items():
             self._settings.set_key(action, key)
+        # save timeout value - convert to sec
+        timeout_seconds = self._timeout_min_spin.value() * 60 + self._timeout_sec_spin.value()
+        self._settings.set_recogniser_timeout(float(timeout_seconds))
         self._settings.save()
         self.accept()
