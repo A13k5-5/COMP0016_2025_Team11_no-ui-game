@@ -7,8 +7,7 @@ ACTIONS = [
     ("option_right",       "Option Right"),
     ("replay_main",        "Replay Main Text"),
     ("replay_options",     "Replay Options Text"),
-    ("quit",               "Quit / Save Progress"),
-    ("recogniser_timeout", "Gesture Recognizer Timeout (s)"),
+    ("quit",               "Quit / Save Progress")
 ]
 
 GESTURE_OPTIONS = [g for g in EnumGesture if g != EnumGesture.INVALID]
