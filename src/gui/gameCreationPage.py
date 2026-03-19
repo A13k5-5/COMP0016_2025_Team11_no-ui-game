@@ -52,6 +52,26 @@ class _GameGenerationWorker(QtCore.QObject):
         self.progress.emit(payload)
 
 
+class _AutoResizeTextEdit(QtWidgets.QTextEdit):
+    """
+    QTextEdit that grows vertically as text is typed, up to a maximum height,
+    and shrinks back when text is removed.
+    """
+    _MIN_HEIGHT = 80
+    _MAX_HEIGHT = 300
+ 
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setMinimumHeight(self._MIN_HEIGHT)
+        self.setMaximumHeight(self._MAX_HEIGHT)
+        self.document().contentsChanged.connect(self._adjust_height)
+ 
+    def _adjust_height(self) -> None:
+        doc_height = int(self.document().size().height()) + 10  # +10 for padding
+        new_height = max(self._MIN_HEIGHT, min(doc_height, self._MAX_HEIGHT))
+        self.setFixedHeight(new_height)
+
+
 class GameCreationPage(QtWidgets.QWidget):
     """
     Main page for creating a no-ui game.
@@ -215,7 +235,7 @@ class GameCreationPage(QtWidgets.QWidget):
         prompt_label.setStyleSheet("font-size: 16px; background: transparent;")
         layout.addWidget(prompt_label)
 
-        self._ai_prompt = QtWidgets.QTextEdit()
+        self._ai_prompt = _AutoResizeTextEdit()
         self._ai_prompt.setPlaceholderText("e.g. A horror story set in an abandoned hospital...")
         self._ai_prompt.setFixedHeight(80)
         self._ai_prompt.setStyleSheet(
