@@ -7,7 +7,7 @@ from src.graph import Node, EnumLR
 
 class SerialNode(BaseModel):
     id: int
-    text: str = Field(max_length=200)
+    text: str
     left_option: str = ""
     right_option: str = ""
     adjacency_list: dict[EnumLR, int]
