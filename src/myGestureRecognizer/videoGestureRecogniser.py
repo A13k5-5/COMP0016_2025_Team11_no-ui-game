@@ -9,23 +9,23 @@ from mediapipe.tasks.python.vision import GestureRecognizer, RunningMode, Gestur
 
 from src.gesture import EnumGesture
 from .videoCaptureManager import video_capture_manager
+from ..gamePlayer import SettingsManager
 
-WINDOW_NAME = "Hand Detection"
-TIMEOUT_TIME = 30.0 # seconds
-
+WINDOW_NAME = "Gesture Detection"
 
 class VideoGestureRecogniser:
     """
     Class to handle gesture recognition using MediaPipe's GestureRecognizer.
     """
 
-    def __init__(self):
+    def __init__(self, settings: SettingsManager):
         self.model_path = os.path.join(os.path.dirname(__file__), "gesture_recognizer.task")
         self.camera_index = 0
         self._running: bool = True
         self._last_gesture_category: str | None = None
         self._last_handedness: str | None = None
         self._gestures_to_spot: list[EnumGesture] = []
+        self._settings = settings
 
     def _get_last_gesture(self) -> EnumGesture:
         return EnumGesture.from_gesture(self._last_gesture_category, self._last_handedness)
@@ -89,7 +89,7 @@ class VideoGestureRecogniser:
             while self._running:
 
                 ret, frame = cap.read()
-                self.timeout_stop(start, TIMEOUT_TIME)
+                self.timeout_stop(start, self._settings.get_recogniser_timeout())
 
                 if not ret:
                     print("Failed to grab frame from camera.")

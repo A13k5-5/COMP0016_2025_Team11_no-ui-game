@@ -40,25 +40,20 @@ if __name__ == "__main__":
     # for game player
     # import sys
     # import gamePlayer
+    # from src import myGestureRecognizer
+    from src.gui_game_player import playerPage
+
     #
     # if len(sys.argv) > 1:
     #     player = gamePlayer.GamePlayer()
     #     player.play_game(sys.argv[1])
     # else:
-    #     import playerPage
-    #     playerPage.run()
-
-    # for video gesture recognizer
-    # import myGestureRecognizer
-    # from gesture import EnumGesture
-    #
-    # recognizer = myGestureRecognizer.VideoGestureRecogniser()
-    # recognizer.get_gesture([EnumGesture.ILoveYou_Right, EnumGesture.Victory])
+    playerPage.run()
 
     # for game engine
     # import kokoro
-    from src.gui.homePage import run
-    run()
+    # from src.gui.homePage import run
+    # run()
 
     # for game loading
     # from storageManager.game_load import GameLoader
@@ -80,7 +75,3 @@ if __name__ == "__main__":
     # from game_generation_local_llm import structured_output
     # structured_output.main()
 
-    # for tts
-    # from text2speech import Talker
-    # talker = Talker()
-    # talker.generate_speech("Hello world", "test_audio.wav")

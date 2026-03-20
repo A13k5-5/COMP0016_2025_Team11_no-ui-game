@@ -1,1 +1,2 @@
-from .settingsPage import SettingsPage
+from .gameCreationPage import GameCreationPage
+from .homePage import HomePage

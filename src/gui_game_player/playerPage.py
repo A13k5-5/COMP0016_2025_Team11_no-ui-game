@@ -1,8 +1,7 @@
 import sys
 import os
 from PySide6 import QtWidgets
-
-from src.gui.settingsPage import SettingsPage
+from src.gui_game_player.settingsPage import SettingsPage
 from src.gamePlayer.settings_manager import SettingsManager
 
 from src import gamePlayer
@@ -65,8 +64,7 @@ class PlayerPage(QtWidgets.QWidget):
             self._recogniser = KeyboardInputHandler(self._settings)
         else:
             from src import myGestureRecognizer
-            self._recogniser = myGestureRecognizer.VideoGestureRecogniser()
-
+            self._recogniser = myGestureRecognizer.VideoGestureRecogniser(self._settings)
         player = gamePlayer.GamePlayer(self._recogniser, self._settings)
         thread = threading.Thread(
             target=player.play_game,

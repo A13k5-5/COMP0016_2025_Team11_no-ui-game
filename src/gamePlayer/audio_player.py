@@ -17,31 +17,82 @@ class AudioPlayer:
             # should be a better handling probably - a popup window maybe? or an audio file?
             pass
 
-    def play_main_audio(self, game_path: str, node_id: int):
+    def play_main_audio(self, game_folder: str, node_id: int):
         """
         Play the main audio file for the current node.
         """
-        self.play_audio_from_path(os.path.join(game_path, "audio", Node.get_main_text_audio_filename(node_id)))
+        self.play_audio_from_path(os.path.join(game_folder, "audio", Node.get_main_text_audio_filename(node_id)))
 
-    def play_options_audio(self, game_path: str, node_id: int):
+    def play_options_audio(self, game_folder: str, node_id: int):
         """
         Play the options audio file for the current node.
         """
-        self.play_audio_from_path(os.path.join(game_path, "audio", Node.get_options_audio_filename(node_id)))
+        self.play_audio_from_path(os.path.join(game_folder, "audio", Node.get_options_audio_filename(node_id)))
 
-    def play_audio(self, game_path: str, node_id: int):
+    def play_main_menu_audio(self, game_folder: str, progress_exists: bool):
+        """
+        Play the main menu audio file.
+        """
+        self.play_audio_from_path(os.path.join(game_folder, "audio", "main_menu_welcome.wav"))
+        self.play_audio_from_path(os.path.join(game_folder, "audio", "main_menu_new_game.wav"))
+        if progress_exists:
+            self.play_audio_from_path(os.path.join(game_folder, "audio", "main_menu_progress.wav"))
+
+    def play_quit_audio(self, game_folder: str):
+        """
+        Play the quit audio file.
+        """
+        self.play_audio_from_path(os.path.join(game_folder, "audio", "quit.wav"))
+
+    def play_quitting_to_main_menu(self, game_folder: str):
+        """
+        Play the progress saved audio file.
+        """
+        self.play_audio_from_path(os.path.join(game_folder, "audio", "progress_saved.wav"))
+
+    def play_win_audio(self, game_folder: str):
+        """
+        Play the win audio file.
+        """
+        self.play_audio_from_path(os.path.join(game_folder, "audio", "win.wav"))
+
+    def play_lose_audio(self, game_folder: str):
+        """
+        Play the lose audio file.
+        """
+        self.play_audio_from_path(os.path.join(game_folder, "audio", "lose.wav"))
+
+    def play_resume_audio(self, game_folder: str):
+        """
+        Play the resume audio file.
+        """
+        self.play_audio_from_path(os.path.join(game_folder, "audio", "resume.wav"))
+
+    def play_start_new_audio(self, game_folder: str):
+        """
+        Play the start new game audio file.
+        """
+        self.play_audio_from_path(os.path.join(game_folder, "audio", "start_new.wav"))
+
+    def play_audio(self, game_folder: str, node_id: int):
         """
         Play the main audio followed by the options audio for the current node.
         """
-        self.play_main_audio(game_path, node_id)
+        self.play_main_audio(game_folder, node_id)
         time.sleep(0.5)  # small pause between main text and options
-        self.play_options_audio(game_path, node_id)
+        self.play_options_audio(game_folder, node_id)
 
-    def play_audio_from_file(self, game_path: str, audio_file: str):
+    def play_audio_from_file(self, game_folder: str, audio_file: str):
         """
         Play the audio from file name
         """
-        self.play_audio_from_path(os.path.join(game_path, "audio", audio_file))
+        self.play_audio_from_path(os.path.join(game_folder, "audio", audio_file))
+
+    def play_inactivity_audio(self, game_folder: str):
+        """
+        Play the inactivity audio file.
+        """
+        self.play_audio_from_path(os.path.join(game_folder, "audio", "inactivity.wav"))
 
 if __name__ == "__main__":
     AudioPlayer.play_audio_from_path(Path(__file__).parent.parent / "voiceSamples" / "bf_emma.wav")
