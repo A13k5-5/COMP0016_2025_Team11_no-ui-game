@@ -515,8 +515,22 @@ class GameCreationPage(QtWidgets.QWidget):
         # cancel any other active link mode first
         self._cancel_link_mode()
 
-        # if this side already has a connection, unlink it
+        # if this side already has a connection, try to unlink it
         if source in self.node_children and side in self.node_children[source]:
+            target = self.node_children[source][side]
+            # count how many connections point to the target (excluding this one)
+            other_parents = sum(
+                1
+                for p, sides in self.node_children.items()
+                for s, child in sides.items()
+                if child is target and not (p is source and s == side)
+            )
+            if other_parents == 0 and target is not self.root_node:
+                QtWidgets.QMessageBox.warning(
+                    self, "Cannot Unlink",
+                    "This node has no other parent — unlinking would leave it floating."
+                )
+                return
             self._remove_connection(source, side)
             self._update_buttons()
             return
