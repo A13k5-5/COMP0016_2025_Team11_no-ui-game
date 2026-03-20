@@ -9,7 +9,7 @@ def register_file_type(
     extension: str,          # e.g. ".myext"
     prog_id: str,            # e.g. "MyApp.Document"
     description: str,        # e.g. "My App Document"
-    icon_path: str = str(DEFAULT_ICON),   # path to .ico file or exe,index e.g. "C:\app.exe,0"
+    icon_path: str,
 ):
     """
     Register a custom file type in the Windows registry (current user only).
@@ -39,8 +39,6 @@ def register_file_type(
 
     # 4. Tell the shell the association has changed
     _notify_shell_assoc_changed()
-
-    print(f"Registered {extension} -> {prog_id} for {exe_path}")
 
 
 def _is_registered(extension: str, prog_id: str) -> bool:
@@ -86,6 +84,17 @@ def _normalize_extension(extension: str) -> str:
         raise ValueError("extension must not be empty")
     return ext if ext.startswith(".") else f".{ext}"
 
+def register_noui_file_type():
+    """
+    Registers the .noui file type on current user's Windows system.
+    :return:
+    """
+    register_file_type(
+        extension=".noui",
+        prog_id="NoGui.noui",
+        description="NoGUI Game File",
+        icon_path=str(DEFAULT_ICON)
+    )
 
 def unregister_file_type(extension: str, prog_id: str):
     """
@@ -118,8 +127,9 @@ if __name__ == "__main__":
 
     unregister_file_type(EXT, PROG_ID)
 
-    register_file_type(
-        extension=EXT,
-        prog_id=PROG_ID,
-        description="NoGUI Game File",
-    )
+    # register_file_type(
+    #     extension=EXT,
+    #     prog_id=PROG_ID,
+    #     description="NoGUI Game File",
+    #     icon_path=str(DEFAULT_ICON)
+    # )
