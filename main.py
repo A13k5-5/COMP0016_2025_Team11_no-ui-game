@@ -37,23 +37,25 @@
 # nuitka-project: --spacy-language-model=en_core_web_sm
 
 if __name__ == "__main__":
+    # before doing anything, register the .noui file type
+    from src import register_file_type
+    register_file_type.register_noui_file_type()
     # for game player
     # import sys
     # import gamePlayer
     # from src import myGestureRecognizer
-    from src.gui_game_player import playerPage
+    # from src.gui_game_player import playerPage
 
-    #
     # if len(sys.argv) > 1:
     #     player = gamePlayer.GamePlayer()
     #     player.play_game(sys.argv[1])
     # else:
-    playerPage.run()
+    # playerPage.run()
 
     # for game engine
     # import kokoro
-    # from src.gui.homePage import run
-    # run()
+    from src.gui.homePage import run
+    run()
 
     # for game loading
     # from storageManager.game_load import GameLoader

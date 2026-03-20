@@ -1,8 +1,10 @@
 import json
+from threading import Event
 from typing import Any, Callable
 
 from openvino_genai import GenerationConfig, LLMPipeline, StructuredOutputConfig, ChatHistory
 
+from src.game_generation_local_llm.generation_control import raise_if_cancelled
 from src.graph.serial_graph import SerialGraph
 from src.graph.serial_node import SerialNode
 from src.game_generation_local_llm.story_generator.prompts import SYS_MESSAGE, NODE_USER_MESSAGE
@@ -51,6 +53,7 @@ class StoryGenerator:
         user_prompt: str,
         game_blueprint: GraphBlueprint,
         progress_cb: Callable[[dict[str, Any]], None] | None = None,
+        cancel_event: Event | None = None,
     ) -> SerialGraph:
         config: GenerationConfig = self._build_node_config()
         generated_nodes: dict[int, SerialNode] = {}
@@ -58,6 +61,7 @@ class StoryGenerator:
 
         # generate each node one-by-one
         for index, (node_id, adjacency) in enumerate(game_blueprint.adjacency.items(), start=1):
+            raise_if_cancelled(cancel_event, progress_cb)
             is_win: bool = node_id in game_blueprint.win_nodes
             is_losing: bool = node_id in game_blueprint.lose_nodes
 
@@ -80,6 +84,7 @@ class StoryGenerator:
             )
 
             decoded_results = self.llm.generate(history, config)
+            raise_if_cancelled(cancel_event, progress_cb)
             serial_node: SerialNode = SerialNode.model_validate_json(decoded_results.texts[0])
 
             # Enforce blueprint adjacency and terminal/win/lose flags
@@ -103,5 +108,6 @@ class StoryGenerator:
                 nodes_total=nodes_total,
                 node=serial_node,
             )
+
 
         return SerialGraph(nodes=generated_nodes)
