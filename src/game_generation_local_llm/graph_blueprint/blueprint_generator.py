@@ -50,6 +50,16 @@ class BlueprintGenerator:
         generated_blueprint: GraphBlueprint = GraphBlueprint.model_validate_json(decoded_results.texts[0])
         generated_blueprint.sanitize_references()
 
+        # stubbed generated blueprint
+        # adjacency = {
+        #                 "0":  {"0": 1,  "1": 3},
+        #                 "1":  {"0": 2,  "1": 2},
+        #                 "2":  {"0": 2,  "1": 2},
+        #                 "3":  {"0": 3,  "1": 3}
+        # }
+        #
+        # generated_blueprint: GraphBlueprint = GraphBlueprint(adjacency=adjacency, win_nodes=[3], lose_nodes=[2])
+
         self._emit_progress(
             progress_cb,
             stage="blueprint_ready",
