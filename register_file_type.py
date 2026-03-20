@@ -8,7 +8,6 @@ DEFAULT_ICON: Path = Path(__file__).parent / "gameIcon.ico"
 def register_file_type(
     extension: str,          # e.g. ".myext"
     prog_id: str,            # e.g. "MyApp.Document"
-    app_name: str,           # e.g. "My Application"
     description: str,        # e.g. "My App Document"
     icon_path: str = str(DEFAULT_ICON),   # path to .ico file or exe,index e.g. "C:\app.exe,0"
 ):
@@ -16,6 +15,9 @@ def register_file_type(
     Register a custom file type in the Windows registry (current user only).
     No admin rights required.
     """
+    if _is_registered(extension, prog_id):
+        return
+
     exe_path = sys.executable  # points to your compiled .exe when built with Nuitka
 
     # 1. Register the ProgID and its shell open command
@@ -40,7 +42,7 @@ def register_file_type(
     print(f"Registered {extension} -> {prog_id} for {exe_path}")
 
 
-def is_registered(extension: str, prog_id: str) -> bool:
+def _is_registered(extension: str, prog_id: str) -> bool:
     """Check if the file type is already registered."""
     try:
         with winreg.OpenKey(winreg.HKEY_CURRENT_USER, rf"Software\Classes\{extension}") as key:
@@ -109,10 +111,8 @@ if __name__ == "__main__":
 
     unregister_file_type(EXT, PROG_ID)
 
-    if not is_registered(EXT, PROG_ID):
-        register_file_type(
-            extension=EXT,
-            prog_id=PROG_ID,
-            app_name="NoGUI Game Player",
-            description="NoGUI Game File",
-        )
+    register_file_type(
+        extension=EXT,
+        prog_id=PROG_ID,
+        description="NoGUI Game File",
+    )
