@@ -28,27 +28,44 @@ class _GameGenerationWorker(QtCore.QObject):
     """Background worker that keeps heavy LLM generation off the GUI thread."""
     progress = QtCore.Signal(dict)
     finished = QtCore.Signal(object)
+    cancelled = QtCore.Signal(str)
     failed = QtCore.Signal(str)
     done = QtCore.Signal()
 
     def __init__(self, prompt: str) -> None:
         super().__init__()
         self.prompt = prompt
+        self._cancel_event = threading.Event()
+
+    def request_cancel(self) -> None:
+        self._cancel_event.set()
 
     @QtCore.Slot()
     def run(self) -> None:
         from src.game_generation_local_llm.game_generator import GameGenerator
+        from src.game_generation_local_llm.generation_control import GenerationCancelledError
 
         try:
             generator = GameGenerator()
-            serial_graph = generator.generate_game(self.prompt, progress_cb=self._emit_progress)
+            serial_graph = generator.generate_game(
+                self.prompt,
+                progress_cb=self._emit_progress,
+                cancel_event=self._cancel_event,
+            )
+            if self._cancel_event.is_set():
+                self.cancelled.emit("Generation canceled by user")
+                return
             self.finished.emit(serial_graph)
+        except GenerationCancelledError as exc:
+            self.cancelled.emit(str(exc))
         except Exception as exc:
             self.failed.emit(str(exc))
         finally:
             self.done.emit()
 
     def _emit_progress(self, payload: dict[str, Any]) -> None:
+        if self._cancel_event.is_set() and payload.get("stage") != "cancelled":
+            return
         self.progress.emit(payload)
 
 
@@ -140,6 +157,7 @@ class GameCreationPage(QtWidgets.QWidget):
         # AI generation state
         self._generation_thread: Optional[QtCore.QThread] = None
         self._generation_worker: Optional[_GameGenerationWorker] = None
+        self._generation_cancel_requested: bool = False
         self._stream_blueprint: Optional[GraphBlueprint] = None
         self._stream_nodes: dict[int, SerialNode] = {}
 
@@ -288,7 +306,38 @@ class GameCreationPage(QtWidgets.QWidget):
             "QPushButton:disabled { color: #aaa; }"
         )
         self._ai_generate_btn.clicked.connect(self._on_AIgenerate_clicked)
-        layout.addWidget(self._ai_generate_btn)
+
+        self._ai_cancel_btn = QtWidgets.QPushButton("Stop")
+        self._ai_cancel_btn.setToolTip("Stop generation")
+        self._ai_cancel_btn.setFixedSize(56, 28)
+        self._ai_cancel_btn.setEnabled(False)
+        self._ai_cancel_btn.setStyleSheet(
+            "QPushButton {"
+            "  color: white;"
+            "  background-color: #c40000;"
+            "  border: 1px solid #8f0000;"
+            "  border-radius: 4px;"
+            "  font-weight: 600;"
+            "}"
+            "QPushButton:hover {"
+            "  background-color: #dd0000;"
+            "}"
+            "QPushButton:pressed {"
+            "  background-color: #a80000;"
+            "}"
+            "QPushButton:disabled {"
+            "  color: #f6d7d7;"
+            "  background-color: #8c2a2a;"
+            "  border: 1px solid #6e1f1f;"
+            "}"
+        )
+        self._ai_cancel_btn.clicked.connect(self._on_generation_cancel_clicked)
+
+        action_row = QtWidgets.QHBoxLayout()
+        action_row.setSpacing(8)
+        action_row.addWidget(self._ai_generate_btn, stretch=1)
+        action_row.addWidget(self._ai_cancel_btn)
+        layout.addLayout(action_row)
 
         self._ai_progress = QtWidgets.QProgressBar()
         self._ai_progress.setVisible(False)
@@ -318,6 +367,7 @@ class GameCreationPage(QtWidgets.QWidget):
 
         self._stream_blueprint = None
         self._stream_nodes.clear()
+        self._generation_cancel_requested = False
         self._set_generation_running(True)
         self._ai_status.setText("Starting game generation...")
 
@@ -328,6 +378,7 @@ class GameCreationPage(QtWidgets.QWidget):
         thread.started.connect(worker.run)
         worker.progress.connect(self._on_generation_progress)
         worker.finished.connect(self._on_generation_finished)
+        worker.cancelled.connect(self._on_generation_cancelled)
         worker.failed.connect(self._on_generation_failed)
         worker.done.connect(self._on_generation_done)
         worker.done.connect(thread.quit)
@@ -339,11 +390,24 @@ class GameCreationPage(QtWidgets.QWidget):
         self._generation_worker = worker
         thread.start()
 
+    @QtCore.Slot()
+    def _on_generation_cancel_clicked(self) -> None:
+        if self._generation_worker is None:
+            return
+
+        self._generation_cancel_requested = True
+        self._generation_worker.request_cancel()
+        self._ai_cancel_btn.setEnabled(False)
+        self._ai_status.setText("Cancel requested...")
+
     # payload is sent from the backend, this method is like a rest controller
     @QtCore.Slot(dict)
     def _on_generation_progress(self, payload: dict[str, Any]) -> None:
         stage = payload.get("stage", "")
         message = payload.get("message", "")
+
+        if self._generation_cancel_requested and stage != "cancelled":
+            return
 
         if stage == "blueprint_ready":
             self._stream_blueprint = payload.get("blueprint")
@@ -375,11 +439,18 @@ class GameCreationPage(QtWidgets.QWidget):
 
     @QtCore.Slot(object)
     def _on_generation_finished(self, serial_graph: SerialGraph) -> None:
+        if self._generation_cancel_requested:
+            return
+
         self._clear_canvas()
         self._populate_graph_from_serial(serial_graph)
         self._ai_status.setText("Generation complete.")
         if self._ai_progress.maximum() > 0:
             self._ai_progress.setValue(self._ai_progress.maximum())
+
+    @QtCore.Slot(str)
+    def _on_generation_cancelled(self, message: str) -> None:
+        self._ai_status.setText((message or "Generation canceled.") + " Keeping generated preview.")
 
     @QtCore.Slot(str)
     def _on_generation_failed(self, error_message: str) -> None:
@@ -388,6 +459,7 @@ class GameCreationPage(QtWidgets.QWidget):
     @QtCore.Slot()
     def _on_generation_done(self) -> None:
         self._set_generation_running(False)
+        self._generation_cancel_requested = False
 
     @QtCore.Slot()
     def _on_generation_thread_finished(self) -> None:
@@ -396,6 +468,7 @@ class GameCreationPage(QtWidgets.QWidget):
 
     def _set_generation_running(self, running: bool) -> None:
         self._ai_generate_btn.setEnabled(not running)
+        self._ai_cancel_btn.setEnabled(running)
         self._ai_prompt.setEnabled(not running)
         self._ai_progress.setVisible(running)
         if not running:
