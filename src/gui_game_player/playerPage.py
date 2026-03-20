@@ -1,7 +1,7 @@
 import sys
 import os
 from PySide6 import QtWidgets
-from src.gui.settingsPage import SettingsPage
+from src.gui_game_player.settingsPage import SettingsPage
 from src.gamePlayer.settings_manager import SettingsManager
 
 from src import gamePlayer
