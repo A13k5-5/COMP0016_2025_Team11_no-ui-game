@@ -528,7 +528,7 @@ class GameCreationPage(QtWidgets.QWidget):
             if other_parents == 0 and target is not self.root_node:
                 QtWidgets.QMessageBox.warning(
                     self, "Cannot Unlink",
-                    "This node has no other parent — unlinking would leave it floating."
+                    "This node has no other parent and unlinking would leave it floating."
                 )
                 return
             self._remove_connection(source, side)
