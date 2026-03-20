@@ -40,7 +40,6 @@ class GameGenerator:
             if blueprint is None:
                 self._emit_progress(progress_cb, stage="blueprint_started", message="Generating blueprint")
                 blueprint = self.blueprint_generator.generate_blueprint(prompt, progress_cb=progress_cb)
-            print(blueprint.model_dump_json(indent=2))
 
             self._emit_progress(
                 progress_cb,
@@ -57,7 +56,6 @@ class GameGenerator:
                 message="Generation complete",
                 nodes_total=len(story.nodes),
             )
-            print(story.model_dump_json(indent=2))
             return story
         except Exception as exc:
             self._emit_progress(progress_cb, stage="error", message=str(exc))

@@ -45,13 +45,10 @@ class BlueprintGenerator:
         self._build_history(user_prompt)
         self._emit_progress(progress_cb, stage="blueprint_started", message="Generating blueprint structure")
 
-        # for stubbing
-        # with open(os.path.join(os.path.dirname(__file__), os.pardir, "generated_blueprint", "generated_blueprint.json"), 'r') as f:
-        #     generated_blueprint =  GraphBlueprint.model_validate_json(f.read().strip())
-
         decoded_results = self.llm.generate(self.history, self.config)
         print(decoded_results.texts[0])
         generated_blueprint: GraphBlueprint = GraphBlueprint.model_validate_json(decoded_results.texts[0])
+        generated_blueprint.sanitize_references()
 
         self._emit_progress(
             progress_cb,
