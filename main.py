@@ -12,7 +12,8 @@ if __name__ == "__main__":
     # import sys
     # import gamePlayer
     # from src import myGestureRecognizer
-    from src import playerPage
+    from src.gui_game_player import playerPage
+
     #
     # if len(sys.argv) > 1:
     #     player = gamePlayer.GamePlayer()

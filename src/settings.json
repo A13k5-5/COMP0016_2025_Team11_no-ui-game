@@ -13,5 +13,6 @@
         "replay_main": "R",
         "replay_options": "F",
         "quit": "Q"
-    }
+    },
+    "recogniser_timeout": 5.0
 }

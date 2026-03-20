@@ -52,6 +52,50 @@ class _GameGenerationWorker(QtCore.QObject):
         self.progress.emit(payload)
 
 
+class _GameSaveWorker(QtCore.QObject):
+    """Background worker that saves the game without blocking the GUI thread."""
+    finished = QtCore.Signal(str, str)
+    failed = QtCore.Signal(str)
+    done = QtCore.Signal()
+
+    def __init__(self, save_dir: str, title: str, root: Node, voice: str) -> None:
+        super().__init__()
+        self.save_dir = save_dir
+        self.title = title
+        self.root = root
+        self.voice = voice
+
+    @QtCore.Slot()
+    def run(self) -> None:
+        try:
+            GameSaver().save_game(self.save_dir, self.title, self.root, self.voice)
+            self.finished.emit(self.save_dir, self.title)
+        except Exception as exc:
+            self.failed.emit(str(exc))
+        finally:
+            self.done.emit()
+
+
+class _AutoResizeTextEdit(QtWidgets.QTextEdit):
+    """
+    QTextEdit that grows vertically as text is typed, up to a maximum height,
+    and shrinks back when text is removed.
+    """
+    _MIN_HEIGHT = 80
+    _MAX_HEIGHT = 300
+ 
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setMinimumHeight(self._MIN_HEIGHT)
+        self.setMaximumHeight(self._MAX_HEIGHT)
+        self.document().contentsChanged.connect(self._adjust_height)
+ 
+    def _adjust_height(self) -> None:
+        doc_height = int(self.document().size().height()) + 10  # +10 for padding
+        new_height = max(self._MIN_HEIGHT, min(doc_height, self._MAX_HEIGHT))
+        self.setFixedHeight(new_height)
+
+
 class GameCreationPage(QtWidgets.QWidget):
     """
     Main page for creating a no-ui game.
@@ -71,6 +115,11 @@ class GameCreationPage(QtWidgets.QWidget):
         self.game_par_dir: Optional[str] = os.path.dirname(game_path) if game_path else None
         # self._voice_samples_dir = os.path.join(os.path.dirname(__file__), os.pardir, "voiceSamples")
         self._voice_samples_dir = Path(__file__).parent.parent / "voiceSamples"
+
+        # Save state
+        self._save_thread: Optional[QtCore.QThread] = None
+        self._save_worker: Optional[_GameSaveWorker] = None
+        self._save_progress_dialog: Optional[QtWidgets.QProgressDialog] = None
 
         # Ordered list of all node widgets
         self.nodes: list[NodeWidget] = []
@@ -215,7 +264,7 @@ class GameCreationPage(QtWidgets.QWidget):
         prompt_label.setStyleSheet("font-size: 16px; background: transparent;")
         layout.addWidget(prompt_label)
 
-        self._ai_prompt = QtWidgets.QTextEdit()
+        self._ai_prompt = _AutoResizeTextEdit()
         self._ai_prompt.setPlaceholderText("e.g. A horror story set in an abandoned hospital...")
         self._ai_prompt.setFixedHeight(80)
         self._ai_prompt.setStyleSheet(
@@ -716,6 +765,10 @@ class GameCreationPage(QtWidgets.QWidget):
         return widget_node[self.root_node]
 
     def save_game(self) -> None:
+        if self._save_thread is not None and self._save_thread.isRunning():
+            QtWidgets.QMessageBox.information(self, "Save in progress", "A save is already in progress.")
+            return
+
         root = self._build_game_graph()
         if not root:
             return
@@ -727,16 +780,57 @@ class GameCreationPage(QtWidgets.QWidget):
         if not save_dir:
             return
 
-        progress = self._show_saving_popup()
-        try:
-            voice = self.voice_selector.currentData()
-            self.game_saver.save_game(save_dir, title, root, voice)
-        except Exception as e:
-            progress.close()
-            QtWidgets.QMessageBox.critical(self, "Save failed", str(e))
-            return
-        progress.close()
+        voice = self.voice_selector.currentData()
+        self._set_save_running(True)
+
+        thread = QtCore.QThread(self)
+        worker = _GameSaveWorker(save_dir, title, root, voice)
+        worker.moveToThread(thread)
+
+        thread.started.connect(worker.run)
+        worker.finished.connect(self._on_save_finished)
+        worker.failed.connect(self._on_save_failed)
+        worker.done.connect(self._on_save_done)
+        worker.done.connect(thread.quit)
+        thread.finished.connect(worker.deleteLater)
+        thread.finished.connect(self._on_save_thread_finished)
+        thread.finished.connect(thread.deleteLater)
+
+        self._save_thread = thread
+        self._save_worker = worker
+        thread.start()
+
+    @QtCore.Slot(str, str)
+    def _on_save_finished(self, save_dir: str, title: str) -> None:
         QtWidgets.QMessageBox.information(self, "Success", f"Game saved to {save_dir}/{title}")
+
+    @QtCore.Slot(str)
+    def _on_save_failed(self, error_message: str) -> None:
+        QtWidgets.QMessageBox.critical(self, "Save failed", error_message)
+
+    @QtCore.Slot()
+    def _on_save_done(self) -> None:
+        self._set_save_running(False)
+
+    @QtCore.Slot()
+    def _on_save_thread_finished(self) -> None:
+        self._save_thread = None
+        self._save_worker = None
+
+    def _set_save_running(self, running: bool) -> None:
+        self.save_game_button.setEnabled(not running)
+        self.title_entry.setEnabled(not running)
+        self.voice_selector.setEnabled(not running)
+
+        if running:
+            if self._save_progress_dialog is None:
+                self._save_progress_dialog = self._show_saving_popup()
+            return
+
+        if self._save_progress_dialog is not None:
+            self._save_progress_dialog.close()
+            self._save_progress_dialog.deleteLater()
+            self._save_progress_dialog = None
 
     def _show_saving_popup(self) -> QtWidgets.QProgressDialog:
         progress = QtWidgets.QProgressDialog("Saving game...", None, 0, 0, self)
@@ -798,10 +892,12 @@ class GameCreationPage(QtWidgets.QWidget):
             if node_id in visited:
                 if parent_widget is not None and side is not None:
                     target_widget = backend_to_widget[node_id]
-                    if parent_widget not in self.node_children:
-                        self.node_children[parent_widget] = {}
-                    self.node_children[parent_widget][side] = target_widget
-                    self._draw_line(parent_widget, side, target_widget)
+                    # skip self-loops (terminal win/lose nodes point to themselves)
+                    if target_widget is not parent_widget:
+                        if parent_widget not in self.node_children:
+                            self.node_children[parent_widget] = {}
+                        self.node_children[parent_widget][side] = target_widget
+                        self._draw_line(parent_widget, side, target_widget)
                 continue
 
             visited.add(node_id)
