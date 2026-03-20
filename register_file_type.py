@@ -14,6 +14,7 @@ def register_file_type(
     """
     Register a custom file type in the Windows registry (current user only).
     No admin rights required.
+    This app should be run once at startup to ensure the file type is registered, but it will be a no-op if already registered.
     """
     if _is_registered(extension, prog_id):
         return
@@ -87,6 +88,12 @@ def _normalize_extension(extension: str) -> str:
 
 
 def unregister_file_type(extension: str, prog_id: str):
+    """
+    Unregisters filetype for the current user. Here for testing purposes.
+    :param extension:
+    :param prog_id:
+    :return:
+    """
     ext = _normalize_extension(extension)
 
     # Remove all per-user links for this extension so apps are fully unlinked from it.
