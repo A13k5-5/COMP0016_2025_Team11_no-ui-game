@@ -48,12 +48,13 @@ class SerialNode(BaseModel):
 
     def get_options_text(self) -> str:
         options_parts: list[str] = []
+        # this audio only when both options available
         if self.left_option and self.right_option:
             options_parts.append("...You have two options.")
         if self.left_option:
             options_parts.append(
-                f"Do {self.left_option} by raising your left hand.")
+                f"{self.left_option} by selecting the left option.")
         if self.right_option:
             options_parts.append(
-                f"Do {self.right_option} by raising your right hand.")
+                f"{self.right_option} by selecting the right option.")
         return " ".join(options_parts)
