@@ -504,9 +504,23 @@ class GameCreationPage(QtWidgets.QWidget):
         """
         Activate link mode: highlight all other nodes as targets and wait
         for the user to click one (or press Escape to cancel).
+        If the side is already linked, pressing the button again unlinks it.
+        If already in link mode for this side, pressing again cancels it.
         """
-        # Cancel any active link mode first
+        # if already in link mode, cancel (toggle off)
+        if self._link_source == (source, side):
+            self._cancel_link_mode()
+            return
+
+        # cancel any other active link mode first
         self._cancel_link_mode()
+
+        # if this side already has a connection, unlink it
+        if source in self.node_children and side in self.node_children[source]:
+            self._remove_connection(source, side)
+            self._update_buttons()
+            return
+
         self._link_source = (source, side)
 
         for node in self.nodes:
