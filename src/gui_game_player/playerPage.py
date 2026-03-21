@@ -3,6 +3,7 @@ import os
 from PySide6 import QtWidgets
 from src.gui_game_player.settingsPage import SettingsPage
 from src.gamePlayer.settings_manager import SettingsManager
+from src.gui_game_player.file_association_popup import show_noui_registration_popup_if_needed
 
 from src import gamePlayer
 
@@ -74,6 +75,8 @@ class PlayerPage(QtWidgets.QWidget):
         # daemon thread = background thread that dies when the main program exits
         thread.start()
 
+
+
     def keyPressEvent(self, event) -> None:
         """
         Forward keypresses to KeyboardInputHandler when in keyboard mode.
@@ -87,6 +90,7 @@ def run(path: str = None):
     window = PlayerPage()
 
     window.show()
+    show_noui_registration_popup_if_needed(parent=window)
     if path is not None:
         window.path_edit.setText(os.path.abspath(path))
         window.run_btn.setEnabled(True)

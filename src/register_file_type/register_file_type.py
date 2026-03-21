@@ -3,6 +3,8 @@ import sys
 import ctypes
 from pathlib import Path
 
+EXT = ".noui"
+PROG_ID = "NoGui.noui"
 DEFAULT_ICON: Path = Path(__file__).parent.parent.parent / "icon.ico"
 
 def register_file_type(
@@ -16,7 +18,7 @@ def register_file_type(
     No admin rights required.
     This app should be run once at startup to ensure the file type is registered, but it will be a no-op if already registered.
     """
-    if _is_registered(extension, prog_id):
+    if is_registered(extension, prog_id):
         return
 
     exe_path = sys.argv[0]  # points to compiled .exe when built with Nuitka
@@ -41,7 +43,7 @@ def register_file_type(
     _notify_shell_assoc_changed()
 
 
-def _is_registered(extension: str, prog_id: str) -> bool:
+def is_registered(extension: str, prog_id: str) -> bool:
     """Check if the file type is already registered."""
     try:
         with winreg.OpenKey(winreg.HKEY_CURRENT_USER, rf"Software\Classes\{extension}") as key:
@@ -90,11 +92,18 @@ def register_noui_file_type():
     :return:
     """
     register_file_type(
-        extension=".noui",
-        prog_id="NoGui.noui",
+        extension=EXT,
+        prog_id=PROG_ID,
         description="NoGUI Game File",
         icon_path=str(DEFAULT_ICON)
     )
+
+def is_noui_file_type_registered() -> bool:
+    """
+    Checks if the .noui file type is registered for the current user.
+    :return: True if registered, False otherwise
+    """
+    return is_registered(EXT, PROG_ID)
 
 def _get_default_value(root: int, subkey: str):
     """Return the key's (Default) value, or None when missing."""
@@ -127,8 +136,5 @@ def unregister_file_type(extension: str, prog_id: str):
 
 # --- Call this at startup ---
 if __name__ == "__main__":
-    EXT = ".noui"
-    PROG_ID = "NoGui.noui"
-
     register_noui_file_type()
     # unregister_file_type(EXT, PROG_ID)
