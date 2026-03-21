@@ -11,7 +11,8 @@ from src.graph.enum_LR import EnumLR
 from src.graph import Node
 from src.graph.serial_graph import SerialGraph
 from src.graph.serial_node import SerialNode
-from src.storageManager import GameLoader, GameSaver
+from src.storageManager.game_load import GameLoader
+from src.storageManager.game_save import GameSaver
 from . import config
 from .zoomableGraphicsView import ZoomableGraphicsView
 from .nodeWidget import NodeWidget
@@ -991,6 +992,7 @@ class GameCreationPage(QtWidgets.QWidget):
             node_id = node.get_id()
 
             if node_id in visited:
+                # This node already has a widget — just draw the link line
                 if parent_widget is not None and side is not None:
                     target_widget = backend_to_widget[node_id]
                     # skip self-loops (terminal win/lose nodes point to themselves)

@@ -1,8 +1,8 @@
 import time
 import os
 
-import cv2
 import mediapipe as mp
+import cv2
 from mediapipe.tasks.python import BaseOptions
 from mediapipe.tasks.python.vision import GestureRecognizer, RunningMode, GestureRecognizerOptions, \
     GestureRecognizerResult

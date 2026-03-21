@@ -1,0 +1,88 @@
+{
+  "nodes": {
+    "0": {
+      "id": 0,
+      "text": "You find yourself at the start of an ancient stone pathway, bordered by tall, whispering trees and bathed in the gentle warmth of the morning sun. In front of you, two distinct paths beckon: one veer to the left, while the other continues straight ahead.",
+      "left_option": "Nod politely",
+      "right_option": "Give a casual wave",
+      "adjacency_list": {
+        "0": 1,
+        "1": 2
+      },
+      "is_win": false,
+      "is_losing": false
+    },
+    "1": {
+      "id": 1,
+      "text": "The left path leads you to a quaint village square, where friendly villagers are gathered. One particularly cheerful villager catches your eye, ready to bestow a traditional greeting upon you.",
+      "left_option": "Perform a curtsy",
+      "right_option": "Bow slightly",
+      "adjacency_list": {
+        "0": 3,
+        "1": 3
+      },
+      "is_win": false,
+      "is_losing": false
+    },
+    "2": {
+      "id": 2,
+      "text": "Taking the path straight ahead, you arrive at a serene lakeside. An elegant figure awaits on the dock, poised to engage you with a rare and elaborate greeting.",
+      "left_option": "Salute gracefully",
+      "right_option": "Offer a silent bow",
+      "adjacency_list": {
+        "0": 4,
+        "1": 5
+      },
+      "is_win": false,
+      "is_losing": false
+    },
+    "3": {
+      "id": 3,
+      "text": "After the villager's warm welcome, they invite you to their charming village home for refreshments. Here, they teach you an ancient greeting dance, which you must perform to your next host.",
+      "left_option": "",
+      "right_option": "",
+      "adjacency_list": {
+        "0": 6,
+        "1": 6
+      },
+      "is_win": true,
+      "is_losing": false
+    },
+    "4": {
+      "id": 4,
+      "text": "Your graceful salute at the lakeside is met with a puzzled reaction. The figure seems hesitant, and you notice a more comfortable-looking path leading to a nearby forest clearing.",
+      "left_option": "Continue with a firm handshake",
+      "right_option": "Retrace your steps",
+      "adjacency_list": {
+        "0": 6,
+        "1": 5
+      },
+      "is_win": false,
+      "is_losing": false
+    },
+    "5": {
+      "id": 5,
+      "text": "The figure remains silent, an uncomfortable silence enveloping the lakeside. It seems your greeting has not been well-received. The path behind seems all that is left.",
+      "left_option": "",
+      "right_option": "",
+      "adjacency_list": {
+        "0": 5,
+        "1": 5
+      },
+      "is_win": false,
+      "is_losing": true
+    },
+    "6": {
+      "id": 6,
+      "text": "You find yourself in a vibrant festival, where everyone around you is celebrating with joyous greetings. Surrounded by laughter and music, you realize you’ve achieved a perfect union of culture and camaraderie.",
+      "left_option": "",
+      "right_option": "",
+      "adjacency_list": {
+        "0": 6,
+        "1": 6
+      },
+      "is_win": true,
+      "is_losing": false
+    }
+  }
+}

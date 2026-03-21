@@ -1,11 +1,40 @@
-# Compilation mode, support OS-specific options
-# nuitka-project-if: {OS} in ("Windows", "Linux", "Darwin", "FreeBSD"):
-#    nuitka-project: --mode=onefile
-# nuitka-project-else:
-#    nuitka-project: --mode=standalone
-# The PySide6 plugin covers qt-plugins
+# nuitka-project: --mode=standalone
+
 # nuitka-project: --enable-plugin=pyside6
 # nuitka-project: --include-qt-plugins=qml
+
+# Data files required at runtime
+# nuitka-project: --include-data-files={MAIN_DIRECTORY}/myGestureRecognizer/gesture_recognizer.task=myGestureRecognizer/gesture_recognizer.task
+# nuitka-project: --include-data-dir={MAIN_DIRECTORY}/game_generation_local_llm/model_path=game_generation_local_llm/model_path
+
+# nuitka-project: --output-filename=NOGUI_engine.exe
+# nuitka-project: --module-parameter=torch-disable-jit=yes
+# nuitka-project: --nofollow-import-to=transformers.commands
+# nuitka-project: --nofollow-import-to=transformers.generation.tf_utils
+# nuitka-project: --nofollow-import-to=transformers.generation.flax_utils
+# nuitka-project: --nofollow-import-to=transformers.pipelines
+# nuitka-project: --nofollow-import-to=transformers.tools
+# nuitka-project: --nofollow-import-to=transformers.benchmark
+# nuitka-project: --nofollow-import-to=torch._dynamo
+# nuitka-project: --nofollow-import-to=matplotlib
+# nuitka-project: --nofollow-import-to=av
+# nuitka-project: --nofollow-import-to=pyphen
+# nuitka-project: --assume-yes-for-downloads
+
+## nuitka-project: --plugin-disable=transformers
+## nuitka-project: --include-package=transformers.models.albert
+## nuitka-project: --include-module=transformers.models.albert.configuration_albert
+## nuitka-project: --include-module=transformers.models.albert.modeling_albert
+
+# nuitka-project: --include-data-dir={MAIN_DIRECTORY}/.venv/Lib/site-packages/openvino/libs=openvino/libs
+# nuitka-project: --include-data-dir={MAIN_DIRECTORY}/.venv/Lib/site-packages/openvino_tokenizers/lib=openvino_tokenizers/lib
+
+# nuitka-project: --include-package=kokoro
+# nuitka-project: --include-package-data=kokoro
+
+# nuitka-project: --include-distribution-metadata=transformers
+
+# nuitka-project: --spacy-language-model=en_core_web_sm
 
 if __name__ == "__main__":
     # before doing anything, register the .noui file type

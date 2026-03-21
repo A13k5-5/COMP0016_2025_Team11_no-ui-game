@@ -1,0 +1,5 @@
+mediapipe==0.10.21
+playsound3
+multipledispatch
+pydantic
+pyside6

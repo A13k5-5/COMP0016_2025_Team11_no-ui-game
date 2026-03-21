@@ -3,7 +3,9 @@ import sys
 import ctypes
 from pathlib import Path
 
-DEFAULT_ICON: Path = Path(__file__).parent / "gameIcon.ico"
+EXT = ".noui"
+PROG_ID = "NoGui.noui"
+DEFAULT_ICON: Path = Path(__file__).parent.parent.parent / "icon.ico"
 
 def register_file_type(
     extension: str,          # e.g. ".myext"
@@ -16,10 +18,10 @@ def register_file_type(
     No admin rights required.
     This app should be run once at startup to ensure the file type is registered, but it will be a no-op if already registered.
     """
-    if _is_registered(extension, prog_id):
+    if is_registered(extension, prog_id):
         return
 
-    exe_path = sys.executable  # points to your compiled .exe when built with Nuitka
+    exe_path = sys.argv[0]  # points to compiled .exe when built with Nuitka
 
     # 1. Register the ProgID and its shell open command
     with winreg.CreateKey(winreg.HKEY_CURRENT_USER, rf"Software\Classes\{prog_id}") as key:
@@ -41,7 +43,7 @@ def register_file_type(
     _notify_shell_assoc_changed()
 
 
-def _is_registered(extension: str, prog_id: str) -> bool:
+def is_registered(extension: str, prog_id: str) -> bool:
     """Check if the file type is already registered."""
     try:
         with winreg.OpenKey(winreg.HKEY_CURRENT_USER, rf"Software\Classes\{extension}") as key:
@@ -90,29 +92,41 @@ def register_noui_file_type():
     :return:
     """
     register_file_type(
-        extension=".noui",
-        prog_id="NoGui.noui",
+        extension=EXT,
+        prog_id=PROG_ID,
         description="NoGUI Game File",
         icon_path=str(DEFAULT_ICON)
     )
 
+def is_noui_file_type_registered() -> bool:
+    """
+    Checks if the .noui file type is registered for the current user.
+    :return: True if registered, False otherwise
+    """
+    return is_registered(EXT, PROG_ID)
+
+def _get_default_value(root: int, subkey: str):
+    """Return the key's (Default) value, or None when missing."""
+    try:
+        with winreg.OpenKey(root, subkey, 0, winreg.KEY_READ) as key:
+            value, _ = winreg.QueryValueEx(key, "")
+            return value
+    except (FileNotFoundError, OSError):
+        return None
+
+
 def unregister_file_type(extension: str, prog_id: str):
     """
-    Unregisters filetype for the current user. Here for testing purposes.
-    :param extension:
-    :param prog_id:
-    :return:
+    Unregister this app's filetype mapping for the current user.
+    Only removes keys owned by this app.
     """
     ext = _normalize_extension(extension)
+    ext_key_path = rf"Software\Classes\{ext}"
 
-    # Remove all per-user links for this extension so apps are fully unlinked from it.
-    extension_link_paths = [
-        rf"Software\Classes\{ext}",
-        rf"Software\Classes\SystemFileAssociations\{ext}",
-        rf"Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\{ext}",
-    ]
-    for path in extension_link_paths:
-        _delete_tree(winreg.HKEY_CURRENT_USER, path)
+    # Remove extension mapping only if it currently points to this app's ProgID.
+    current_prog_id = _get_default_value(winreg.HKEY_CURRENT_USER, ext_key_path)
+    if current_prog_id == prog_id:
+        _delete_tree(winreg.HKEY_CURRENT_USER, ext_key_path)
 
     # Remove this app's ProgID registration itself.
     _delete_tree(winreg.HKEY_CURRENT_USER, rf"Software\Classes\{prog_id}")
@@ -122,14 +136,5 @@ def unregister_file_type(extension: str, prog_id: str):
 
 # --- Call this at startup ---
 if __name__ == "__main__":
-    EXT = ".noui"
-    PROG_ID = "NoGui.noui"
-
-    unregister_file_type(EXT, PROG_ID)
-
-    # register_file_type(
-    #     extension=EXT,
-    #     prog_id=PROG_ID,
-    #     description="NoGUI Game File",
-    #     icon_path=str(DEFAULT_ICON)
-    # )
+    register_noui_file_type()
+    # unregister_file_type(EXT, PROG_ID)
