@@ -28,7 +28,7 @@ if __name__ == "__main__":
     history.append({"role": "system", "content": "You are a helpful assistant."})
 
     print("Loading model...")
-    model_path: str = os.path.join(os.path.dirname(__file__), "models", "TinyLlama-1.1B-Chat-v1.0_ov")
+    model_path: str = os.path.join(os.path.dirname(__file__), "models", "model_path")
     pipe: LLMPipeline = LLMPipeline(model_path, "CPU")
     while True:
 

@@ -1,11 +1,12 @@
 import sys
 import os
 from PySide6 import QtWidgets
-from src.gui_game_player.settingsPage import SettingsPage
-from src.gamePlayer.settings_manager import SettingsManager
-from src.gui_game_player.file_association_popup import show_noui_registration_popup_if_needed
+from src.game_player.gui.settingsPage import SettingsPage
+from src.game_player.model.settings_manager import SettingsManager
+from src.game_player.gui.file_association_popup import show_noui_registration_popup_if_needed
 
-from src import gamePlayer
+from src.game_player.model import game_player
+from src.game_player import myGestureRecognizer
 
 
 class PlayerPage(QtWidgets.QWidget):
@@ -61,12 +62,11 @@ class PlayerPage(QtWidgets.QWidget):
         """
         import threading
         if self._settings.is_keyboard_mode():
-            from src.gamePlayer.keyboard_input_handler import KeyboardInputHandler
+            from src.game_player.model.keyboard_input_handler import KeyboardInputHandler
             self._recogniser = KeyboardInputHandler(self._settings)
         else:
-            from src import myGestureRecognizer
             self._recogniser = myGestureRecognizer.VideoGestureRecogniser(self._settings)
-        player = gamePlayer.GamePlayer(self._recogniser, self._settings)
+        player = game_player.GamePlayer(self._recogniser, self._settings)
         thread = threading.Thread(
             target=player.play_game,
             args=(self.path_edit.text(),),

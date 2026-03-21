@@ -1,15 +1,13 @@
-import os
-import json
 import time
 
-from src.gamePlayer.audio_player import AudioPlayer
+from src.audio_player import AudioPlayer
 from src.graph import Node
 
-from src.gesture import EnumGesture
+from src.game_player.gesture import EnumGesture
 from src.graph.enum_LR import EnumLR
 from src.storageManager import game_load
 from src.storageManager import progress_tracker
-from src.gamePlayer.settings_manager import SettingsManager
+from src.game_player.model.settings_manager import SettingsManager
 
 class GamePlayer:
     """

@@ -5,8 +5,8 @@ from typing import Any, Optional
 from PySide6 import QtWidgets, QtCore, QtGui
 from pathlib import Path
 
-from src.gamePlayer.audio_player import AudioPlayer
-from src.game_generation_local_llm.graph_blueprint.blueprint import GraphBlueprint
+from src.audio_player import AudioPlayer
+from src.game_engine.game_generation_local_llm.graph_blueprint.blueprint import GraphBlueprint
 from src.graph.enum_LR import EnumLR
 from src.graph import Node
 from src.graph.serial_graph import SerialGraph
@@ -43,8 +43,8 @@ class _GameGenerationWorker(QtCore.QObject):
 
     @QtCore.Slot()
     def run(self) -> None:
-        from src.game_generation_local_llm.game_generator import GameGenerator
-        from src.game_generation_local_llm.generation_control import GenerationCancelledError
+        from src.game_engine.game_generation_local_llm.game_generator import GameGenerator
+        from src.game_engine.game_generation_local_llm.generation_control import GenerationCancelledError
 
         try:
             generator = GameGenerator()
@@ -131,7 +131,6 @@ class GameCreationPage(QtWidgets.QWidget):
         self.game_loader: GameLoader = GameLoader()
         self.game_saver: GameSaver = GameSaver()
         self.game_par_dir: Optional[str] = os.path.dirname(game_path) if game_path else None
-        # self._voice_samples_dir = os.path.join(os.path.dirname(__file__), os.pardir, "voiceSamples")
         self._voice_samples_dir = Path(__file__).parent.parent / "voiceSamples"
 
         # Save state

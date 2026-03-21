@@ -4,11 +4,11 @@ from typing import Any, Callable
 
 from openvino_genai import GenerationConfig, LLMPipeline, StructuredOutputConfig, ChatHistory
 
-from src.game_generation_local_llm.generation_control import raise_if_cancelled
+from src.game_engine.game_generation_local_llm.generation_control import raise_if_cancelled
 from src.graph.serial_graph import SerialGraph
 from src.graph.serial_node import SerialNode
-from src.game_generation_local_llm.story_generator.prompts import SYS_MESSAGE, NODE_USER_MESSAGE
-from src.game_generation_local_llm.graph_blueprint.blueprint import GraphBlueprint
+from src.game_engine.game_generation_local_llm.story_generator.prompts import SYS_MESSAGE, NODE_USER_MESSAGE
+from src.game_engine.game_generation_local_llm.graph_blueprint.blueprint import GraphBlueprint
 
 
 class StoryGenerator:

@@ -1,6 +1,6 @@
 import os
 import json
-from src.gesture import EnumGesture
+from src.game_player.gesture import EnumGesture
 from pathlib import Path
 
 SETTINGS_PATH: Path = Path(__file__).parent.parent / "settings.json"
@@ -21,7 +21,7 @@ DEFAULT_SETTINGS: dict = {
         "replay_options": "F",
         "quit":           "Q",
     },
-    "recogniser_timeout": 5.0 # seconds to wait for gesture recognizer before timeout
+    "recogniser_timeout": 30.0 # seconds to wait for gesture recognizer before timeout
 }
  
 

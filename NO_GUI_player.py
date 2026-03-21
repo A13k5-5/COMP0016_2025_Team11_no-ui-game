@@ -14,7 +14,7 @@
 
 
 import sys
-from src.gui_game_player import playerPage
+from src.game_player.gui import playerPage
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:

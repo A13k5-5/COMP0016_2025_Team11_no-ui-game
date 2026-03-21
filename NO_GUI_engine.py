@@ -30,7 +30,7 @@
 # nuitka-project: --include-package=openvino_tokenizers
 # nuitka-project: --include-package-data=openvino_tokenizers
 
-from src.gui.homePage import run
+from src.game_engine.gui import homePage
 
 if __name__ == "__main__":
-    run()
+    homePage.run()
