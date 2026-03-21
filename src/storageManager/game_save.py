@@ -2,7 +2,6 @@ import os
 import tempfile
 import zipfile
 
-from multipledispatch import dispatch
 from . import config
 from src.graph import Node
 from src.graph.serial_graph import SerialGraph
@@ -15,21 +14,17 @@ class GameSaver:
     def __init__(self):
         self._talker: Talker = Talker()
 
-    @dispatch(str, str, Node, str)
     def save_game(self, path_to_save: str, game_name: str, root: Node, voice: str):
-        serialized_graph: SerialGraph = SerialGraph.serialize_graph(root)
-        self.save_game(path_to_save, game_name, serialized_graph, voice)
-
-    @dispatch(str, str, SerialGraph, str)
-    def save_game(self, path_to_save: str, game_name: str, serialized_graph: SerialGraph, voice: str):
         """
         Saves the game to the given path as a zip archive. Only the zip file is written to path_to_save;
         a temporary directory is used for staging and is removed afterwards.
+        :param voice:
+        :param root:
         :param path_to_save: the directory where the game zip should be created
         :param game_name: the name of the game, which will be used as the name of the zip file
-        :param serialized_graph: the graph in a serialized format (dictionary) to be saved as JSON
         :return:
         """
+        serialized_graph: SerialGraph = SerialGraph.serialize_graph(root)
         zip_path: str = os.path.join(path_to_save, game_name + config.FILE_EXTENSION)
 
         self._check_zip_path(zip_path)
