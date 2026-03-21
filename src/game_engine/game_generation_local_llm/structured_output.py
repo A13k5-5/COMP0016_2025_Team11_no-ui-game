@@ -1,14 +1,9 @@
-import argparse
 import json
 import os
 
-from openvino_genai import LLMPipeline
-
-from src.game_generation_local_llm.game_generator import GameGenerator
+from src.game_engine.game_generation_local_llm.game_generator import GameGenerator
 from src.graph.serial_graph import SerialGraph
-from src.game_generation_local_llm.story_generator.story_generator import StoryGenerator
-from src.game_generation_local_llm.graph_blueprint.blueprint import GraphBlueprint
-from src.game_generation_local_llm.graph_blueprint.blueprint_generator import BlueprintGenerator
+from src.game_engine.game_generation_local_llm.graph_blueprint.blueprint import GraphBlueprint
 
 
 def main():

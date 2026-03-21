@@ -6,7 +6,7 @@ from multipledispatch import dispatch
 from . import config
 from src.graph import Node
 from src.graph.serial_graph import SerialGraph
-from src.text2speech import Talker
+from src.game_engine.text2speech import Talker
 
 class GameSaver:
     """

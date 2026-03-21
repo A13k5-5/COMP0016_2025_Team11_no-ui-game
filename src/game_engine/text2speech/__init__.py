@@ -1,0 +1,1 @@
+from src.game_engine.text2speech.text2speech import Talker

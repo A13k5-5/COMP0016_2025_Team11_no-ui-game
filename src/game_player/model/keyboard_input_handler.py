@@ -1,6 +1,6 @@
-from PySide6 import QtWidgets, QtCore, QtGui
-from src.gesture import EnumGesture
-from src.gamePlayer.settings_manager import SettingsManager
+from PySide6 import QtWidgets, QtCore
+from src.game_player.gesture import EnumGesture
+from src.game_player.gamePlayer.settings_manager import SettingsManager
 
 class KeyboardInputHandler:
     """

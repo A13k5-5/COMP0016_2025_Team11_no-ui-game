@@ -1,6 +1,6 @@
 from PySide6 import QtWidgets
 
-from src.register_file_type.register_file_type import (
+from src.game_player.register_file_type.register_file_type import (
     is_noui_file_type_registered,
     register_noui_file_type,
 )

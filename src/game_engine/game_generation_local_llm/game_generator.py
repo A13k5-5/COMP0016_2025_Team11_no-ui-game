@@ -5,10 +5,10 @@ from typing import Any, Callable
 from openvino_genai import LLMPipeline
 
 from src.graph.serial_graph import SerialGraph
-from src.game_generation_local_llm.generation_control import GenerationCancelledError, raise_if_cancelled
-from src.game_generation_local_llm.graph_blueprint.blueprint import GraphBlueprint
-from src.game_generation_local_llm.graph_blueprint.blueprint_generator import BlueprintGenerator
-from src.game_generation_local_llm.story_generator.story_generator import StoryGenerator
+from src.game_engine.game_generation_local_llm.generation_control import GenerationCancelledError, raise_if_cancelled
+from src.game_engine.game_generation_local_llm.graph_blueprint.blueprint import GraphBlueprint
+from src.game_engine.game_generation_local_llm.graph_blueprint.blueprint_generator import BlueprintGenerator
+from src.game_engine.game_generation_local_llm.story_generator.story_generator import StoryGenerator
 
 
 class GameGenerator:
