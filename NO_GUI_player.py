@@ -5,9 +5,13 @@
 # nuitka-project: --enable-plugin=pyside6
 # nuitka-project: --include-qt-plugins=qml
 
-# recognizer file
+# recognizer file for mediapipe
 # nuitka-project: --include-data-files={MAIN_DIRECTORY}/src/myGestureRecognizer/gesture_recognizer.task=src/myGestureRecognizer/gesture_recognizer.task
-# nuitka-project: --include-data-files={MAIN_DIRECTORY}/src/register_file_type/gameIcon.ico=src/register_file_type/gameIcon.ico
+
+# for the icon
+# nuitka-project: --include-data-files=icon.ico=icon.ico
+# nuitka-project: --windows-icon-from=icon.ico
+
 
 import sys
 from src.gui_game_player import playerPage

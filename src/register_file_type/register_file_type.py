@@ -3,7 +3,7 @@ import sys
 import ctypes
 from pathlib import Path
 
-DEFAULT_ICON: Path = Path(__file__).parent / "gameIcon.ico"
+DEFAULT_ICON: Path = Path(__file__).parent.parent.parent / "icon.ico"
 
 def register_file_type(
     extension: str,          # e.g. ".myext"
@@ -130,11 +130,5 @@ if __name__ == "__main__":
     EXT = ".noui"
     PROG_ID = "NoGui.noui"
 
-    unregister_file_type(EXT, PROG_ID)
-
-    # register_file_type(
-    #     extension=EXT,
-    #     prog_id=PROG_ID,
-    #     description="NoGUI Game File",
-    #     icon_path=str(DEFAULT_ICON)
-    # )
+    register_noui_file_type()
+    # unregister_file_type(EXT, PROG_ID)
