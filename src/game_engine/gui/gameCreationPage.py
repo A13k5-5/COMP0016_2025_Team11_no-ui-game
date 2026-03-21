@@ -80,7 +80,7 @@ class _GameSaveWorker(QtCore.QObject):
         super().__init__()
         self.save_dir = save_dir
         self.title = title
-        self.root = root
+        self.root: Node = root
         self.voice = voice
 
     @QtCore.Slot()

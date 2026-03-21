@@ -6,7 +6,7 @@
 # nuitka-project: --include-qt-plugins=qml
 
 # recognizer file for mediapipe
-# nuitka-project: --include-data-files={MAIN_DIRECTORY}/src/myGestureRecognizer/gesture_recognizer.task=src/myGestureRecognizer/gesture_recognizer.task
+# nuitka-project: --include-data-files={MAIN_DIRECTORY}/src/game_player/myGestureRecognizer/gesture_recognizer.task=src/game_player/myGestureRecognizer/gesture_recognizer.task
 
 # for the icon
 # nuitka-project: --include-data-files=icon.ico=icon.ico

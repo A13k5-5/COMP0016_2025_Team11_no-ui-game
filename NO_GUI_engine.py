@@ -1,18 +1,17 @@
 # nuitka-project: --mode=standalone
-# nuitka-project: --windows-disable-console
+## nuitka-project: --windows-console-mode=disable
 
 # for pyside6
 # nuitka-project: --enable-plugin=pyside6
 # nuitka-project: --include-qt-plugins=qml
-
-# recognizer file
-# nuitka-project: --include-data-files={MAIN_DIRECTORY}/src/myGestureRecognizer/gesture_recognizer.task=src/myGestureRecognizer/gesture_recognizer.task
 
 # --------------- FOR TTS ----------------
 # nuitka-project: --nofollow-import-to=transformers.generation.tf_utils
 # nuitka-project: --nofollow-import-to=transformers.generation.flax_utils
 # nuitka-project: --nofollow-import-to=torch._dynamo
 # nuitka-project: --nofollow-import-to=matplotlib
+
+# nuitka-project: --include-data-dir={MAIN_DIRECTORY}/src/game_engine/voiceSamples=src/game_engine/voiceSamples
 
 # nuitka-project: --module-parameter=torch-disable-jit=yes
 

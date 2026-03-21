@@ -2,7 +2,9 @@ from pathlib import Path
 import shutil, re
 
 if __name__ == "__main__":
-    sp = Path("../.venv3/lib/python3.12/site-packages")
+    # sp = Path("../.venv3/lib/python3.12/site-packages")
+    sp = Path(__file__).parent / ".venv_gameEngine" / "Lib" / "site-packages"
+
     src = next(sp.glob("phonemizer_fork-*.dist-info"))
     dst = sp / src.name.replace("phonemizer_fork", "phonemizer")
 
