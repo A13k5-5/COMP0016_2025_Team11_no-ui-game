@@ -96,23 +96,28 @@ def register_noui_file_type():
         icon_path=str(DEFAULT_ICON)
     )
 
+def _get_default_value(root: int, subkey: str):
+    """Return the key's (Default) value, or None when missing."""
+    try:
+        with winreg.OpenKey(root, subkey, 0, winreg.KEY_READ) as key:
+            value, _ = winreg.QueryValueEx(key, "")
+            return value
+    except (FileNotFoundError, OSError):
+        return None
+
+
 def unregister_file_type(extension: str, prog_id: str):
     """
-    Unregisters filetype for the current user. Here for testing purposes.
-    :param extension:
-    :param prog_id:
-    :return:
+    Unregister this app's filetype mapping for the current user.
+    Only removes keys owned by this app.
     """
     ext = _normalize_extension(extension)
+    ext_key_path = rf"Software\Classes\{ext}"
 
-    # Remove all per-user links for this extension so apps are fully unlinked from it.
-    extension_link_paths = [
-        rf"Software\Classes\{ext}",
-        rf"Software\Classes\SystemFileAssociations\{ext}",
-        rf"Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\{ext}",
-    ]
-    for path in extension_link_paths:
-        _delete_tree(winreg.HKEY_CURRENT_USER, path)
+    # Remove extension mapping only if it currently points to this app's ProgID.
+    current_prog_id = _get_default_value(winreg.HKEY_CURRENT_USER, ext_key_path)
+    if current_prog_id == prog_id:
+        _delete_tree(winreg.HKEY_CURRENT_USER, ext_key_path)
 
     # Remove this app's ProgID registration itself.
     _delete_tree(winreg.HKEY_CURRENT_USER, rf"Software\Classes\{prog_id}")

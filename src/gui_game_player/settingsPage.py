@@ -1,6 +1,7 @@
 from PySide6 import QtWidgets, QtCore
 from src.gesture import EnumGesture
 from src.gamePlayer.settings_manager import SettingsManager
+from src.register_file_type.register_file_type import register_noui_file_type, unregister_file_type
 
 ACTIONS = [
     ("option_left",        "Option Left"),
@@ -21,6 +22,9 @@ class SettingsPage(QtWidgets.QDialog):
     Keyboard bindings are predetermined and shown read-only.
     """
 
+    NOUI_EXTENSION = ".noui"
+    NOUI_PROG_ID = "NoGui.noui"
+
     def __init__(self, settings: SettingsManager, parent=None):
         super().__init__(parent)
         self._dropdowns: dict[str, QtWidgets.QComboBox] = {}
@@ -32,6 +36,7 @@ class SettingsPage(QtWidgets.QDialog):
         self._gesture_bindings()
         self._keyboard_bindings()
         self._timeout_setting()
+        self._file_association_controls()
         self._buttons()
 
     def _setup_window_layout(self) -> None:
@@ -130,6 +135,23 @@ class SettingsPage(QtWidgets.QDialog):
         timeout_layout.addRow("Timeout:", timeout_row)
         self.layout.addWidget(timeout_group)
 
+    def _file_association_controls(self) -> None:
+        """Add manual controls for registering/unregistering .noui association."""
+        assoc_group = QtWidgets.QGroupBox("File Association (.noui)")
+        assoc_layout = QtWidgets.QHBoxLayout(assoc_group)
+
+        register_btn = QtWidgets.QPushButton("Register")
+        register_btn.clicked.connect(self._register_noui)
+
+        unregister_btn = QtWidgets.QPushButton("Unregister")
+        unregister_btn.clicked.connect(self._unregister_noui)
+
+        assoc_layout.addWidget(register_btn)
+        assoc_layout.addWidget(unregister_btn)
+        assoc_layout.addStretch()
+
+        self.layout.addWidget(assoc_group)
+
     def _buttons(self) -> None:
         """Add Save and Cancel buttons."""
         btn_row = QtWidgets.QHBoxLayout()
@@ -164,6 +186,36 @@ class SettingsPage(QtWidgets.QDialog):
                 return None
             keys[action] = key
         return keys
+
+    def _register_noui(self) -> None:
+        try:
+            register_noui_file_type()
+            QtWidgets.QMessageBox.information(
+                self,
+                "File Association",
+                "Registered .noui file association for this user."
+            )
+        except Exception as exc:
+            QtWidgets.QMessageBox.warning(
+                self,
+                "File Association",
+                f"Could not register .noui association.\n{exc}"
+            )
+
+    def _unregister_noui(self) -> None:
+        try:
+            unregister_file_type(self.NOUI_EXTENSION, self.NOUI_PROG_ID)
+            QtWidgets.QMessageBox.information(
+                self,
+                "File Association",
+                "Unregistered .noui file association for this user."
+            )
+        except Exception as exc:
+            QtWidgets.QMessageBox.warning(
+                self,
+                "File Association",
+                f"Could not unregister .noui association.\n{exc}"
+            )
 
     def _save(self) -> None:
         selected = [gest.currentData() for gest in self._dropdowns.values()]
