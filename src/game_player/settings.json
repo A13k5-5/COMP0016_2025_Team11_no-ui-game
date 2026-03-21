@@ -14,5 +14,5 @@
         "replay_options": "F",
         "quit": "Q"
     },
-    "recogniser_timeout": 5.0
+    "recogniser_timeout": 30.0
 }
