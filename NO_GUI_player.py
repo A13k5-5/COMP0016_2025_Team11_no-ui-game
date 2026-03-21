@@ -1,4 +1,5 @@
-# nuitka-project: --mode=onefile
+## nuitka-project: --mode=onefile
+# nuitka-project: --mode=standalone
 # nuitka-project: --windows-console-mode=disable
 
 # for pyside6
