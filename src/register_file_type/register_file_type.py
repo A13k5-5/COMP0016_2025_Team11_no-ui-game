@@ -19,7 +19,7 @@ def register_file_type(
     if _is_registered(extension, prog_id):
         return
 
-    exe_path = sys.executable  # points to your compiled .exe when built with Nuitka
+    exe_path = sys.argv[0]  # points to compiled .exe when built with Nuitka
 
     # 1. Register the ProgID and its shell open command
     with winreg.CreateKey(winreg.HKEY_CURRENT_USER, rf"Software\Classes\{prog_id}") as key:
