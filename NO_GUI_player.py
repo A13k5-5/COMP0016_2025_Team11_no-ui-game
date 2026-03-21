@@ -10,7 +10,7 @@
 
 # for the icon
 # nuitka-project: --include-data-files=icon.ico=icon.ico
-# nuitka-project: --windows-icon-from=icon.ico
+# nuitka-project: --windows-icon-from-ico=icon.ico
 
 
 import sys
