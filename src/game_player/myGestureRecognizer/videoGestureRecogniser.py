@@ -9,7 +9,7 @@ from mediapipe.tasks.python.vision import GestureRecognizer, RunningMode, Gestur
 
 from src.game_player.gesture import EnumGesture
 from .videoCaptureManager import video_capture_manager
-from src.game_player.gamePlayer import SettingsManager
+from src.game_player.model import SettingsManager
 
 WINDOW_NAME = "Gesture Detection"
 
