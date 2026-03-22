@@ -35,6 +35,8 @@ class PlayerPage(QtWidgets.QWidget):
         self.setWindowTitle("No-UI Game")
         self.resize(400, 120)
 
+        self.ran_standalone: bool | None = False
+
         layout = QtWidgets.QVBoxLayout(self)
 
         # Folder selection row
@@ -74,8 +76,10 @@ class PlayerPage(QtWidgets.QWidget):
         dlg.exec()
 
     def _quit(self):
-        app = QtWidgets.QApplication.instance() or QtWidgets.QApplication(sys.argv)
-        app.quit()
+        # if ran with a file argument, quit the app
+        if not self.ran_standalone:
+            app = QtWidgets.QApplication.instance() or QtWidgets.QApplication(sys.argv)
+            app.quit()
 
     def _run(self):
         """
@@ -105,6 +109,7 @@ class PlayerPage(QtWidgets.QWidget):
 def run(path: str = None):
     app = QtWidgets.QApplication.instance() or QtWidgets.QApplication(sys.argv)
     window = PlayerPage()
+    window.ran_standalone = path is None
 
     window.show()
     show_noui_registration_popup_if_needed(parent=window)
