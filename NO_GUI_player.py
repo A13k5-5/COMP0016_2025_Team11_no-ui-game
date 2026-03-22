@@ -10,8 +10,8 @@
 # nuitka-project: --include-data-files={MAIN_DIRECTORY}/src/game_player/myGestureRecognizer/gesture_recognizer.task=src/game_player/myGestureRecognizer/gesture_recognizer.task
 
 # for the icon
-# nuitka-project: --include-data-files=icon.ico=icon.ico
-# nuitka-project: --windows-icon-from-ico=icon.ico
+# nuitka-project: --include-data-files=src/game_player/icon.ico=src/game_player/icon.ico
+# nuitka-project: --windows-icon-from-ico=src/game_player/icon.ico
 
 
 import sys
