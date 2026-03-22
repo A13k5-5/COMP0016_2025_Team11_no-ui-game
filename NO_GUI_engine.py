@@ -1,5 +1,5 @@
 # nuitka-project: --mode=standalone
-## nuitka-project: --windows-console-mode=disable
+# nuitka-project: --windows-console-mode=disable
 
 # for pyside6
 # nuitka-project: --enable-plugin=pyside6
@@ -22,12 +22,21 @@
 # nuitka-project: --include-distribution-metadata=spacy
 # nuitka-project: --spacy-language-model=en_core_web_sm
 
+# nuitka-project: --include-package=language_tags
+# nuitka-project: --include-package=espeakng_loader
+# nuitka-project: --include-package=spacy_curated_transformers
+# nuitka-project: --include-package=curated_transformers
+# nuitka-project: --include-package=misaki
+
 # --------------- FOR OPENVINO ----------------
 # nuitka-project: --include-package=openvino_genai
 # nuitka-project: --include-package-data=openvino_genai
 
 # nuitka-project: --include-package=openvino_tokenizers
 # nuitka-project: --include-package-data=openvino_tokenizers
+
+# nuitka-project: --include-package=openvino
+# nuitka-project: --include-package-data=openvino
 
 from src.game_engine.gui import homePage
 
