@@ -1,6 +1,6 @@
 from PySide6 import QtWidgets, QtCore
 from src.game_player.gesture import EnumGesture
-from src.game_player.gamePlayer.settings_manager import SettingsManager
+from src.game_player.model.settings_manager import SettingsManager
 
 class KeyboardInputHandler:
     """
@@ -10,8 +10,8 @@ class KeyboardInputHandler:
         self._last_key: int | None = None
 
         self._key_to_gesture: dict[int, EnumGesture] = {}
-        # for every game action:
-        # 1) get the configured key string from settings
+        # for every game action:
+        # 1) get the configured key string from settings
         # 2) convert key string to Qt code ("A" -> QtCore.Qt.Key_A)
         # 3) map it to the corresponding EnumGesture
         for action in ("option_left", "option_right", "replay_main", "replay_options", "quit"):
@@ -20,7 +20,7 @@ class KeyboardInputHandler:
             if qt_key is not None:
                 self._key_to_gesture[qt_key] = settings.get_gesture(action)
 
-    def get_gesture(self, gestures_to_spot: list[EnumGesture]) -> EnumGesture:
+    def get_gesture(self, gestures_to_spot: list[EnumGesture]) -> EnumGesture | None:
         """
         Blocks until the user presses a key mapped to one of gestures_to_spot.
         The quit gesture is always accepted regardless of gestures_to_spot.
@@ -36,7 +36,7 @@ class KeyboardInputHandler:
                 continue
             if gesture in gestures_to_spot:
                 return gesture
-    
+
     def register_key(self, key: int) -> None:
         """
         Called by PlayerPage.keyPressEvent when a key is pressed.
