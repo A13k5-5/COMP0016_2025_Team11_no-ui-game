@@ -38,6 +38,12 @@
 # nuitka-project: --include-package=openvino
 # nuitka-project: --include-package-data=openvino
 
+# icon
+# nuitka-project: --windows-icon-from-ico=src/game_engine/engineIcon.ico
+
+# nuitka-project: --product-name=NoGUI-Engine
+# nuitka-project: --product-version=1.0.0
+
 from src.game_engine.gui import homePage
 
 if __name__ == "__main__":
