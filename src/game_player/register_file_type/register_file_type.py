@@ -5,7 +5,7 @@ from pathlib import Path
 
 EXT = ".noui"
 PROG_ID = "NoGui.noui"
-DEFAULT_ICON: Path = Path(__file__).parent.parent.parent / "icon.ico"
+DEFAULT_ICON: Path = Path(__file__).parent.parent / "icon.ico"
 
 def register_file_type(
     extension: str,          # e.g. ".myext"

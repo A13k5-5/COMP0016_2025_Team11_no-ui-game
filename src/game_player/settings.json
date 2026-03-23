@@ -1,18 +1,18 @@
 {
     "input_device": "webcam",
     "gestures": {
-        "option_left": "4",
-        "option_right": "3",
-        "replay_main": "1",
-        "replay_options": "0",
+        "option_left": "11",
+        "option_right": "10",
+        "replay_main": "5",
+        "replay_options": "4",
         "quit": "2"
     },
     "keyboard": {
-        "option_left": "J",
-        "option_right": "K",
+        "option_left": "A",
+        "option_right": "D",
         "replay_main": "R",
         "replay_options": "F",
         "quit": "Q"
     },
-    "recogniser_timeout": 5.0
+    "recogniser_timeout": 30.0
 }

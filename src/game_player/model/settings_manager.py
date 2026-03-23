@@ -8,11 +8,11 @@ SETTINGS_PATH: Path = Path(__file__).parent.parent / "settings.json"
 DEFAULT_SETTINGS: dict = {
     "input_device": "webcam",  # "webcam" or "keyboard"
     "gestures": {
-        "option_left":    EnumGesture.ILoveYou_Left.value,
-        "option_right":   EnumGesture.ILoveYou_Right.value,
+        "option_left":    EnumGesture.Thumb_Up_Left.value,
+        "option_right":   EnumGesture.Thumb_Up_Right.value,
         "replay_main":    EnumGesture.PointingUp_Left.value,
         "replay_options": EnumGesture.PointingUp_Right.value,
-        "quit":           EnumGesture.Victory.value,
+        "quit":           EnumGesture.Victory_Left.value,
     },
     "keyboard": {
         "option_left":    "A",

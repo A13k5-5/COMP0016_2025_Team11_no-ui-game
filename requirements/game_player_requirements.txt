@@ -3,3 +3,5 @@ playsound3
 multipledispatch
 pydantic
 pyside6
+ordered-set
+zstandard
