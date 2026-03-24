@@ -137,13 +137,13 @@ class GameSaver:
 
         # main menu options audio
         self._talker.generate_speech(
-            "To start a new game, raise your right hand.",
+            "To start a new game, choose the right option.",
             os.path.join(game_path, "audio", "main_menu_new_game.wav"),
             voice
         )
 
         self._talker.generate_speech(
-            "To resume your previous progress, raise your left hand.",
+            "To resume your previous progress, choose the left option.",
             os.path.join(game_path, "audio", "main_menu_progress.wav"),
             voice
         )

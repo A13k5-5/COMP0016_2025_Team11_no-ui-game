@@ -22,11 +22,11 @@
 # nuitka-project: --include-distribution-metadata=spacy
 # nuitka-project: --spacy-language-model=en_core_web_sm
 
-# nuitka-project: --include-package=language_tags
-# nuitka-project: --include-package=espeakng_loader
-# nuitka-project: --include-package=spacy_curated_transformers
-# nuitka-project: --include-package=curated_transformers
-# nuitka-project: --include-package=misaki
+# nuitka-project: --include-package-data=language_tags
+# nuitka-project: --include-package-data=espeakng_loader
+# nuitka-project: --include-package-data=spacy_curated_transformers
+# nuitka-project: --include-package-data=curated_transformers
+# nuitka-project: --include-package-data=misaki
 
 # --------------- FOR OPENVINO ----------------
 # nuitka-project: --include-package=openvino_genai
