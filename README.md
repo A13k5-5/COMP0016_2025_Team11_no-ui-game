@@ -104,9 +104,16 @@ source .venv/bin/activate
 
 2. Install dependencies:
 
+a. For No-GUI game engine:
 ```bash
-pip install -r requirements.txt
+pip install -r ./requirements/game_engine_requirements.txt
 ```
+
+b. For No-GUI game player:
+```bash
+pip install -r ./requirements/game_player_requirements.txt
+```
+
 3. (Optional) Download the LLM model for AI generation - as instructed above.
 
 ## Running the Project
@@ -121,7 +128,7 @@ Current `main.py` launches the GUI creator (`gui.homePage`).
 
 ### Create or Edit a Game
 
-1. Run `python main.py`.
+1. Run `python NO_GUI_engine.py`.
 2. Choose:
 - `Create a New Game` to start from scratch.
 - `Edit Game` to load an existing `.noui` file.
@@ -133,12 +140,18 @@ Current `main.py` launches the GUI creator (`gui.homePage`).
 You can run the player flow by launching `playerPage.py`:
 
 ```bash
-python playerPage.py
+python NO_GUI_player.py
 ```
 
 Then:
 1. Browse for a `.noui` file.
 2. Run and play using gestures.
+
+OR you can run the game directly from the terminal:
+
+```bash
+python NO_GUI_player.py path/to/your_game.noui
+```
 
 ## Development Notes
 
