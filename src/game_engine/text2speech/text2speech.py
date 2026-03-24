@@ -39,7 +39,7 @@ class Talker:
             import numpy as np
             full_audio = np.concatenate(audio_chunks)
             sf.write(output_file, full_audio, 24000)
-            print("Generated speech saved to: ", output_file)
+            # print("Generated speech saved to: ", output_file)
 
 if __name__ == "__main__":
     talker = Talker()
