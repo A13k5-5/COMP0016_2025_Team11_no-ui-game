@@ -66,25 +66,25 @@ Assert-PathExists -Path $venvPython -Label "Virtual environment python"
 #}
 #Assert-PathExists -Path $distDir -Label "Nuitka dist output"
 
-Write-Host "[2/4] Copying person detector intel folder"
-$intelDest = Join-Path $distDir "src\video_recogniser\person_recogniser\intel"
+Write-Host "[2/4] Copying AI model folder"
+$intelDest = Join-Path $distDir "src\game_engine\game_generation_local_llm\models\model_path"
 if (Test-Path -LiteralPath $intelDest) {
     Remove-Item -LiteralPath $intelDest -Recurse -Force
 }
 New-Item -ItemType Directory -Path (Split-Path -Path $intelDest -Parent) -Force | Out-Null
 Copy-Item -LiteralPath $modelSource -Destination $intelDest -Recurse -Force
 
-Write-Host "[3/4] Copying OpenVINO libs into dist/openvino/libs"
-$openvinoLibsSource = Join-Path $venvDir "Lib\site-packages\openvino\libs"
-Assert-PathExists -Path $openvinoLibsSource -Label "OpenVINO libs in venv"
-$openvinoLibsDest = Join-Path $distDir "openvino\libs"
+Write-Host "[3/4] Copying OpenVINO libs into dist/openvino"
+$openvinoSource = Join-Path $venvDir "Lib\site-packages\openvino"
+Assert-PathExists -Path $openvinoSource -Label "OpenVINO libs in venv"
+$openvinoLibsDest = Join-Path $distDir "openvino"
 New-Item -ItemType Directory -Path $openvinoLibsDest -Force | Out-Null
-Copy-Item -Path (Join-Path $openvinoLibsSource "*") -Destination $openvinoLibsDest -Recurse -Force
+Copy-Item -Path (Join-Path $openvinoSource "*") -Destination $openvinoLibsDest -Recurse -Force
 
 Write-Host "[4/4] Copying OpenVINO DLLs into dist root"
-$dllNames = @("openvino_intel_cpu_plugin.dll", "openvino_ir_frontend.dll")
+$dllNames = @("openvino_intel_cpu_plugin.dll", "openvino_intel_gpu_plugin.dll", "openvino_ir_frontend.dll")
 foreach ($dllName in $dllNames) {
-    $dllSource = Join-Path $openvinoLibsSource $dllName
+    $dllSource = Join-Path $openvinoSource "libs" $dllName
     Assert-PathExists -Path $dllSource -Label "Required DLL"
     Copy-Item -LiteralPath $dllSource -Destination (Join-Path $distDir $dllName) -Force
 }
