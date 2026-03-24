@@ -155,6 +155,6 @@ python NO_GUI_player.py path/to/your_game.noui
 
 ## Development Notes
 
-- Entry script: `main.py`
+- Entry script: `NO_GUI_engine.py` or `NO_GUI_player.py`
 - Sample games: `saved_games/`
 - LLM test outputs: `game_generation_local_llm/generated_games/`
