@@ -52,20 +52,6 @@ Assert-PathExists -Path $modelSource -Label "AI model folder"
 Write-Host "[1/4] Checking virtual environment exists: $venvDir"
 Assert-PathExists -Path $venvPython -Label "Virtual environment python"
 
-#Write-Host "[2/6] Installing dependencies and Nuitka 4.0.5"
-#Invoke-CheckedCommand -FilePath $venvPython -Arguments @("-m", "pip", "install", "--upgrade", "pip")
-#Invoke-CheckedCommand -FilePath $venvPython -Arguments @("-m", "pip", "install", "-r", $requirements)
-#Invoke-CheckedCommand -FilePath $venvPython -Arguments @("-m", "pip", "install", "nuitka==4.0.5")
-
-#Write-Host "[2/5] Compiling with Nuitka"
-#Push-Location $ProjectRoot
-#try {
-#    Invoke-CheckedCommand -FilePath $venvPython -Arguments @("-m", "nuitka", "run_system_tray.py")
-#} finally {
-#    Pop-Location
-#}
-#Assert-PathExists -Path $distDir -Label "Nuitka dist output"
-
 Write-Host "[2/4] Copying AI model folder"
 $intelDest = Join-Path $distDir "src\game_engine\game_generation_local_llm\models\model_path"
 if (Test-Path -LiteralPath $intelDest) {
@@ -74,19 +60,34 @@ if (Test-Path -LiteralPath $intelDest) {
 New-Item -ItemType Directory -Path (Split-Path -Path $intelDest -Parent) -Force | Out-Null
 Copy-Item -LiteralPath $modelSource -Destination $intelDest -Recurse -Force
 
-Write-Host "[3/4] Copying OpenVINO libs into dist/openvino"
-$openvinoSource = Join-Path $venvDir "Lib\site-packages\openvino"
-Assert-PathExists -Path $openvinoSource -Label "OpenVINO libs in venv"
-$openvinoLibsDest = Join-Path $distDir "openvino"
-New-Item -ItemType Directory -Path $openvinoLibsDest -Force | Out-Null
-Copy-Item -Path (Join-Path $openvinoSource "*") -Destination $openvinoLibsDest -Recurse -Force
+Write-Host "[3/4] Copying OpenVINO and NLP runtime libs into dist"
+$sitePackagesDir = Join-Path $venvDir "Lib\site-packages"
+$packagesToCopy = @(
+    "openvino",
+    "spacy_curated_transformers",
+    "curated_transformers",
+    "curated_tokenizers",
+    "openvino_tokenizers"
+)
 
-Write-Host "[4/4] Copying OpenVINO DLLs into dist root"
-$dllNames = @("openvino_intel_cpu_plugin.dll", "openvino_intel_gpu_plugin.dll", "openvino_ir_frontend.dll")
+foreach ($packageName in $packagesToCopy) {
+    $packageSource = Join-Path $sitePackagesDir $packageName
+    Assert-PathExists -Path $packageSource -Label "$packageName libs in venv"
+
+    $packageDest = Join-Path $distDir $packageName
+    New-Item -ItemType Directory -Path $packageDest -Force | Out-Null
+    Copy-Item -Path (Join-Path $packageSource "*") -Destination $packageDest -Recurse -Force
+}
+
+$openvinoSource = Join-Path $sitePackagesDir "openvino"
+Write-Host "[4/4] Copying OpenVINO DLLs and required packages into dist root"
+$dllNames = @("libs/openvino_intel_cpu_plugin.dll", "libs/openvino_intel_gpu_plugin.dll", "libs/openvino_ir_frontend.dll")
 foreach ($dllName in $dllNames) {
-    $dllSource = Join-Path $openvinoSource "libs" $dllName
+    $dllSource = Join-Path $openvinoSource $dllName
+    $dllFileName = Split-Path -Path $dllName -Leaf
+    Write-Host "Copying $dllSource"
     Assert-PathExists -Path $dllSource -Label "Required DLL"
-    Copy-Item -LiteralPath $dllSource -Destination (Join-Path $distDir $dllName) -Force
+    Copy-Item -LiteralPath $dllSource -Destination (Join-Path $distDir $dllFileName) -Force
 }
 
 Write-Host "Build automation complete. Output folder: $distDir"
