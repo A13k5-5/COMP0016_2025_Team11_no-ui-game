@@ -1,7 +1,7 @@
 import os
 import sys
 import threading
-from PySide6 import QtWidgets, QtCore
+from PySide6 import QtWidgets
 from src.game_player.gui.settingsPage import SettingsPage
 from src.game_player.model.settings_manager import SettingsManager
 from src.game_player.gui.file_association_popup import show_noui_registration_popup_if_needed
@@ -33,6 +33,16 @@ class PlayerPage(QtWidgets.QWidget):
         folder_row.addWidget(self.path_edit)
         folder_row.addWidget(browse_btn)
         layout.addLayout(folder_row)
+
+        self.gesture_hint_label = QtWidgets.QLabel(
+            "Tip: You can view your current gesture bindings in Settings."
+        )
+        self.gesture_hint_label.setWordWrap(True)
+        hint_font = self.gesture_hint_label.font()
+        hint_font.setPointSize(max(8, hint_font.pointSize() - 1))
+        self.gesture_hint_label.setFont(hint_font)
+        self.gesture_hint_label.setStyleSheet("color: #6e6e6e;")
+        layout.addWidget(self.gesture_hint_label)
 
         # Run button
         btn_row = QtWidgets.QHBoxLayout()
