@@ -16,6 +16,8 @@ class PlayerPage(QtWidgets.QWidget):
         self._settings = SettingsManager()
         self.setWindowTitle("No-UI Game")
         self.resize(400, 120)
+        # keyboard or video recogniser
+        self._recogniser = None
 
         self.ran_standalone: bool | None = False
 
