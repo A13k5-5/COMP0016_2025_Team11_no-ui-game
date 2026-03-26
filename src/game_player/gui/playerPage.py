@@ -1,31 +1,13 @@
-import sys
 import os
+import sys
+import threading
 from PySide6 import QtWidgets, QtCore
 from src.game_player.gui.settingsPage import SettingsPage
 from src.game_player.model.settings_manager import SettingsManager
 from src.game_player.gui.file_association_popup import show_noui_registration_popup_if_needed
 
-from src.game_player.model import game_player
+from src.game_player.model import game_player, GamePlayer
 from src.game_player import myGestureRecognizer
-
-class WorkerSignal(QtCore.QObject):
-    finished = QtCore.Signal()
-
-class Worker(QtCore.QRunnable):
-    def __init__(self, recogniser, settings, path):
-        super().__init__()
-        self.recogniser = recogniser
-        self.settings = settings
-        self.path = path
-        self.signals = WorkerSignal()
-
-    @QtCore.Slot()
-    def run(self):
-        try:
-            player = game_player.GamePlayer(self.recogniser, self.settings)
-            player.play_game(self.path)
-        finally:
-            self.signals.finished.emit()
 
 
 class PlayerPage(QtWidgets.QWidget):
@@ -54,7 +36,7 @@ class PlayerPage(QtWidgets.QWidget):
         btn_row = QtWidgets.QHBoxLayout()
         self.run_btn = QtWidgets.QPushButton("Run")
         self.run_btn.setEnabled(False)
-        self.run_btn.clicked.connect(self._run)
+        self.run_btn.clicked.connect(self.run)
 
         settings_btn = QtWidgets.QPushButton("⚙ Settings")
         settings_btn.clicked.connect(self._open_settings)
@@ -75,13 +57,22 @@ class PlayerPage(QtWidgets.QWidget):
         dlg = SettingsPage(self._settings, parent=self)
         dlg.exec()
 
-    def _quit(self):
+    def _optional_quit(self):
         # if ran with a file argument, quit the app
         if not self.ran_standalone:
             app = QtWidgets.QApplication.instance() or QtWidgets.QApplication(sys.argv)
             app.quit()
 
-    def _run(self):
+    def _play_game(self, player: GamePlayer):
+        """
+        Runs the game and optionally quits.
+        :param player:
+        :return:
+        """
+        player.play_game(self.path_edit.text())
+        self._optional_quit()
+
+    def run(self):
         """
         Depending on settings configuration, call gamePlayer with keyboard or video recognizer
         Run the game loop in a background thread so the Qt main thread stays
@@ -93,10 +84,9 @@ class PlayerPage(QtWidgets.QWidget):
         else:
             self._recogniser = myGestureRecognizer.VideoGestureRecogniser(self._settings)
 
-        worker = Worker(self._recogniser, self._settings, self.path_edit.text())
-        worker.signals.finished.connect(self._quit)
-        # run method of the worker starts (the game loop)
-        QtCore.QThreadPool.globalInstance().start(worker)
+        player = game_player.GamePlayer(self._recogniser, self._settings)
+        thread = threading.Thread(target=self._play_game, args=(player,), daemon=True)
+        thread.start()
 
     def keyPressEvent(self, event) -> None:
         """
@@ -113,9 +103,9 @@ def run(path: str = None):
 
     window.show()
     show_noui_registration_popup_if_needed(parent=window)
-    if path is not None:
+    if not window.ran_standalone:
         window.path_edit.setText(os.path.abspath(path))
-        window.run_btn.setEnabled(True)
-        window._run()
+        window.run_btn.setEnabled(False)
+        window.run()
 
-    app.exec()
+    sys.exit(app.exec())
