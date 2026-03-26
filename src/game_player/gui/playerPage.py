@@ -82,6 +82,8 @@ class PlayerPage(QtWidgets.QWidget):
         :return:
         """
         player.play_game(self.path_edit.text())
+        # re-enable the run button after the game loop ends
+        self.run_btn.setEnabled(True)
         self._optional_quit()
 
     def run(self):
@@ -90,6 +92,8 @@ class PlayerPage(QtWidgets.QWidget):
         Run the game loop in a background thread so the Qt main thread stays
         free to process keypresses via keyPressEvent.
         """
+        # prevent multiple clicks
+        self.run_btn.setEnabled(False)
         if self._settings.is_keyboard_mode():
             from src.game_player.model.keyboard_input_handler import KeyboardInputHandler
             self._recogniser = KeyboardInputHandler(self._settings)
