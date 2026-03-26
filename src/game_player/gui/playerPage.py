@@ -1,13 +1,37 @@
 import os
 import sys
 import threading
-from PySide6 import QtWidgets
+from PySide6 import QtWidgets, QtCore
 from src.game_player.gui.settingsPage import SettingsPage
 from src.game_player.model.settings_manager import SettingsManager
 from src.game_player.gui.file_association_popup import show_noui_registration_popup_if_needed
 
-from src.game_player.model import game_player, GamePlayer
+from src.game_player.model import game_player
 from src.game_player import myGestureRecognizer
+
+
+class WorkerSignal(QtCore.QObject):
+    finished = QtCore.Signal()
+
+
+class Worker:
+    def __init__(self, recogniser, settings, path):
+        self.recogniser = recogniser
+        self.settings = settings
+        self.path = path
+        self.signals = WorkerSignal()
+        self._thread = None
+
+    def start(self):
+        self._thread = threading.Thread(target=self.run, daemon=True)
+        self._thread.start()
+
+    def run(self):
+        try:
+            player = game_player.GamePlayer(self.recogniser, self.settings)
+            player.play_game(self.path)
+        finally:
+            self.signals.finished.emit()
 
 
 class PlayerPage(QtWidgets.QWidget):
@@ -18,6 +42,7 @@ class PlayerPage(QtWidgets.QWidget):
         self.resize(400, 120)
         # keyboard or video recogniser
         self._recogniser = None
+        self._worker = None
 
         self.ran_standalone: bool | None = False
 
@@ -75,14 +100,7 @@ class PlayerPage(QtWidgets.QWidget):
             app = QtWidgets.QApplication.instance() or QtWidgets.QApplication(sys.argv)
             app.quit()
 
-    def _play_game(self, player: GamePlayer):
-        """
-        Runs the game and optionally quits.
-        :param player:
-        :return:
-        """
-        player.play_game(self.path_edit.text())
-        # re-enable the run button after the game loop ends
+    def _on_worker_finished(self):
         self.run_btn.setEnabled(True)
         self._optional_quit()
 
@@ -100,9 +118,9 @@ class PlayerPage(QtWidgets.QWidget):
         else:
             self._recogniser = myGestureRecognizer.VideoGestureRecogniser(self._settings)
 
-        player = game_player.GamePlayer(self._recogniser, self._settings)
-        thread = threading.Thread(target=self._play_game, args=(player,), daemon=True)
-        thread.start()
+        self._worker = Worker(self._recogniser, self._settings, self.path_edit.text())
+        self._worker.signals.finished.connect(self._on_worker_finished)
+        self._worker.start()
 
     def keyPressEvent(self, event) -> None:
         """
@@ -111,6 +129,7 @@ class PlayerPage(QtWidgets.QWidget):
         if self._settings.is_keyboard_mode() and hasattr(self, "_recogniser"):
             self._recogniser.register_key(event.key())
         super().keyPressEvent(event)
+
 
 def run(path: str = None):
     app = QtWidgets.QApplication.instance() or QtWidgets.QApplication(sys.argv)
