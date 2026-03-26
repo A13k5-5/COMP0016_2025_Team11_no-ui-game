@@ -1,5 +1,7 @@
 import os
 import json
+import time
+
 from src.game_player.gesture import EnumGesture
 from pathlib import Path
 
@@ -54,6 +56,13 @@ class SettingsManager:
                 merged[key] = candidate_value
 
         return merged
+
+    def timeout_stop(self, start_time: float, timeout_duration: float):
+        """
+        Stop the recognition due to timeout.
+        """
+        if time.time() - start_time > timeout_duration:
+            raise TimeoutError(f"Gesture recognition timed out after {timeout_duration} seconds.")
 
     def _load(self) -> dict:
         if os.path.exists(SETTINGS_PATH):

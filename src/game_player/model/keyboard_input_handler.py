@@ -1,3 +1,5 @@
+import time
+
 from PySide6 import QtWidgets, QtCore
 from src.game_player.gesture import EnumGesture
 from src.game_player.model.settings_manager import SettingsManager
@@ -8,6 +10,7 @@ class KeyboardInputHandler:
     """
     def __init__(self, settings: SettingsManager):
         self._last_key: int | None = None
+        self._settings: SettingsManager = settings
 
         self._key_to_gesture: dict[int, EnumGesture] = {}
         # for every game action:
@@ -25,7 +28,9 @@ class KeyboardInputHandler:
         Blocks until the user presses a key mapped to one of gestures_to_spot.
         The quit gesture is always accepted regardless of gestures_to_spot.
         """
+        start = time.time()
         while True:
+            self._settings.timeout_stop(start, self._settings.get_recogniser_timeout())
             QtWidgets.QApplication.processEvents(QtCore.QEventLoop.AllEvents, 100)
             key = self._last_key
             self._last_key = None
