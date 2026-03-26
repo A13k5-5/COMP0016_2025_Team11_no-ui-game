@@ -1,5 +1,6 @@
-import sys
 import os
+import sys
+import threading
 from PySide6 import QtWidgets, QtCore
 from src.game_player.gui.settingsPage import SettingsPage
 from src.game_player.model.settings_manager import SettingsManager
@@ -8,18 +9,23 @@ from src.game_player.gui.file_association_popup import show_noui_registration_po
 from src.game_player.model import game_player
 from src.game_player import myGestureRecognizer
 
+
 class WorkerSignal(QtCore.QObject):
     finished = QtCore.Signal()
 
-class Worker(QtCore.QRunnable):
+
+class Worker:
     def __init__(self, recogniser, settings, path):
-        super().__init__()
         self.recogniser = recogniser
         self.settings = settings
         self.path = path
         self.signals = WorkerSignal()
+        self._thread = None
 
-    @QtCore.Slot()
+    def start(self):
+        self._thread = threading.Thread(target=self.run, daemon=True)
+        self._thread.start()
+
     def run(self):
         try:
             player = game_player.GamePlayer(self.recogniser, self.settings)
@@ -34,6 +40,9 @@ class PlayerPage(QtWidgets.QWidget):
         self._settings = SettingsManager()
         self.setWindowTitle("No-UI Game")
         self.resize(400, 120)
+        # keyboard or video recogniser
+        self._recogniser = None
+        self._worker = None
 
         self.ran_standalone: bool | None = False
 
@@ -50,11 +59,21 @@ class PlayerPage(QtWidgets.QWidget):
         folder_row.addWidget(browse_btn)
         layout.addLayout(folder_row)
 
+        self.gesture_hint_label = QtWidgets.QLabel(
+            "Tip: You can view your current gesture bindings in Settings."
+        )
+        self.gesture_hint_label.setWordWrap(True)
+        hint_font = self.gesture_hint_label.font()
+        hint_font.setPointSize(max(8, hint_font.pointSize() - 1))
+        self.gesture_hint_label.setFont(hint_font)
+        self.gesture_hint_label.setStyleSheet("color: #6e6e6e;")
+        layout.addWidget(self.gesture_hint_label)
+
         # Run button
         btn_row = QtWidgets.QHBoxLayout()
         self.run_btn = QtWidgets.QPushButton("Run")
         self.run_btn.setEnabled(False)
-        self.run_btn.clicked.connect(self._run)
+        self.run_btn.clicked.connect(self.run)
 
         settings_btn = QtWidgets.QPushButton("⚙ Settings")
         settings_btn.clicked.connect(self._open_settings)
@@ -75,28 +94,33 @@ class PlayerPage(QtWidgets.QWidget):
         dlg = SettingsPage(self._settings, parent=self)
         dlg.exec()
 
-    def _quit(self):
+    def _optional_quit(self):
         # if ran with a file argument, quit the app
         if not self.ran_standalone:
             app = QtWidgets.QApplication.instance() or QtWidgets.QApplication(sys.argv)
             app.quit()
 
-    def _run(self):
+    def _on_worker_finished(self):
+        self.run_btn.setEnabled(True)
+        self._optional_quit()
+
+    def run(self):
         """
         Depending on settings configuration, call gamePlayer with keyboard or video recognizer
         Run the game loop in a background thread so the Qt main thread stays
         free to process keypresses via keyPressEvent.
         """
+        # prevent multiple clicks
+        self.run_btn.setEnabled(False)
         if self._settings.is_keyboard_mode():
             from src.game_player.model.keyboard_input_handler import KeyboardInputHandler
             self._recogniser = KeyboardInputHandler(self._settings)
         else:
             self._recogniser = myGestureRecognizer.VideoGestureRecogniser(self._settings)
 
-        worker = Worker(self._recogniser, self._settings, self.path_edit.text())
-        worker.signals.finished.connect(self._quit)
-        # run method of the worker starts (the game loop)
-        QtCore.QThreadPool.globalInstance().start(worker)
+        self._worker = Worker(self._recogniser, self._settings, self.path_edit.text())
+        self._worker.signals.finished.connect(self._on_worker_finished)
+        self._worker.start()
 
     def keyPressEvent(self, event) -> None:
         """
@@ -106,6 +130,7 @@ class PlayerPage(QtWidgets.QWidget):
             self._recogniser.register_key(event.key())
         super().keyPressEvent(event)
 
+
 def run(path: str = None):
     app = QtWidgets.QApplication.instance() or QtWidgets.QApplication(sys.argv)
     window = PlayerPage()
@@ -113,9 +138,9 @@ def run(path: str = None):
 
     window.show()
     show_noui_registration_popup_if_needed(parent=window)
-    if path is not None:
+    if not window.ran_standalone:
         window.path_edit.setText(os.path.abspath(path))
-        window.run_btn.setEnabled(True)
-        window._run()
+        window.run_btn.setEnabled(False)
+        window.run()
 
-    app.exec()
+    sys.exit(app.exec())

@@ -102,6 +102,7 @@ class GamePlayer:
             # Ask recognizer for a decision
             decision: EnumGesture = self.get_gesture(self._allowed_gestures_for_node(cur_node))
 
+            # handle quitting
             if decision == self.settings.get_quit_gesture():
                 self._handle_quit_from_game(cur_node, zip_path)
                 break
