@@ -116,19 +116,9 @@ pip install -r ./requirements/game_player_requirements.txt
 
 3. (Optional) Download the LLM model for AI generation - as instructed above.
 
-## Running the Project
-
-Default entrypoint:
-
-```bash
-python main.py
-```
-
-Current `main.py` launches the GUI creator (`gui.homePage`).
-
 ### Create or Edit a Game
 
-1. Run `python NO_GUI_engine.py`.
+1. Run `python SOUNDLAB_engine.py`.
 2. Choose:
 - `Create a New Game` to start from scratch.
 - `Edit Game` to load an existing `.noui` file.
@@ -140,7 +130,7 @@ Current `main.py` launches the GUI creator (`gui.homePage`).
 You can run the player flow by launching `playerPage.py`:
 
 ```bash
-python NO_GUI_player.py
+python SOUNDLAB_player.py
 ```
 
 Then:
@@ -150,7 +140,7 @@ Then:
 OR you can run the game directly from the terminal:
 
 ```bash
-python NO_GUI_player.py path/to/your_game.noui
+python SOUNDLAB_player.py path/to/your_game.noui
 ```
 
 ## Development Notes
