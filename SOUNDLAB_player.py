@@ -12,6 +12,7 @@
 # for the icon
 # nuitka-project: --include-data-files=src/game_player/icon.ico=src/game_player/icon.ico
 # nuitka-project: --windows-icon-from-ico=src/game_player/icon.ico
+# nuitka-project: --output-filename=SoundLab Player.exe
 
 
 import sys

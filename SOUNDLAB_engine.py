@@ -41,8 +41,9 @@
 # icon
 # nuitka-project: --windows-icon-from-ico=src/game_engine/engineIcon.ico
 
-# nuitka-project: --product-name=NoGUI-Engine
+# nuitka-project: --product-name=SoundLab-Engine
 # nuitka-project: --product-version=1.0.0
+# nuitka-project: --output-filename=SoundLab Engine.exe
 
 from src.game_engine.gui import homePage
 
